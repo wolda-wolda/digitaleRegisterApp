@@ -1,0 +1,19 @@
+import 'package:flutter/material.dart';
+import 'dig Reg/myHomePage.dart';
+import 'dart:developer';
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Digitales Register App (obo bessa)',
+      theme: ThemeData(
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: MyHomePage(),
+    );
+  }
+}

@@ -1,0 +1,4 @@
+#Fri Jan 22 18:07:22 CET 2021
+base.0=/home/kilian/AndroidStudioProjects/digitales_register_app/build/app/intermediates/dex/debug/mergeDexDebug/out/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dig Reg/myHomePage.dart';
-import 'dart:developer';
 void main() {
   runApp(MyApp());
 }

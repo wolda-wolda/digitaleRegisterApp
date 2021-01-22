@@ -22,7 +22,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void login() {
     Session()
-        .post('https://fallmerayer.digitalesregister.it/v2/api/auth/login', {
+        .login('https://fallmerayer.digitalesregister.it/v2/api/auth/login', {
       "username": usernameController.text.trim(),
       "password": passwordController.text.trim()
     }).then((value) => {});
@@ -63,7 +63,15 @@ class _MyHomePageState extends State<MyHomePage> {
             RaisedButton(
               onPressed: () {
                 Session()
-                    .get('https://fallmerayer.digitalesregister.it/v2/')
+                    .get('https://fallmerayer.digitalesregister.it/v2/api/profile/get')
+                    .then((value) => {});
+              },
+              child: Text('Get Profile Info'),
+            ),
+            RaisedButton(
+              onPressed: () {
+                Session()
+                    .post('https://fallmerayer.digitalesregister.it/v2/api/student/dashboard/dashboard', {'viewFuture': 'true'})
                     .then((value) => {});
               },
               child: Text('Get Dashboard'),

@@ -47,6 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       textInputAction: TextInputAction.next),
                   TextFormField(
                     controller: passwordController,
+                    obscureText: true,
                     decoration: InputDecoration(labelText: 'Passwort'),
                     textInputAction: TextInputAction.done,
                     onFieldSubmitted: (passwordController) {

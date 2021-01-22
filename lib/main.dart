@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dig Reg/myHomePage.dart';
+import 'digReg/myHomePage.dart';
 void main() {
   runApp(MyApp());
 }

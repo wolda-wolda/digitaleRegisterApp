@@ -10,6 +10,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _isHidden = true;
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -47,8 +48,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       textInputAction: TextInputAction.next),
                   TextFormField(
                     controller: passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(labelText: 'Passwort'),
+                    obscureText: _isHidden,
+                    decoration: InputDecoration(labelText: 'Passwort', suffix: InkWell(
+                      onTap: _togglePasswordView,
+                      child: Icon(_isHidden ? Icons.visibility : Icons.visibility_off,),
+                        )),
                     textInputAction: TextInputAction.done,
                     onFieldSubmitted: (passwordController) {
                       login();
@@ -81,5 +85,10 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+  void _togglePasswordView() {
+    setState(() {
+      _isHidden = !_isHidden;
+    });
   }
 }

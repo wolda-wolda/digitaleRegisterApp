@@ -28,11 +28,11 @@ class Session {
 
   void updateCookie(http.Response response) {
     String raw = response.headers['set-cookie'];
-    int i_php = raw.indexOf('PHP');
-    int j_php = raw.indexOf(';', i_php);
-    int i_sess = raw.lastIndexOf('registerSession');
-    int j_sess = raw.indexOf(';', i_sess);
-    String cookie = raw.substring(i_php, j_php)+'; '+raw.substring(i_sess, j_sess);
+    int iPHP = raw.indexOf('PHP');
+    int jPHP = raw.indexOf(';', iPHP);
+    int iSession = raw.lastIndexOf('registerSession');
+    int jSession = raw.indexOf(';', iSession);
+    String cookie = raw.substring(iPHP, jPHP)+'; '+raw.substring(iSession, jSession);
     headers = {'Cookie': cookie};
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class ThemeChanger with ChangeNotifier {
   ThemeData _themeData;
   ThemeChanger(this._themeData);
+  
   bool getBool() {
     if (_themeData == ThemeData.dark()) {
       return true;
@@ -11,6 +12,7 @@ class ThemeChanger with ChangeNotifier {
       return false;
     }
   }
+  
   void setBool(bool theme) {
     if (theme == true) {
       _themeData = ThemeData.dark();
@@ -20,5 +22,6 @@ class ThemeChanger with ChangeNotifier {
     }
     notifyListeners();
   }
+  
   getTheme() => _themeData;
 }

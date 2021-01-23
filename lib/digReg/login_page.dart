@@ -1,5 +1,6 @@
 import 'package:digitales_register_app/API/API.dart';
 import 'package:digitales_register_app/digReg/PopUpMenu.dart';
+import 'package:digitales_register_app/digReg/homePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
@@ -21,12 +22,18 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void login() {
-    Session()
+  Future<void> login(BuildContext context) async {
+    String ret = await Session()
         .login('https://fallmerayer.digitalesregister.it/v2/api/auth/login', {
       "username": usernameController.text.trim(),
       "password": passwordController.text.trim()
-    }).then((value) => {});
+    });
+    print(ret);
+    if (ret != null) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return HomePage();
+      }));
+    }
   }
 
   @override
@@ -73,17 +80,17 @@ class _LoginPageState extends State<LoginPage> {
                     )),
                     textInputAction: TextInputAction.done,
                     onFieldSubmitted: (passwordController) {
-                      login();
+                      login(context);
                     },
                   )
                 ])),
             RaisedButton(
               onPressed: () {
-                login();
+                login(context);
               },
               child: Text('Login'),
             ),
-            RaisedButton(
+            /*RaisedButton(
               onPressed: () {
                 Session()
                     .get(
@@ -99,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                     {'viewFuture': 'true'}).then((value) => {});
               },
               child: Text('Get Dashboard'),
-            ),
+            ),*/
           ],
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.

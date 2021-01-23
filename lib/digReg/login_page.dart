@@ -1,4 +1,5 @@
 import 'package:digitales_register_app/API/API.dart';
+import 'package:digitales_register_app/digReg/PopUpMenu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
@@ -32,7 +33,25 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Titel"),
+        title: Text("Digitales Register"),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: choiceAction,
+            itemBuilder: (BuildContext context){
+              return Constants.choices.map((String choice){
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.settings),
+                      Text(choice),
+                    ],
+                  ),
+                );
+              }).toList();
+            },
+          )
+        ],
       ),
       body: Center(
         child: Column(
@@ -81,14 +100,6 @@ class _LoginPageState extends State<LoginPage> {
               },
               child: Text('Get Dashboard'),
             ),
-            RaisedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return Settings();
-                }));
-              },
-              child: Text('Settings'),
-            ),
           ],
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
@@ -100,5 +111,11 @@ class _LoginPageState extends State<LoginPage> {
       _isHidden = !_isHidden;
     });
   }
-
+  void choiceAction(String choice){
+    if(choice == Constants.Setting){
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return Settings();
+      }));
+    }
+  }
 }

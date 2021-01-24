@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage>
                 ),
               );
             }
-            if(choice == Constants.Exit)
+            else if(choice == Constants.Exit)
             {
               return PopupMenuItem<String>(
                 value: choice,
@@ -86,6 +86,8 @@ class _HomePageState extends State<HomePage>
       body: Center(child: _options.elementAt(_selectedIndex)),
       bottomNavigationBar: TabBar(
         controller: _tabController,
+        unselectedLabelColor: Colors.grey[600],
+        labelColor: const Color(0xFF3baee7),
         isScrollable: true,
         onTap: (index) => _onItemTapped(index),
         tabs: new List.generate(options.length, (index) {
@@ -100,7 +102,7 @@ class _HomePageState extends State<HomePage>
         return Settings();
       }));
     }
-    if(choice == Constants.Exit)
+    else if(choice == Constants.Exit)
     {
       SystemNavigator.pop();
       return ;

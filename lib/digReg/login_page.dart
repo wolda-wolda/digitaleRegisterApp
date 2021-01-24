@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     );
                   }
-                if(choice == Constants.Exit)
+                else if(choice == Constants.Exit)
                   {
                     return PopupMenuItem<String>(
                       value: choice,
@@ -139,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
         return Settings();
       }));
     }
-    if(choice == Constants.Exit)
+    else if(choice == Constants.Exit)
       {
         SystemNavigator.pop();
         return ;

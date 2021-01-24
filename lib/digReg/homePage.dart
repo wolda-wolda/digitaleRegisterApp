@@ -1,5 +1,6 @@
 import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'PopUpMenu.dart';
 
@@ -21,13 +22,13 @@ class _HomePageState extends State<HomePage>
     'Profil'
   ];
   List<Widget> _options = <Widget>[
-    Text('Merkheft'),
-    Text('Absenzen'),
-    Text('Kalender'),
-    Text('Noten'),
-    Text('Mitteilungen'),
-    Text('Zeugnis'),
-    Text('Profil'),
+    Text('Merkheft', style: TextStyle(fontWeight: FontWeight.bold,)),
+    Text('Absenzen', style: TextStyle(fontWeight: FontWeight.bold,)),
+    Text('Kalender', style: TextStyle(fontWeight: FontWeight.bold,)),
+    Text('Noten', style: TextStyle(fontWeight: FontWeight.bold,)),
+    Text('Mitteilungen', style: TextStyle(fontWeight: FontWeight.bold,)),
+    Text('Zeugnis', style: TextStyle(fontWeight: FontWeight.bold,)),
+    Text('Profil', style: TextStyle(fontWeight: FontWeight.bold,)),
   ];
 
   void _onItemTapped(int index) {
@@ -54,15 +55,30 @@ class _HomePageState extends State<HomePage>
       onSelected: choiceAction,
         itemBuilder: (BuildContext context){
           return Constants.choices.map((String choice){
-            return PopupMenuItem<String>(
-              value: choice,
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.settings),
-                  Text(choice),
-                ],
-              ),
-            );
+            if(choice == Constants.Setting)
+            {
+              return PopupMenuItem<String>(
+                value: choice,
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.settings_applications, color: Colors.grey,),
+                    Text(choice),
+                  ],
+                ),
+              );
+            }
+            if(choice == Constants.Exit)
+            {
+              return PopupMenuItem<String>(
+                value: choice,
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.exit_to_app, color: Colors.grey,),
+                    Text(choice),
+                  ],
+                ),
+              );
+            }
           }).toList();
         },
       )
@@ -83,6 +99,11 @@ class _HomePageState extends State<HomePage>
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return Settings();
       }));
+    }
+    if(choice == Constants.Exit)
+    {
+      SystemNavigator.pop();
+      return ;
     }
   }
 }

@@ -44,17 +44,32 @@ class _LoginPageState extends State<LoginPage> {
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: choiceAction,
-            itemBuilder: (BuildContext context){
+            itemBuilder: (BuildContext choice){
               return Constants.choices.map((String choice){
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.settings),
-                      Text(choice),
-                    ],
-                  ),
-                );
+                if(choice == Constants.Setting)
+                  {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.settings_applications, color: Colors.grey,),
+                          Text(choice),
+                        ],
+                      ),
+                    );
+                  }
+                if(choice == Constants.Exit)
+                  {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.exit_to_app, color: Colors.grey,),
+                          Text(choice),
+                        ],
+                      ),
+                    );
+                  }
               }).toList();
             },
           )
@@ -124,5 +139,10 @@ class _LoginPageState extends State<LoginPage> {
         return Settings();
       }));
     }
+    if(choice == Constants.Exit)
+      {
+        SystemNavigator.pop();
+        return ;
+      }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:digitales_register_app/API/API.dart';
 import 'package:digitales_register_app/digReg/PopUpMenu.dart';
 import 'package:digitales_register_app/digReg/homePage.dart';
+import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
@@ -30,9 +31,10 @@ class _LoginPageState extends State<LoginPage> {
     });
     print(ret);
     if (ret != null) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return HomePage();
-      }));
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) => HomePage()),
+          (route) => false);
     }
   }
 
@@ -44,32 +46,35 @@ class _LoginPageState extends State<LoginPage> {
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: choiceAction,
-            itemBuilder: (BuildContext choice){
-              return Constants.choices.map((String choice){
-                if(choice == Constants.Setting)
-                  {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Row(
-                        children: <Widget>[
-                          Icon(Icons.settings_applications, color: Colors.grey,),
-                          Text(choice),
-                        ],
-                      ),
-                    );
-                  }
-                else if(choice == Constants.Exit)
-                  {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Row(
-                        children: <Widget>[
-                          Icon(Icons.exit_to_app, color: Colors.grey,),
-                          Text(choice),
-                        ],
-                      ),
-                    );
-                  }
+            itemBuilder: (BuildContext choice) {
+              return Constants.choices.map((String choice) {
+                if (choice == Constants.Setting) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.settings_applications,
+                          color: Colors.grey,
+                        ),
+                        Text(choice),
+                      ],
+                    ),
+                  );
+                } else if (choice == Constants.Exit) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.exit_to_app,
+                          color: Colors.grey,
+                        ),
+                        Text(choice),
+                      ],
+                    ),
+                  );
+                }
               }).toList();
             },
           )
@@ -89,10 +94,14 @@ class _LoginPageState extends State<LoginPage> {
                   TextFormField(
                     controller: passwordController,
                     obscureText: _isHidden,
-                    decoration: InputDecoration(labelText: 'Passwort', suffix: InkWell(
-                      onTap: _togglePasswordView,
-                      child: Icon(_isHidden ? Icons.visibility : Icons.visibility_off,),
-                    )),
+                    decoration: InputDecoration(
+                        labelText: 'Passwort',
+                        suffix: InkWell(
+                          onTap: _togglePasswordView,
+                          child: Icon(
+                            _isHidden ? Icons.visibility : Icons.visibility_off,
+                          ),
+                        )),
                     textInputAction: TextInputAction.done,
                     onFieldSubmitted: (passwordController) {
                       login(context);
@@ -133,16 +142,15 @@ class _LoginPageState extends State<LoginPage> {
       _isHidden = !_isHidden;
     });
   }
-  void choiceAction(String choice){
-    if(choice == Constants.Setting){
+
+  void choiceAction(String choice) {
+    if (choice == Constants.Setting) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return Settings();
       }));
+    } else if (choice == Constants.Exit) {
+      SystemNavigator.pop();
+      return;
     }
-    else if(choice == Constants.Exit)
-      {
-        SystemNavigator.pop();
-        return ;
-      }
   }
 }

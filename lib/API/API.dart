@@ -7,7 +7,6 @@ Map<String, String> headers;
 class Session {
   Future<String> get(String url) async {
     http.Response response = await http.get(url, headers: headers);
-    print(response.body);
     return response.body;
   }
 

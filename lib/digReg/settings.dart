@@ -17,7 +17,9 @@ class _SettingsState extends State<Settings> {
   bool notificationsEnabled;
   void changeNotification() {
     print(notificationsEnabled.toString());
-    Session().post('https://fallmerayer.digitalesregister.it/v2/api/profile/updateNotificationSettings', notificationsEnabled);
+    Session().post('https://fallmerayer.digitalesregister.it/v2/api/profile/updateNotificationSettings', {
+      'notificationsEnabled': notificationsEnabled
+    });
   }
 
   @override
@@ -27,7 +29,7 @@ class _SettingsState extends State<Settings> {
     return FutureBuilder(
       future: Profile().getData(),
       builder: (context, AsyncSnapshot<String> snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.hasData && !snapshot.data.contains('window.location')) {
           if (i == 0) {
             notificationsEnabled =
             jsonDecode(snapshot.data)['notificationsEnabled'];

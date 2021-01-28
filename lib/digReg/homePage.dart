@@ -1,4 +1,5 @@
 import 'package:digitales_register_app/API/API.dart';
+import 'package:digitales_register_app/digReg/messages.dart';
 import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:flutter/material.dart';
@@ -52,10 +53,7 @@ class _HomePageState extends State<HomePage>
           style: TextStyle(
             fontWeight: FontWeight.bold,
           )),
-      Text('Mitteilungen',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
+      Messages().build(context),
       Text('Zeugnis',
           style: TextStyle(
             fontWeight: FontWeight.bold,

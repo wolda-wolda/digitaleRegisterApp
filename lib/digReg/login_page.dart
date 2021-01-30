@@ -29,7 +29,6 @@ class _LoginPageState extends State<LoginPage> {
       "username": usernameController.text.trim(),
       "password": passwordController.text.trim()
     });
-    print(ret);
     if (ret != null) {
       Navigator.pushAndRemoveUntil(
           context,

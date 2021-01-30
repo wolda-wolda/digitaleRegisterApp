@@ -9,13 +9,6 @@ class Profile {
         .get('https://fallmerayer.digitalesregister.it/v2/api/profile/get');
     return data;
   }
-  
-  Widget notifications(bool notificationsEnabled) {
-    if (notificationsEnabled == true)
-      return Icon(Icons.notifications_active);
-    else
-      return Icon(Icons.notifications); 
-  }
 
   Widget build(BuildContext context) {
     return FutureBuilder<String>(

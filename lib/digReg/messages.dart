@@ -37,10 +37,9 @@ class Messages {
               itemCount: items.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  onTap: () => showMessage(context, items[index]),
-                  title: Text(items[index].subject),
-                  subtitle: Text(items[index].date)
-                );
+                    onTap: () => showMessage(context, items[index]),
+                    title: Text(items[index].subject),
+                    subtitle: Text(items[index].date));
               },
             );
           }
@@ -62,12 +61,17 @@ class Mess {
 
   Mess({this.id, this.subject, this.text, this.date});
 
-  factory Mess.fromJson(Map<String, dynamic> json) => Mess(
-      id: json['id'],
-      subject: json['subject'],
-      text: Txt.fromJson(jsonDecode(json['text'])).ops[0]['insert'],
-      date: Date.format(json['timeSent']).date
-  );
+  factory Mess.fromJson(Map<String, dynamic> json) {
+    String text = '';
+    for (var i in Txt.fromJson(jsonDecode(json['text'])).ops) {
+      text = text + i['insert'].toString();
+    }
+    return Mess(
+        id: json['id'],
+        subject: json['subject'],
+        text: text,
+        date: Date.format(json['timeSent']).date);
+  }
 }
 
 class Txt {
@@ -94,7 +98,6 @@ class Date {
 
     return Date(day + '.' + month + '.' + year);
   }
-
 }
 
 class PopUpDialog extends StatelessWidget {

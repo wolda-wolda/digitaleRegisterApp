@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'package:digitales_register_app/API/API.dart';
+import 'package:digitales_register_app/digReg/dashboard.dart';
 import 'package:digitales_register_app/digReg/messages.dart';
 import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'PopUpMenu.dart';
 
@@ -21,6 +24,7 @@ class _HomePageState extends State<HomePage>
     setState(() {
       super.initState();
       _tabController = TabController(length: options.length, vsync: this);
+      initializeDateFormatting('de_DE');
     });
   }
 
@@ -37,10 +41,7 @@ class _HomePageState extends State<HomePage>
 
   Widget _options(BuildContext context, int select) {
     return <Widget>[
-      Text('Merkheft',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
+      Dashboard().build(context),
       Text('Absenzen',
           style: TextStyle(
             fontWeight: FontWeight.bold,

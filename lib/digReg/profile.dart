@@ -15,13 +15,9 @@ class Profile {
         future: getData(),
         builder: (context, AsyncSnapshot<String> snapshot) {
           if (snapshot.hasData) {
-            String username = jsonDecode(snapshot.data)['username'];
             String roleName = jsonDecode(snapshot.data)['roleName'];
             String name = jsonDecode(snapshot.data)['name'];
             String email = jsonDecode(snapshot.data)['email'];
-            bool notificationsEnabled =
-                jsonDecode(snapshot.data)['notificationsEnabled'];
-            String language = jsonDecode(snapshot.data)['language'];
             return ListView(
               children: <Widget>[
                 ListTile(

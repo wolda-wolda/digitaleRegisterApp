@@ -60,7 +60,9 @@ class Dashboard {
 
 Widget title(BuildContext context, Dash item, int index2) {
   if (item.items[index2].label != null)
-    return Text(item.items[index2].title.toString() + ' - ' + item.items[index2].label.toString());
+    return Text(item.items[index2].title.toString() +
+        ' - ' +
+        item.items[index2].label.toString());
   return Text(item.items[index2].title.toString());
 }
 
@@ -83,11 +85,36 @@ class Items {
   final String title;
   final String subtitle;
   final String label;
-  Items({this.subtitle, this.title, this.label});
+  final bool checkable;
+  final bool checked;
+  final bool deletable;
+  final bool warning;
+  final String type;
+  final int id;
+
+  Items(
+      {this.subtitle,
+      this.title,
+      this.label,
+      this.checkable,
+      this.checked,
+      this.deletable,
+      this.warning,
+      this.type,
+      this.id});
 
   factory Items.fromJson(Map<String, dynamic> json) {
     return Items(
-        subtitle: json['subtitle'], title: json['title'], label: json['label']);
+        subtitle: json['subtitle'],
+        title: json['title'],
+        label: json['label'],
+        checkable: json['checkable'],
+        checked: json['checked'],
+        deletable: json['deleteable'],
+        warning: json['warning'],
+        type: json['type'],
+        id: json['id']
+    );
   }
 }
 

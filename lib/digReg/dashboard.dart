@@ -31,8 +31,13 @@ class Dashboard {
               shrinkWrap: true,
               itemCount: items.length,
               itemBuilder: (context, index1) {
-                return ListTile(
-                    title: Text(items[index1].date.toString()),
+                return Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListTile(
+                    title: Text(items[index1].date.toString(),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
                     subtitle: ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
@@ -44,7 +49,9 @@ class Dashboard {
                               items[index1].items[index2].subtitle.toString()),
                         );
                       },
-                    ));
+                    ),
+                  ),
+                );
               },
             );
           }

@@ -5,9 +5,8 @@ import 'package:flutter/rendering.dart';
 
 class Subjects {
   Future<String> getData() async {
-    String data = await Session().get(
+    return await Session().get(
         'https://fallmerayer.digitalesregister.it/v2/api/student/all_subjects');
-    return data;
   }
   var items = List<Subject>();
   bool get = true;
@@ -25,7 +24,7 @@ class Subjects {
     return FutureBuilder<String>(
         future: getData(),
         builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
             if (get == true) {
               for (var i in jsonDecode(snapshot.data)['subjects']) {
                 items.add(Subject.fromJson(i));

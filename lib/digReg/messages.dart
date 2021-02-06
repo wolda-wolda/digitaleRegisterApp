@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 class Messages {
   Future<String> getData() async {
-    String data = await Session().post(
+    return await Session().post(
         'https://fallmerayer.digitalesregister.it/v2/api/message/getMyMessages',
         {'filterByLabelName': ''});
-    return data;
   }
 
   void showMessage(BuildContext context, Mess data) {
@@ -26,7 +26,7 @@ class Messages {
     return FutureBuilder<String>(
         future: getData(),
         builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
             if (get == true) {
               for (var i in jsonDecode(snapshot.data)) {
                 items.add(Mess.fromJson(i));

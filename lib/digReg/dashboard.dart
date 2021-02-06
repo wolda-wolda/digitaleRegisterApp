@@ -6,10 +6,9 @@ import 'package:intl/intl.dart';
 
 class Dashboard {
   Future<String> getData() async {
-    String data = await Session().post(
+    return await Session().post(
         'https://fallmerayer.digitalesregister.it/v2/api/student/dashboard/dashboard',
         {'viewFuture': true});
-    return data;
   }
 
   var items = List<Dash>();
@@ -19,7 +18,7 @@ class Dashboard {
     return FutureBuilder<String>(
         future: getData(),
         builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
             if (get == true) {
               for (var i in jsonDecode(snapshot.data)) {
                 items.add(Dash.fromJson(i));

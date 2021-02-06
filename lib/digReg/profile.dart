@@ -36,13 +36,14 @@ class Profile {
             return ListView(
               children: <Widget>[
                 Container(
-                  width: 400,
-                  height: 300,
+                  width: 250,
+                  height: 250,
                   padding: EdgeInsets.all(20),
-                  child:
-                  MaterialApp (
-                    home: Scaffold(
-                      body: Image.network(pictureurl,headers: headers, fit: BoxFit.cover, width: double.infinity, height: double.infinity ),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: NetworkImage(pictureurl, headers: headers ),
+                        fit: BoxFit.fitHeight,
                     ),
                   ),
                 ),

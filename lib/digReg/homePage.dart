@@ -1,19 +1,22 @@
 import 'package:digitales_register_app/API/API.dart';
+import 'package:digitales_register_app/API/Data.dart';
 import 'package:digitales_register_app/digReg/messages.dart';
 import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:digitales_register_app/API/Data.dart';
 
 import 'PopUpMenu.dart';
 
+
+
 class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
+
+  @override _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   String profile;
 
   @override
@@ -34,7 +37,6 @@ class _HomePageState extends State<HomePage>
     'Zeugnis',
     'Profil'
   ];
-
   Widget _options(BuildContext context, int select) {
     return <Widget>[
       Text('Merkheft',

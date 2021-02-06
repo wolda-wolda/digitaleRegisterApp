@@ -1,7 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-
 Map<String, String> headers;
 String cookie = 'empty';
 class Session {

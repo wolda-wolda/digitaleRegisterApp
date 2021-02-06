@@ -1,4 +1,5 @@
 import 'package:digitales_register_app/API/API.dart';
+import 'package:digitales_register_app/API/Data.dart';
 import 'package:digitales_register_app/digReg/dashboard.dart';
 import 'package:digitales_register_app/digReg/login_page.dart';
 import 'package:digitales_register_app/digReg/messages.dart';

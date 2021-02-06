@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 class Messages {
   Future<String> getData() async {
-    String data = await Session().post(
+    return await Session().post(
         'https://fallmerayer.digitalesregister.it/v2/api/message/getMyMessages',
         {'filterByLabelName': ''});
-    return data;
   }
 
   void showMessage(BuildContext context, Mess data) {
@@ -26,7 +26,7 @@ class Messages {
     return FutureBuilder<String>(
         future: getData(),
         builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
             if (get == true) {
               for (var i in jsonDecode(snapshot.data)) {
                 items.add(Mess.fromJson(i));
@@ -37,10 +37,9 @@ class Messages {
               itemCount: items.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  onTap: () => showMessage(context, items[index]),
-                  title: Text(items[index].subject),
-                  subtitle: Text(items[index].date)
-                );
+                    onTap: () => showMessage(context, items[index]),
+                    title: Text(items[index].subject),
+                    subtitle: Text(items[index].date));
               },
             );
           }
@@ -62,12 +61,17 @@ class Mess {
 
   Mess({this.id, this.subject, this.text, this.date});
 
-  factory Mess.fromJson(Map<String, dynamic> json) => Mess(
-      id: json['id'],
-      subject: json['subject'],
-      text: Txt.fromJson(jsonDecode(json['text'])).ops[0]['insert'],
-      date: Date.format(json['timeSent']).date
-  );
+  factory Mess.fromJson(Map<String, dynamic> json) {
+    String text = '';
+    for (var i in Txt.fromJson(jsonDecode(json['text'])).ops) {
+      text = text + i['insert'].toString();
+    }
+    return Mess(
+        id: json['id'],
+        subject: json['subject'],
+        text: text,
+        date: Date.format(json['timeSent']).date);
+  }
 }
 
 class Txt {
@@ -94,7 +98,6 @@ class Date {
 
     return Date(day + '.' + month + '.' + year);
   }
-
 }
 
 class PopUpDialog extends StatelessWidget {

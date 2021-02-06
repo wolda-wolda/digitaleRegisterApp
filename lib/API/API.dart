@@ -25,7 +25,6 @@ class Session {
 
   Future<String> post(String url, dynamic data) async {
     http.Response response = await http.post(url, body: jsonEncode(data), headers: headers);
-    print(response.body);
     return response.body;
   }
 

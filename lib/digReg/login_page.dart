@@ -1,7 +1,6 @@
 import 'package:digitales_register_app/API/API.dart';
 import 'package:digitales_register_app/digReg/PopUpMenu.dart';
 import 'package:digitales_register_app/digReg/homePage.dart';
-import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
@@ -29,7 +28,6 @@ class _LoginPageState extends State<LoginPage> {
       "username": usernameController.text.trim(),
       "password": passwordController.text.trim()
     });
-    print(ret);
     if (ret != null) {
       Navigator.pushAndRemoveUntil(
           context,

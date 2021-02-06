@@ -5,10 +5,10 @@ import 'package:flutter/rendering.dart';
 
 class Profile {
   Future<String> getData() async {
-    String data = await Session().get('https://fallmerayer.digitalesregister.it/v2/api/profile/get');
+    String data = await Session()
+        .get('https://fallmerayer.digitalesregister.it/v2/api/profile/get');
     return data;
   }
-
   
   Widget notifications(bool notificationsEnabled) {
     if (notificationsEnabled == true)
@@ -29,24 +29,8 @@ class Profile {
             bool notificationsEnabled =
                 jsonDecode(snapshot.data)['notificationsEnabled'];
             String language = jsonDecode(snapshot.data)['language'];
-            String pictureurl = 'https://fallmerayer.digitalesregister.it/v2/api/profile/picture&pictureUrl=' + jsonDecode(snapshot.data)['picture'];
-            Map<String, String> headers;
-            cookie = Session().getCookie();
-            headers = {'Cookie': cookie};
             return ListView(
               children: <Widget>[
-                Container(
-                  width: 250,
-                  height: 250,
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: NetworkImage(pictureurl, headers: headers ),
-                        fit: BoxFit.fitHeight,
-                    ),
-                  ),
-                ),
                 ListTile(
                   leading: Icon(Icons.account_circle),
                   title: Text(name),
@@ -59,7 +43,6 @@ class Profile {
                   leading: Icon(Icons.alternate_email),
                   title: Text(email),
                 ),
-
               ],
             );
           }

@@ -2,6 +2,7 @@ import 'package:digitales_register_app/digReg/login_page.dart';
 import 'package:digitales_register_app/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 void main() {
   runApp(MyApp());
 }

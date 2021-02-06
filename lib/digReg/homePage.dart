@@ -1,4 +1,6 @@
+import 'package:digitales_register_app/API/API.dart';
 import 'package:digitales_register_app/digReg/dashboard.dart';
+import 'package:digitales_register_app/digReg/login_page.dart';
 import 'package:digitales_register_app/digReg/messages.dart';
 import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
@@ -34,7 +36,6 @@ class _HomePageState extends State<HomePage>
     'Kalender',
     'Noten',
     'Mitteilungen',
-    'Zeugnis',
     'Profil'
   ];
 
@@ -51,10 +52,6 @@ class _HomePageState extends State<HomePage>
           )),
       Subjects().build(context),
       Messages().build(context),
-      Text('Zeugnis',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
       Profile().build(context)
     ][select];
   }
@@ -88,7 +85,7 @@ class _HomePageState extends State<HomePage>
                     ],
                   ),
                 );
-              } else if (choice == Constants.Exit) {
+              } else if (choice == Constants.Logout) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Row(
@@ -120,14 +117,21 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  Future<void> logout() async {
+    await Session().get('https://fallmerayer.digitalesregister.it/v2/logout');
+  }
+
   void choiceAction(String choice) {
     if (choice == Constants.Setting) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return Settings();
       }));
-    } else if (choice == Constants.Exit) {
-      SystemNavigator.pop();
-      return;
+    } else if (choice == Constants.Logout) {
+      logout();
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+              (route) => false);
     }
   }
 }

@@ -8,10 +8,18 @@ class Subjects {
     return await Session().get(
         'https://fallmerayer.digitalesregister.it/v2/api/student/all_subjects');
   }
-
   var items = List<Subject>();
   bool get = true;
 
+  void showSub(BuildContext context, Grades data) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return PopUpDialog(data);
+        });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
         future: getData(),
@@ -28,28 +36,35 @@ class Subjects {
               shrinkWrap: true,
               itemCount: items.length,
               itemBuilder: (context, index1) {
-                return ListTile(
+                return Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ExpansionTile(
                     title: Text(items[index1].name.toString()),
-                    subtitle: ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: items[index1].grades.length,
-                      itemBuilder: (context, index2) {
-                        return ListTile(
-                          title: Text(items[index1]
-                                  .grades[index2]
-                                  .type
-                                  .toString() +
-                              ': ' +
-                              items[index1].grades[index2].grade.toString() +
-                              ' - ' +
-                              items[index1].grades[index2].weight.toString() +
-                              '%'),
-                          subtitle:
-                              Text(items[index1].grades[index2].description),
-                        );
-                      },
-                    ));
+                    children: <Widget>[
+                      ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: items[index1].grades.length,
+                        itemBuilder: (context, index2) {
+                          return ListTile(
+                            title: Text(items[index1]
+                                .grades[index2]
+                                .type
+                                .toString() +
+                                ': ' +
+                                items[index1].grades[index2].grade.toString() +
+                                ' - ' +
+                                items[index1].grades[index2].weight.toString() +
+                                '%'),
+                            onTap: () => showSub(context, items[index1].grades[index2]),
+                          );
+                        },
+                      ),
+                    ]
+                    ),
+                  );
               },
             );
           }
@@ -98,5 +113,18 @@ class Grades {
         date: json['date'],
         type: json['type'],
         description: json['description']);
+  }
+}
+class PopUpDialog extends StatelessWidget {
+  final Grades data;
+  PopUpDialog(this.data);
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(data.type + ": " + data.grade),
+      content: SingleChildScrollView(
+        child: Text(data.description),
+      ),
+    );
   }
 }

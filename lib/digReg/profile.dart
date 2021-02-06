@@ -5,16 +5,15 @@ import 'package:flutter/rendering.dart';
 
 class Profile {
   Future<String> getData() async {
-    String data = await Session()
+    return await Session()
         .get('https://fallmerayer.digitalesregister.it/v2/api/profile/get');
-    return data;
   }
 
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
         future: getData(),
         builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
             String roleName = jsonDecode(snapshot.data)['roleName'];
             String name = jsonDecode(snapshot.data)['name'];
             String email = jsonDecode(snapshot.data)['email'];

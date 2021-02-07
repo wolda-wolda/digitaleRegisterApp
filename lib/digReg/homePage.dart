@@ -1,9 +1,14 @@
 import 'package:digitales_register_app/API/API.dart';
+import 'package:digitales_register_app/digReg/absences.dart';
+import 'package:digitales_register_app/digReg/calendar.dart';
+import 'package:digitales_register_app/digReg/dashboard.dart';
+import 'package:digitales_register_app/digReg/login_page.dart';
 import 'package:digitales_register_app/digReg/messages.dart';
 import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
+import 'package:digitales_register_app/digReg/subjects.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'PopUpMenu.dart';
 
@@ -21,6 +26,7 @@ class _HomePageState extends State<HomePage>
     setState(() {
       super.initState();
       _tabController = TabController(length: options.length, vsync: this);
+      initializeDateFormatting('de_DE');
     });
   }
 
@@ -31,33 +37,16 @@ class _HomePageState extends State<HomePage>
     'Kalender',
     'Noten',
     'Mitteilungen',
-    'Zeugnis',
     'Profil'
   ];
 
   Widget _options(BuildContext context, int select) {
     return <Widget>[
-      Text('Merkheft',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
-      Text('Absenzen',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
-      Text('Kalender',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
-      Text('Noten',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
+      Dashboard().build(context),
+      Absences().build(context),
+      Calendar().build(context),
+      Subjects().build(context),
       Messages().build(context),
-      Text('Zeugnis',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
       Profile().build(context)
     ][select];
   }
@@ -91,7 +80,7 @@ class _HomePageState extends State<HomePage>
                     ],
                   ),
                 );
-              } else if (choice == Constants.Exit) {
+              } else if (choice == Constants.Logout) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Row(
@@ -123,14 +112,21 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  Future<void> logout() async {
+    await Session().get('https://fallmerayer.digitalesregister.it/v2/logout');
+  }
+
   void choiceAction(String choice) {
     if (choice == Constants.Setting) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return Settings();
       }));
-    } else if (choice == Constants.Exit) {
-      SystemNavigator.pop();
-      return;
+    } else if (choice == Constants.Logout) {
+      logout();
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+              (route) => false);
     }
   }
 }

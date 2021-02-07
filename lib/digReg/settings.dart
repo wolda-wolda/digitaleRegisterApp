@@ -42,7 +42,7 @@ class _SettingsState extends State<Settings> {
     return FutureBuilder(
       future: Profile().getData(),
       builder: (context, AsyncSnapshot<String> snapshot) {
-        if (snapshot.hasData && !snapshot.data.contains('window.location')) {
+        if (snapshot.hasData && snapshot.connectionState == ConnectionState.done && !snapshot.data.contains('window.location')) {
           if (i == 0) {
             notificationsEnabled =
             jsonDecode(snapshot.data)['notificationsEnabled'];

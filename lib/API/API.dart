@@ -1,6 +1,8 @@
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
+import 'package:intl/intl.dart';
+
 Map<String, String> headers;
 String cookie = 'empty';
 class Session {
@@ -16,10 +18,9 @@ class Session {
       headers.clear();
     http.Response response = await http.post(url, body: jsonEncode(data), headers: headers);
     print(response.body);
-    if (jsonDecode(response.body)['error'] != null) {
-      return null;
+    if (jsonDecode(response.body)['error'] == null) {
+      updateCookie(response);
     }
-    updateCookie(response);
     return response.body;
   }
 
@@ -36,5 +37,17 @@ class Session {
     int jSession = raw.indexOf(';', iSession);
     cookie = raw.substring(iPHP, jPHP)+'; '+raw.substring(iSession, jSession);
     headers = {'Cookie': cookie};
+  }
+}
+
+class Date {
+  final String date;
+  Date(this.date);
+
+  factory Date.format(String enDate) {
+    DateTime date = new DateFormat('yyyy-MM-dd').parse(enDate);
+
+    return Date(
+        DateFormat('EEEE, d. MMM yyyy', 'de_DE').format(date).toString());
   }
 }

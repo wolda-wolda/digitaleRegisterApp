@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:digitales_register_app/API/API.dart';
 import 'package:digitales_register_app/digReg/PopUpMenu.dart';
 import 'package:digitales_register_app/digReg/homePage.dart';
@@ -14,6 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isHidden = true;
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  final scaffoldKey =  GlobalKey<ScaffoldState>();
 
   @override
   void dispose() {
@@ -28,17 +31,20 @@ class _LoginPageState extends State<LoginPage> {
       "username": usernameController.text.trim(),
       "password": passwordController.text.trim()
     });
-    if (ret != null) {
+    if (jsonDecode(ret)['error'] == null) {
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (BuildContext context) => HomePage()),
           (route) => false);
+    } else {
+      scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(jsonDecode(ret)['message'])));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text("Digitales Register"),
         actions: <Widget>[

@@ -3,7 +3,6 @@ import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
-import 'package:digitales_register_app/theme/theme.dart';
 
 class Absences {
   Future<String> getData() async {
@@ -24,10 +23,11 @@ class Absences {
 
   Icon icon(Absence data) {
     if (data.justified == 2) {
-      return Icon(Icons.check_circle);
-    }
-    else {
-      return Icon(Icons.circle);
+      return Icon(Icons.check_circle, color: Colors.green);
+    } else if (data.justified == 3) {
+      return Icon(Icons.warning, color: Colors.redAccent);
+    } else {
+      return Icon(Icons.circle, color: Colors.orange);
     }
   }
 
@@ -46,31 +46,48 @@ class Absences {
             }
             return Column(
               children: [
-                ExpansionTileCard(title: Text('Fehleinheiten: ' + jsonDecode(snapshot.data)['statistics']['counter'].toString(), style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('davon Entschuldigt: ' + jsonDecode(snapshot.data)['statistics']['justified'].toString()),
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 8.0,
+                ExpansionTileCard(
+                    title: Text(
+                        'Fehleinheiten: ' +
+                            jsonDecode(snapshot.data)['statistics']['counter']
+                                .toString(),
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text('davon Entschuldigt: ' +
+                        jsonDecode(snapshot.data)['statistics']['justified']
+                            .toString()),
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 8.0,
+                          ),
+                          child: Text('davon im Auftrag der Schule: ' +
+                              jsonDecode(snapshot.data)['statistics']
+                                      ['counterForSchool']
+                                  .toString() +
+                              '\nAbwesenheit: ' +
+                              jsonDecode(snapshot.data)['statistics']
+                                  ['percentage'] +
+                              '%' +
+                              '\nNicht entschuldigt: ' +
+                              jsonDecode(snapshot.data)['statistics']
+                                      ['notJustified']
+                                  .toString() +
+                              '\nVerspätungen: ' +
+                              jsonDecode(snapshot.data)['statistics']['delayed']
+                                  .toString()),
                         ),
-                        child: Text('davon im Auftrag der Schule: ' + jsonDecode(snapshot.data)['statistics']['counterForSchool'].toString()
-                + '\nAbwesenheit: ' + jsonDecode(snapshot.data)['statistics']['percentage'] + '%'
-                + '\nNicht entschuldigt: ' + jsonDecode(snapshot.data)['statistics']['notJustified'].toString()
-            + '\nVerspätungen: ' + jsonDecode(snapshot.data)['statistics']['delayed'].toString()),
-          ),
-          ),
-          ]
-          ),
+                      ),
+                    ]),
                 Divider(
                   indent: 1000,
                   endIndent: 1000,
-                  height: 50,
+                  height: 10,
                 ),
-
-                ListView.builder(
+                Expanded(
+                    child: ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   itemCount: items.length,
@@ -93,7 +110,7 @@ class Absences {
                           onTap: () => showAb(context, items[index]),
                         ));
                   },
-                )
+                ))
               ],
             );
           }
@@ -121,7 +138,10 @@ class Absence {
       temp.add(Group.fromJson(i));
     }
     return Absence(
-        date: Date.format(json['date']), hour: temp, reason: json['reason'], justified: json['justified']);
+        date: Date.format(json['date']),
+        hour: temp,
+        reason: json['reason'],
+        justified: json['justified']);
   }
 }
 
@@ -149,6 +169,14 @@ class PopUpDialog extends StatelessWidget {
     }
   }
 
+  String reason(Absence data) {
+    if (data.reason != null) {
+      return data.reason;
+    } else {
+      return ' ';
+    }
+  }
+
   final Absence data;
   PopUpDialog(this.data);
   @override
@@ -156,7 +184,7 @@ class PopUpDialog extends StatelessWidget {
     return AlertDialog(
       title: Text(text(data)),
       content: SingleChildScrollView(
-        child: Text(data.reason),
+        child: Text(reason(data)),
       ),
     );
   }

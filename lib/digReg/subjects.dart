@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:expansion_tile_card/expansion_tile_card.dart';
 
 class Subjects {
   Future<String> getData1() async {
@@ -44,13 +45,14 @@ class Subjects {
               shrinkWrap: true,
               itemCount: items.length,
               itemBuilder: (context, index1) {
-                return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ExpansionTile(
-                      title: Text(items[index1].name.toString()),
+                return ExpansionTileCard(
+                  borderRadius: BorderRadius.circular(10),
+                      title: Text(items[index1].name.toString(), style: TextStyle(fontWeight: FontWeight.bold)),
                       children: <Widget>[
+                        Divider(
+                          thickness: 1.0,
+                          height: 1.0,
+                        ),
                         FutureBuilder<String>(
                             future: getData2(
                                 items[index1].id, items[index1].studentId),
@@ -82,14 +84,14 @@ class Subjects {
                                         physics: NeverScrollableScrollPhysics(),
                                         shrinkWrap: true,
                                         itemCount:
-                                            items[index1].grades.grades.length,
+                                        items[index1].grades.grades.length,
                                         itemBuilder: (context, index2) {
                                           return ListTile(
                                             title: Text(items[index1]
-                                                    .grades
-                                                    .grades[index2]
-                                                    .type
-                                                    .toString() +
+                                                .grades
+                                                .grades[index2]
+                                                .type
+                                                .toString() +
                                                 ': ' +
                                                 items[index1]
                                                     .grades
@@ -116,8 +118,8 @@ class Subjects {
                                 return Center();
                               }
                             })
-                      ]),
-                );
+                      ]
+                  );
               },
             );
           }

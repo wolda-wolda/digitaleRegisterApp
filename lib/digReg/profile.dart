@@ -14,10 +14,18 @@ class Profile {
         future: getData(),
         builder: (context, AsyncSnapshot<String> snapshot) {
           if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+            String pictureurl;
+            String email;
             String roleName = jsonDecode(snapshot.data)['roleName'];
             String name = jsonDecode(snapshot.data)['name'];
-            String email = jsonDecode(snapshot.data)['email'];
-            String pictureurl = 'https://fallmerayer.digitalesregister.it/v2/api/profile/picture&pictureUrl=' + jsonDecode(snapshot.data)['picture'];
+            if( jsonDecode(snapshot.data)['email']!= null){
+              email = jsonDecode(snapshot.data)['email'];
+            }
+            if( jsonDecode(snapshot.data)['picture']!=null ){
+              pictureurl = 'https://fallmerayer.digitalesregister.it/v2/api/profile/picture&pictureUrl=' + jsonDecode(snapshot.data)['picture'];
+            }
+
+
             Map<String, String> headers;
             cookie = Session().getCookie();
             headers = {'Cookie': cookie};
@@ -30,7 +38,7 @@ class Profile {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: NetworkImage(pictureurl, headers: headers ),
+                        image: pictureurl != null ? NetworkImage(pictureurl, headers: headers ) : AssetImage('assets/images/nopicture.jpg'),
                       fit: BoxFit.fitHeight,
                     ),
                   ),
@@ -45,7 +53,7 @@ class Profile {
                 ),
                 ListTile(
                   leading: Icon(Icons.alternate_email),
-                  title: Text(email),
+                  title: email != null ? Text(email) : Text('Email Adresse nicht verfügbar', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic)),
                 ),
               ],
             );

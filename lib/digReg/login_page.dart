@@ -37,7 +37,10 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(builder: (BuildContext context) => HomePage()),
           (route) => false);
     } else {
-      scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(jsonDecode(ret)['message'])));
+      scaffoldKey.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),content: Text(jsonDecode(ret)['message'])));
     }
   }
 

@@ -18,10 +18,9 @@ class Session {
       headers.clear();
     http.Response response = await http.post(url, body: jsonEncode(data), headers: headers);
     print(response.body);
-    if (jsonDecode(response.body)['error'] != null) {
-      return null;
+    if (jsonDecode(response.body)['error'] == null) {
+      updateCookie(response);
     }
-    updateCookie(response);
     return response.body;
   }
 

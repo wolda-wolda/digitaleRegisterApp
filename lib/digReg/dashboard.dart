@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 class Dashboard {
   Future<String> getData() async {
     return await Session().post(
@@ -42,6 +43,7 @@ class Dashboard {
                       itemBuilder: (context, index2) {
                         return ListTile(
                           title: title(context, items[index1], index2),
+                          trailing: title2(context, items[index1], index2),
                           subtitle: Text(
                               items[index1].items[index2].subtitle.toString()),
                         );
@@ -64,12 +66,31 @@ class Dashboard {
 
 Widget title(BuildContext context, Dash item, int index2) {
   if (item.items[index2].label != null)
-    return Text(item.items[index2].title.toString() +
-        ' - ' +
-        item.items[index2].label.toString());
-  return Text(item.items[index2].title.toString());
+    return Text(item.items[index2].title.toString(),
+    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),);
+  return Text(item.items[index2].title.toString(),
+      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),);
 }
-
+Widget title2(BuildContext context, Dash item, int index2) {
+  if (item.items[index2].label != null)
+    return Container(
+      height: 40,
+      width: 130,
+      child: Transform(
+        transform: Matrix4.translationValues(22, 0.0, 0.0),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+            color: Colors.grey,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(item.items[index2].label.toString(),textAlign: TextAlign.center, style: TextStyle(color: Colors.white),),
+          )
+        ),
+      )
+      );
+}
 class Dash {
   final String date;
   final List<Items> items;

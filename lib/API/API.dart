@@ -4,13 +4,15 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 
 Map<String, String> headers;
-
+String cookie = 'empty';
 class Session {
   Future<String> get(String url) async {
     http.Response response = await http.get(url, headers: headers);
     return response.body;
   }
-
+  String getCookie() {
+    return cookie;
+  }
   Future<String> login(String url, dynamic data) async {
     if (headers != null)
       headers.clear();
@@ -34,7 +36,7 @@ class Session {
     int jPHP = raw.indexOf(';', iPHP);
     int iSession = raw.lastIndexOf('registerSession');
     int jSession = raw.indexOf(';', iSession);
-    String cookie = raw.substring(iPHP, jPHP)+'; '+raw.substring(iSession, jSession);
+    cookie = raw.substring(iPHP, jPHP)+'; '+raw.substring(iSession, jSession);
     headers = {'Cookie': cookie};
   }
 }

@@ -5,8 +5,8 @@ import 'package:flutter/rendering.dart';
 
 class Profile {
   Future<String> getData() async {
-    return await Session()
-        .get('https://fallmerayer.digitalesregister.it/v2/api/profile/get');
+    String data = await Session().get('https://fallmerayer.digitalesregister.it/v2/api/profile/get');
+    return data;
   }
 
   Widget build(BuildContext context) {
@@ -17,8 +17,24 @@ class Profile {
             String roleName = jsonDecode(snapshot.data)['roleName'];
             String name = jsonDecode(snapshot.data)['name'];
             String email = jsonDecode(snapshot.data)['email'];
+            String pictureurl = 'https://fallmerayer.digitalesregister.it/v2/api/profile/picture&pictureUrl=' + jsonDecode(snapshot.data)['picture'];
+            Map<String, String> headers;
+            cookie = Session().getCookie();
+            headers = {'Cookie': cookie};
             return ListView(
               children: <Widget>[
+                Container(
+                  width: 250,
+                  height: 250,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: NetworkImage(pictureurl, headers: headers ),
+                      fit: BoxFit.fitHeight,
+                    ),
+                  ),
+                ),
                 ListTile(
                   leading: Icon(Icons.account_circle),
                   title: Text(name),

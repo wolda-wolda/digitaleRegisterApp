@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 Map<String, String> headers;
 
@@ -35,5 +36,17 @@ class Session {
     int jSession = raw.indexOf(';', iSession);
     String cookie = raw.substring(iPHP, jPHP)+'; '+raw.substring(iSession, jSession);
     headers = {'Cookie': cookie};
+  }
+}
+
+class Date {
+  final String date;
+  Date(this.date);
+
+  factory Date.format(String enDate) {
+    DateTime date = new DateFormat('yyyy-MM-dd').parse(enDate);
+
+    return Date(
+        DateFormat('EEEE, d. MMM yyyy', 'de_DE').format(date).toString());
   }
 }

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
 
 class Dashboard {
   Future<String> getData() async {
@@ -141,17 +140,5 @@ class Items {
         type: json['type'],
         id: json['id']
     );
-  }
-}
-
-class Date {
-  final String date;
-  Date(this.date);
-
-  factory Date.format(String enDate) {
-    DateTime date = new DateFormat('yyyy-MM-dd').parse(enDate);
-
-    return Date(
-        DateFormat('EEEE, d. MMM yyyy', 'de_DE').format(date).toString());
   }
 }

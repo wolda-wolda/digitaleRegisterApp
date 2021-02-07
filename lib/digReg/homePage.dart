@@ -1,5 +1,4 @@
 import 'package:digitales_register_app/API/API.dart';
-import 'package:digitales_register_app/API/Data.dart';
 import 'package:digitales_register_app/digReg/dashboard.dart';
 import 'package:digitales_register_app/digReg/login_page.dart';
 import 'package:digitales_register_app/digReg/messages.dart';
@@ -7,7 +6,7 @@ import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:digitales_register_app/digReg/subjects.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:digitales_register_app/digReg/absences.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'PopUpMenu.dart';
@@ -43,10 +42,7 @@ class _HomePageState extends State<HomePage>
   Widget _options(BuildContext context, int select) {
     return <Widget>[
       Dashboard().build(context),
-      Text('Absenzen',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
+      Absences().build(context),
       Text('Kalender',
           style: TextStyle(
             fontWeight: FontWeight.bold,

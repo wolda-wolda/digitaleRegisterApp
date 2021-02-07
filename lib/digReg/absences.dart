@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:expansion_tile_card/expansion_tile_card.dart';
 
 class Absences {
   Future<String> getData() async {
@@ -45,24 +46,46 @@ class Absences {
             }
             return Column(
               children: [
-                Text('Fehleinheiten: ' +
-                    jsonDecode(snapshot.data)['statistics']['counter']
-                        .toString()),
-                Text('davon im Auftrag der Schule: ' +
-                    jsonDecode(snapshot.data)['statistics']['counterForSchool']
-                        .toString()),
-                Text('Abwesenheit: ' +
-                    jsonDecode(snapshot.data)['statistics']['percentage'] +
-                    '%'),
-                Text('Entschuldigt: ' +
-                    jsonDecode(snapshot.data)['statistics']['justified']
-                        .toString()),
-                Text('Nicht entschuldigt: ' +
-                    jsonDecode(snapshot.data)['statistics']['notJustified']
-                        .toString()),
-                Text('Verspätungen: ' +
-                    jsonDecode(snapshot.data)['statistics']['delayed']
-                        .toString()),
+                ExpansionTileCard(
+                    title: Text(
+                        'Fehleinheiten: ' +
+                            jsonDecode(snapshot.data)['statistics']['counter']
+                                .toString(),
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text('davon Entschuldigt: ' +
+                        jsonDecode(snapshot.data)['statistics']['justified']
+                            .toString()),
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 8.0,
+                          ),
+                          child: Text('davon im Auftrag der Schule: ' +
+                              jsonDecode(snapshot.data)['statistics']
+                                      ['counterForSchool']
+                                  .toString() +
+                              '\nAbwesenheit: ' +
+                              jsonDecode(snapshot.data)['statistics']
+                                  ['percentage'] +
+                              '%' +
+                              '\nNicht entschuldigt: ' +
+                              jsonDecode(snapshot.data)['statistics']
+                                      ['notJustified']
+                                  .toString() +
+                              '\nVerspätungen: ' +
+                              jsonDecode(snapshot.data)['statistics']['delayed']
+                                  .toString()),
+                        ),
+                      ),
+                    ]),
+                Divider(
+                  indent: 1000,
+                  endIndent: 1000,
+                  height: 10,
+                ),
                 Expanded(
                     child: ListView.builder(
                   scrollDirection: Axis.vertical,
@@ -145,12 +168,11 @@ class PopUpDialog extends StatelessWidget {
           '. Stunde';
     }
   }
-  
+
   String reason(Absence data) {
     if (data.reason != null) {
       return data.reason;
-    }
-    else {
+    } else {
       return ' ';
     }
   }

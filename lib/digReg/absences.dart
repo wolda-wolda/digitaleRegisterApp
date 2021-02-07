@@ -22,10 +22,11 @@ class Absences {
 
   Icon icon(Absence data) {
     if (data.justified == 2) {
-      return Icon(Icons.check_circle);
-    }
-    else {
-      return Icon(Icons.circle);
+      return Icon(Icons.check_circle, color: Colors.green);
+    } else if (data.justified == 3) {
+      return Icon(Icons.warning, color: Colors.redAccent);
+    } else {
+      return Icon(Icons.circle, color: Colors.orange);
     }
   }
 
@@ -44,13 +45,26 @@ class Absences {
             }
             return Column(
               children: [
-                Text('Fehleinheiten: ' + jsonDecode(snapshot.data)['statistics']['counter'].toString()),
-                Text('davon im Auftrag der Schule: ' + jsonDecode(snapshot.data)['statistics']['counterForSchool'].toString()),
-                Text('Abwesenheit: ' + jsonDecode(snapshot.data)['statistics']['percentage'] + '%'),
-                Text('Entschuldigt: ' + jsonDecode(snapshot.data)['statistics']['justified'].toString()),
-                Text('Nicht entschuldigt: ' + jsonDecode(snapshot.data)['statistics']['notJustified'].toString()),
-                Text('Verspätungen: ' + jsonDecode(snapshot.data)['statistics']['delayed'].toString()),
-                ListView.builder(
+                Text('Fehleinheiten: ' +
+                    jsonDecode(snapshot.data)['statistics']['counter']
+                        .toString()),
+                Text('davon im Auftrag der Schule: ' +
+                    jsonDecode(snapshot.data)['statistics']['counterForSchool']
+                        .toString()),
+                Text('Abwesenheit: ' +
+                    jsonDecode(snapshot.data)['statistics']['percentage'] +
+                    '%'),
+                Text('Entschuldigt: ' +
+                    jsonDecode(snapshot.data)['statistics']['justified']
+                        .toString()),
+                Text('Nicht entschuldigt: ' +
+                    jsonDecode(snapshot.data)['statistics']['notJustified']
+                        .toString()),
+                Text('Verspätungen: ' +
+                    jsonDecode(snapshot.data)['statistics']['delayed']
+                        .toString()),
+                Expanded(
+                    child: ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   itemCount: items.length,
@@ -73,7 +87,7 @@ class Absences {
                           onTap: () => showAb(context, items[index]),
                         ));
                   },
-                )
+                ))
               ],
             );
           }
@@ -101,7 +115,10 @@ class Absence {
       temp.add(Group.fromJson(i));
     }
     return Absence(
-        date: Date.format(json['date']), hour: temp, reason: json['reason'], justified: json['justified']);
+        date: Date.format(json['date']),
+        hour: temp,
+        reason: json['reason'],
+        justified: json['justified']);
   }
 }
 
@@ -128,6 +145,15 @@ class PopUpDialog extends StatelessWidget {
           '. Stunde';
     }
   }
+  
+  String reason(Absence data) {
+    if (data.reason != null) {
+      return data.reason;
+    }
+    else {
+      return ' ';
+    }
+  }
 
   final Absence data;
   PopUpDialog(this.data);
@@ -136,7 +162,7 @@ class PopUpDialog extends StatelessWidget {
     return AlertDialog(
       title: Text(text(data)),
       content: SingleChildScrollView(
-        child: Text(data.reason),
+        child: Text(reason(data)),
       ),
     );
   }

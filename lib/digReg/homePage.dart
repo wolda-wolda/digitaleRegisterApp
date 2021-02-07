@@ -7,7 +7,6 @@ import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:digitales_register_app/digReg/subjects.dart';
 import 'package:flutter/material.dart';
-import 'package:digitales_register_app/digReg/absences.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'PopUpMenu.dart';

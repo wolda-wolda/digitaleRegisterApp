@@ -1,4 +1,5 @@
 import 'package:digitales_register_app/API/API.dart';
+import 'package:digitales_register_app/digReg/absences.dart';
 import 'package:digitales_register_app/digReg/dashboard.dart';
 import 'package:digitales_register_app/digReg/login_page.dart';
 import 'package:digitales_register_app/digReg/messages.dart';
@@ -42,10 +43,7 @@ class _HomePageState extends State<HomePage>
   Widget _options(BuildContext context, int select) {
     return <Widget>[
       Dashboard().build(context),
-      Text('Absenzen',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
+      Absences().build(context),
       Text('Kalender',
           style: TextStyle(
             fontWeight: FontWeight.bold,

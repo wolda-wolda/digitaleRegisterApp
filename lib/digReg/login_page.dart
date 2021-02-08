@@ -60,6 +60,8 @@ class _LoginPageState extends State<LoginPage>
         title: Text("Digitales Register"),
         actions: <Widget>[
           PopupMenuButton<String>(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5))),
             onSelected: choiceAction,
             itemBuilder: (BuildContext choice) {
               return Constants.choices.map((String choice) {

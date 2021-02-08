@@ -118,14 +118,17 @@ class _HomePageState extends State<HomePage>
 
   void choiceAction(String choice) {
     if (choice == Constants.Setting) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return Settings();
-      }));
+      Navigator.push(context, PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => Settings(),
+          transitionDuration: Duration(milliseconds: 100)
+      ));
     } else if (choice == Constants.Logout) {
       logout();
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+          PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => LoginPage(),
+              transitionDuration: Duration(milliseconds: 100)),
               (route) => false);
     }
   }

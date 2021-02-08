@@ -116,10 +116,7 @@ class _LoginPageState extends State<LoginPage>
                       labelText: 'Benutzername',
                       hintText: 'Benutzername für das Register',
                     ),
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (usernameController) {
-                      login(context);
-                    },
+                    textInputAction: TextInputAction.next,
                   ),
                   Divider(
                     height: 50,

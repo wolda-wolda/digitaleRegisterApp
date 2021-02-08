@@ -27,6 +27,25 @@ class Subjects {
         });
   }
 
+  String note(Grades data) {
+    List<String> format = data.grade.split('.');
+    String ret;
+    if (format[1] == '00')
+      ret = format[0];
+    else if (format[1] == '25')
+      ret = format[0] + '+';
+    else if (format[1] == '50')
+      ret = format[0] + '/' + (int.parse(format[0]) + 1).toString();
+    else if (format[1] == '75')
+      ret = (int.parse(format[0]) + 1).toString() + '-';
+    return ret;
+  }
+
+  Text average(double ave) {
+    if (ave.isNaN) return Text('Noch kein Durchschnitt vorhanden');
+    return Text('Durchschnitt: ' + ave.toString());
+  }
+
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
         future: getData1(),
@@ -44,81 +63,89 @@ class Subjects {
               shrinkWrap: true,
               itemCount: items.length,
               itemBuilder: (context, index1) {
+                double dividend = 0;
+                double divisor = 0;
+                for (var i in items[index1].tempGrades) {
+                  dividend =
+                      dividend + double.parse(i.grade) * i.weight / 100;
+                  divisor = divisor + i.weight / 100;
+                }
+                items[index1].average =
+                    double.parse((dividend / divisor).toStringAsPrecision(3));
                 return ExpansionTileCard(
-                  borderRadius: BorderRadius.circular(10),
-                      title: Text(items[index1].name.toString(), style: TextStyle(fontWeight: FontWeight.bold)),
-                      children: <Widget>[
-                        Divider(
-                          thickness: 1.0,
-                          height: 1.0,
-                        ),
-                        FutureBuilder<String>(
-                            future: getData2(
-                                items[index1].id, items[index1].studentId),
-                            builder: (context, AsyncSnapshot<String> sub) {
-                              if (sub.hasData &&
-                                  sub.connectionState == ConnectionState.done) {
-                                if (items[index1].getG == true) {
-                                  items[index1].grades =
-                                      Content.fromJson(jsonDecode(sub.data));
-                                }
-                                return Column(
-                                  children: [
-                                    ListView.builder(
-                                        physics: NeverScrollableScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemCount: items[index1]
-                                            .grades
-                                            .observations
-                                            .length,
-                                        itemBuilder: (context, index2) {
-                                          return ListTile(
-                                              title: Text(items[index1]
-                                                  .grades
-                                                  .observations[index2]
-                                                  .type
-                                                  .toString()));
-                                        }),
-                                    ListView.builder(
-                                        physics: NeverScrollableScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemCount:
-                                        items[index1].grades.grades.length,
-                                        itemBuilder: (context, index2) {
-                                          return ListTile(
-                                            title: Text(items[index1]
-                                                .grades
-                                                .grades[index2]
-                                                .type
-                                                .toString() +
-                                                ': ' +
-                                                items[index1]
-                                                    .grades
-                                                    .grades[index2]
-                                                    .grade
-                                                    .toString() +
-                                                ' - ' +
-                                                items[index1]
-                                                    .grades
-                                                    .grades[index2]
-                                                    .weight
-                                                    .toString() +
-                                                '%'),
-                                            onTap: () => showSub(
-                                                context,
-                                                items[index1]
-                                                    .grades
-                                                    .grades[index2]),
-                                          );
-                                        })
-                                  ],
-                                );
-                              } else {
-                                return Center();
+                    borderRadius: BorderRadius.circular(10),
+                    title: Text(items[index1].name.toString(),
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: average(items[index1].average),
+                    children: <Widget>[
+                      Divider(
+                        thickness: 1.0,
+                        height: 1.0,
+                      ),
+                      FutureBuilder<String>(
+                          future: getData2(
+                              items[index1].id, items[index1].studentId),
+                          builder: (context, AsyncSnapshot<String> sub) {
+                            if (sub.hasData &&
+                                sub.connectionState == ConnectionState.done) {
+                              if (items[index1].getG == true) {
+                                items[index1].content =
+                                    Content.fromJson(jsonDecode(sub.data));
                               }
-                            })
-                      ]
-                  );
+                              return Column(
+                                children: [
+                                  ListView.builder(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount: items[index1]
+                                          .content
+                                          .observations
+                                          .length,
+                                      itemBuilder: (context, index2) {
+                                        return ListTile(
+                                            title: Text(items[index1]
+                                                .content
+                                                .observations[index2]
+                                                .type
+                                                .toString()));
+                                      }),
+                                  ListView.builder(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount:
+                                          items[index1].content.grades.length,
+                                      itemBuilder: (context, index2) {
+                                        return ListTile(
+                                          title: Text(items[index1]
+                                                  .content
+                                                  .grades[index2]
+                                                  .type
+                                                  .toString() +
+                                              ': ' +
+                                              note(items[index1]
+                                                  .content
+                                                  .grades[index2]) +
+                                              ' - ' +
+                                              items[index1]
+                                                  .content
+                                                  .grades[index2]
+                                                  .weight
+                                                  .toString() +
+                                              '%'),
+                                          onTap: () => showSub(
+                                              context,
+                                              items[index1]
+                                                  .content
+                                                  .grades[index2]),
+                                        );
+                                      })
+                                ],
+                              );
+                            } else {
+                              return Center();
+                            }
+                          })
+                    ]);
               },
             );
           }
@@ -137,29 +164,43 @@ class Subject {
   final int absences;
   final int id;
   final int studentId;
-  Content grades = Content();
+  final List<Grades> tempGrades;
+  double average;
+  Content content = Content();
   bool getG = true;
 
-  Subject({this.name, this.absences, this.id, this.studentId});
+  Subject({this.name, this.absences, this.id, this.studentId, this.tempGrades});
 
   factory Subject.fromJson(Map<String, dynamic> json) {
+    List<Grades> temp = List<Grades>();
+    for (var i in json['grades']) {
+      temp.add(Grades(
+          grade: i['grade'],
+          weight: i['weight'],
+          date: i['date'],
+          type: i['type'],
+          name: i['name'],
+          description: i['description']));
+    }
     return Subject(
         name: json['subject']['name'],
         absences: json['absences'],
         id: json['subjectId'],
-        studentId: json['student']['id']);
+        studentId: json['student']['id'],
+        tempGrades: temp
+    );
   }
 }
 
 class Content {
-  final List<Grades> grades;
-  final List<Observations> observations;
+  List<Grades> grades = List<Grades>();
+  List<Observations> observations = List<Observations>();
 
   Content({this.grades, this.observations});
 
   factory Content.fromJson(Map<String, dynamic> json) {
-    List<Grades> tempG = [];
-    List<Observations> tempO = [];
+    List<Grades> tempG = List<Grades>();
+    List<Observations> tempO = List<Observations>();
     for (var i in json['grades']) {
       tempG.add(Grades.fromJson(i));
     }

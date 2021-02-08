@@ -2,12 +2,26 @@ import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 
 class Calendar {
   Future<String> getData() async {
+    DateTime now = DateTime.now();
+    if (now.weekday == 6) {
+      now = now.add(Duration(days: 2));
+    }
+    else if (now.weekday == 7) {
+      now = now.add(Duration(days: 1));
+    }
+    else {
+      while (now.weekday != 1) {
+        now = now.subtract(Duration(days: 1));
+      }
+    }
+    String monday = DateFormat('y-MM-dd').format(now);
     return await Session().post(
         'https://fallmerayer.digitalesregister.it/v2/api/calendar/student',
-        {'startDate': '2021-02-08'});
+        {'startDate': monday});
   }
 
   var items = List<Day>();

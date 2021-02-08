@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:digitales_register_app/theme/theme.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -21,6 +21,12 @@ class _SettingsState extends State<Settings> {
     });
   }
 
+  void changeColor(Color color, ThemeChanger _themeChanger) {
+    setState(() {
+      _themeChanger.setColor(color);
+    });
+  }
+
   Widget notifications(bool notificationsEnabled) {
     if (notificationsEnabled == true)
       return Icon(Icons.notifications_active);
@@ -33,6 +39,23 @@ class _SettingsState extends State<Settings> {
       return Icon(Icons.wb_incandescent);
     else
       return Icon(Icons.wb_incandescent_outlined);
+  }
+
+  void showColorPicker(BuildContext context, ThemeChanger _themeChanger) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Wähle eine Farbe'),
+            content: SingleChildScrollView(
+                child: ColorPicker(
+                  pickerColor: _themeChanger.getColor(),
+                  showLabel: true,
+                  onColorChanged: (color) => changeColor(color, _themeChanger),
+            ),
+            )
+          );
+        });
   }
 
   @override
@@ -55,6 +78,10 @@ class _SettingsState extends State<Settings> {
                 sections: [
                   SettingsSection(
                     tiles: [
+                      SettingsTile(
+                        title: 'Theme ändern',
+                        onPressed: (_) => showColorPicker(context, _themeChanger),
+                      ),
                       SettingsTile.switchTile(
                           leading: darkMode(_themeChanger.getBool()),
                           title: 'Dark Mode',
@@ -86,6 +113,10 @@ class _SettingsState extends State<Settings> {
               sections: [
                 SettingsSection(
                   tiles: [
+                    SettingsTile(
+                      title: 'Theme ändern',
+                      onPressed: (_) => showColorPicker(context, _themeChanger),
+                    ),
                     SettingsTile.switchTile(
                         leading: darkMode(_themeChanger.getBool()),
                         title: 'Dark Mode',

@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
+import 'package:digitales_register_app/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 
 class Dashboard {
   Future<String> getData() async {
@@ -14,6 +16,7 @@ class Dashboard {
   bool get = true;
 
   Widget build(BuildContext context) {
+    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
     return FutureBuilder<String>(
         future: getData(),
         builder: (context, AsyncSnapshot<String> snapshot) {
@@ -43,7 +46,7 @@ class Dashboard {
                       itemBuilder: (context, index2) {
                         return ListTile(
                           title: title(context, items[index1], index2),
-                          trailing: title2(context, items[index1], index2),
+                          trailing: title2(context, items[index1], index2, _themeChanger),
                           subtitle: Text(
                               items[index1].items[index2].subtitle.toString()),
                         );
@@ -71,7 +74,8 @@ Widget title(BuildContext context, Dash item, int index2) {
   return Text(item.items[index2].title.toString(),
       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),);
 }
-Widget title2(BuildContext context, Dash item, int index2) {
+
+Widget title2(BuildContext context, Dash item, int index2, ThemeChanger _themeChanger) {
   if (item.items[index2].label != null)
     return Container(
       height: 40,
@@ -82,7 +86,7 @@ Widget title2(BuildContext context, Dash item, int index2) {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-            color: Colors.grey,
+            color: _themeChanger.getColor(),
           child: Align(
             alignment: Alignment.center,
             child: Text(item.items[index2].label.toString(),textAlign: TextAlign.center, style: TextStyle(color: Colors.white),),

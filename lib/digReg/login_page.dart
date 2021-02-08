@@ -14,11 +14,12 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   bool _isHidden = true;
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
-  final scaffoldKey =  GlobalKey<ScaffoldState>();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void dispose() {
@@ -36,13 +37,17 @@ class _LoginPageState extends State<LoginPage> {
     if (jsonDecode(ret)['error'] == null) {
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (BuildContext context) => HomePage()),
+          PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => HomePage(),
+              transitionDuration: Duration(milliseconds: 100)),
           (route) => false);
     } else {
-      scaffoldKey.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
+      scaffoldKey.currentState.showSnackBar(SnackBar(
+          behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-          ),content: Text(jsonDecode(ret)['message'])));
+          ),
+          content: Text(jsonDecode(ret)['message'])));
     }
   }
 
@@ -156,9 +161,11 @@ class _LoginPageState extends State<LoginPage> {
 
   void choiceAction(String choice) {
     if (choice == Constants.Setting) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return Settings();
-      }));
+      Navigator.push(
+          context,
+          PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => Settings(),
+              transitionDuration: Duration(milliseconds: 100)));
     } else if (choice == Constants.Exit) {
       SystemNavigator.pop();
       return;

@@ -79,6 +79,7 @@ class _SettingsState extends State<Settings> {
                   SettingsSection(
                     tiles: [
                       SettingsTile(
+                        leading: Icon(Icons.color_lens),
                         title: 'Theme ändern',
                         onPressed: (_) => showColorPicker(context, _themeChanger),
                       ),
@@ -114,6 +115,7 @@ class _SettingsState extends State<Settings> {
                 SettingsSection(
                   tiles: [
                     SettingsTile(
+                      leading: Icon(Icons.color_lens),
                       title: 'Theme ändern',
                       onPressed: (_) => showColorPicker(context, _themeChanger),
                     ),

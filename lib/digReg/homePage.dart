@@ -7,8 +7,10 @@ import 'package:digitales_register_app/digReg/messages.dart';
 import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:digitales_register_app/digReg/subjects.dart';
+import 'package:digitales_register_app/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 
 import 'PopUpMenu.dart';
 
@@ -61,9 +63,12 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
     return Scaffold(
       appBar: AppBar(title: Text('Digitales Register'), actions: <Widget>[
         PopupMenuButton<String>(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(5))),
           onSelected: choiceAction,
           itemBuilder: (BuildContext context) {
             return Constants.choices.map((String choice) {
@@ -101,8 +106,8 @@ class _HomePageState extends State<HomePage>
       body: Center(child: _options(context, _selectedIndex)),
       bottomNavigationBar: TabBar(
         controller: _tabController,
-        unselectedLabelColor: Colors.grey[600],
-        labelColor: const Color(0xFF3baee7),
+        unselectedLabelColor: Colors.grey,
+        labelColor: _themeChanger.getColor(),
         isScrollable: true,
         onTap: (index) => _onItemTapped(index),
         tabs: new List.generate(options.length, (index) {
@@ -118,14 +123,17 @@ class _HomePageState extends State<HomePage>
 
   void choiceAction(String choice) {
     if (choice == Constants.Setting) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return Settings();
-      }));
+      Navigator.push(context, PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => Settings(),
+          transitionDuration: Duration(milliseconds: 100)
+      ));
     } else if (choice == Constants.Logout) {
       logout();
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+          PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => LoginPage(),
+              transitionDuration: Duration(milliseconds: 100)),
               (route) => false);
     }
   }

@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ThemeChanger>(
-      create: (_) => ThemeChanger(ThemeData.dark()),
+      create: (_) => ThemeChanger(ThemeMode.system, Colors.grey),
       child: new MaterialAppWithTheme(),
     );
   }
@@ -20,11 +20,13 @@ class MyApp extends StatelessWidget {
 class MaterialAppWithTheme extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeChanger>(context);
+    final _theme = Provider.of<ThemeChanger>(context);
 
     return MaterialApp(
       home: LoginPage(),
-      theme: theme.getTheme(),
+      themeMode: _theme.getMode(),
+      theme: ThemeData.light().copyWith(primaryColor: _theme.getColor()),
+      darkTheme: ThemeData.dark().copyWith(primaryColor: _theme.getColor()),
     );
   }
 }

@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:digitales_register_app/digReg/PopUpMenu.dart';
 import 'package:digitales_register_app/digReg/homePage.dart';
+import 'package:digitales_register_app/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -46,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
@@ -120,6 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                 login(context);
               },
               child: Text('Login'),
+              color: _themeChanger.getColor(),
             ),
             /*RaisedButton(
               onPressed: () {

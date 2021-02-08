@@ -31,7 +31,6 @@ class Absences {
     }
   }
 
-  @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
         future: getData(),

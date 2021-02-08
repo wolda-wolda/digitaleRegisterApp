@@ -38,7 +38,6 @@ class Calendar {
     return data.hour.toString();
   }
 
-  @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
         future: getData(),

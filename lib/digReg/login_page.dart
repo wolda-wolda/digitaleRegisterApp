@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:provider/provider.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -100,7 +101,7 @@ class _LoginPageState extends State<LoginPage>
             Container(
                 padding: EdgeInsets.only(left: 40, right: 40, bottom: 25),
                 child: Column(children: <Widget> [
-                  Text('Willkommen im digitalen Register', style: TextStyle(fontFamily: 'OpenSans', fontSize: 32, fontWeight: FontWeight.bold),),
+                  Text('Willkommen im digitalen Register', style: TextStyle(fontFamily: 'OpenSans', fontSize: 32, fontWeight: FontWeight.bold)),
                   SizedBox(
                     height: 50,
                   ),
@@ -111,7 +112,7 @@ class _LoginPageState extends State<LoginPage>
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      prefixIcon: Icon(Icons.email),
+                      prefixIcon: Icon(LineAwesomeIcons.user),
                       labelText: 'Benutzername',
                       hintText: 'Benutzername für das Register',
                     ),
@@ -135,7 +136,7 @@ class _LoginPageState extends State<LoginPage>
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        prefixIcon: Icon(Icons.lock),
+                        prefixIcon: Icon(LineAwesomeIcons.lock),
                         labelText: 'Passwort',
                         hintText: 'Passwort eingeben',
                         suffix: InkWell(

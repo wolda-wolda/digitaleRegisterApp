@@ -9,6 +9,7 @@ import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:digitales_register_app/digReg/subjects.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 import 'PopUpMenu.dart';
 
@@ -25,7 +26,6 @@ class _HomePageState extends State<HomePage>
   void initState() {
     setState(() {
       super.initState();
-      _tabController = TabController(length: options.length, vsync: this);
       initializeDateFormatting('de_DE');
     });
   }
@@ -57,12 +57,11 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-  TabController _tabController;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Digitales Register'), actions: <Widget>[
+        appBar: AppBar(title: Text('Digitales Register'), actions: <Widget>[
         PopupMenuButton<String>(
           onSelected: choiceAction,
           itemBuilder: (BuildContext context) {
@@ -96,20 +95,47 @@ class _HomePageState extends State<HomePage>
               }
             }).toList();
           },
-        )
-      ]),
+        ),
+      ],),
       body: Center(child: _options(context, _selectedIndex)),
-      bottomNavigationBar: TabBar(
-        controller: _tabController,
-        unselectedLabelColor: Colors.grey[600],
-        labelColor: const Color(0xFF3baee7),
-        isScrollable: true,
-        onTap: (index) => _onItemTapped(index),
-        tabs: new List.generate(options.length, (index) {
-          return new Tab(text: options[index].toUpperCase());
-        }),
-      ),
-    );
+      bottomNavigationBar: BottomNavigationBar(
+        fixedColor: Color(0xFF4285F4),
+        unselectedItemColor: Colors.grey[800],
+        currentIndex: _selectedIndex,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.book),
+            label: 'Merkheft',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.thermometer),
+            label: 'Absenzen',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.calendar),
+            label: 'Kalender',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.graduation_cap),
+            label: 'Noten',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.inbox),
+            label: 'Mitteilungen',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.user_tie),
+            label: 'Profil',
+          ),
+        ],
+        onTap: (index) {
+          _onItemTapped(index);
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        ),
+      );
   }
 
   Future<void> logout() async {

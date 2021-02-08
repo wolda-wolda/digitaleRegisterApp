@@ -80,9 +80,7 @@ class Absences {
                         ),
                       ),
                     ]),
-                Divider(
-                  indent: 1000,
-                  endIndent: 1000,
+                SizedBox(
                   height: 10,
                 ),
                 Expanded(

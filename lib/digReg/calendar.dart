@@ -2,12 +2,32 @@ import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:digitales_register_app/Data/Load&Store.dart';
-class Calendar {
+import 'package:intl/intl.dart';
 
-  var items = List<Day>();
-  List week = [];
-  bool get = true;
+class Calendar {
+  DateTime setWeek(int addNow) {
+    DateTime now = DateTime.now();
+    addNow = addNow - 50;
+    print(addNow);
+    return DateTime(now.year, now.month, now.day + addNow*7);
+  }
+
+  Future<String> getData(DateTime week) async {
+    if (week.weekday == 6) {
+      week = week.add(Duration(days: 2));
+    } else if (week.weekday == 7) {
+      week = week.add(Duration(days: 1));
+    } else {
+      while (week.weekday != 1) {
+        week = week.subtract(Duration(days: 1));
+      }
+    }
+    print(week);
+    String monday = DateFormat('y-MM-dd').format(week);
+    return await Session().post(
+        'https://fallmerayer.digitalesregister.it/v2/api/calendar/student',
+        {'startDate': monday});
+  }
 
   void showLesson(BuildContext context, Lesson data) {
     showDialog(
@@ -17,7 +37,11 @@ class Calendar {
         });
   }
 
+  var items = List<Day>();
+  List week = [];
+  bool get = true;
   bool linked = false;
+  final controller = PageController(initialPage: 50);
 
   String hour(Lesson data) {
     if (data.linkedHours == 1) {
@@ -34,50 +58,71 @@ class Calendar {
   }
 
   Widget build(BuildContext context) {
-    String data = Data.calendar;
-            if (get == true) {
-              week = jsonDecode(data).keys.toList();
-              for (var i in week) {
-                items.add(Day.fromJson(jsonDecode(data)[i]['1']['1']));
-              }
-              get = false;
-            }
-            return ListView.builder(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              itemCount: week.length,
-              itemBuilder: (context, index1) {
-                return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    title: Text(
-                        Date.format(
-                                jsonDecode(data).keys.toList()[index1])
-                            .date,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    subtitle: ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: items[index1].list.length,
-                      itemBuilder: (context, index2) {
-                        return ListTile(
-                          leading: Text(hour(items[index1].list[index2])),
-                          title: Text(items[index1].list[index2].subject,
+    return PageView.builder(
+        itemCount: 100,
+        controller: controller,
+        itemBuilder: (BuildContext context, int index) {
+          items.clear();
+          get = true;
+          return FutureBuilder<String>(
+              future: getData(setWeek(index)),
+              builder: (context, AsyncSnapshot<String> snapshot) {
+                if (snapshot.hasData &&
+                    snapshot.connectionState == ConnectionState.done) {
+                  if (get == true) {
+                    week = jsonDecode(snapshot.data).keys.toList();
+                    for (var i in week) {
+                      items.add(Day.fromJson(jsonDecode(snapshot.data)[i]['1']['1']));
+                    }
+                    get = false;
+                  }
+                  return ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: week.length,
+                    itemBuilder: (context, index1) {
+                      return Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                              Date.format(jsonDecode(snapshot.data)
+                                  .keys
+                                  .toList()[index1])
+                                  .date,
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
-                          onTap: () =>
-                              showLesson(context, items[index1].list[index2]),
-                        );
-                      },
-                    ),
-                  ),
+                          subtitle: ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount: items[index1].list.length,
+                            itemBuilder: (context, index2) {
+                              return ListTile(
+                                leading: Text(hour(items[index1].list[index2])),
+                                title: Text(items[index1].list[index2].subject,
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold)),
+                                onTap: () => showLesson(
+                                    context, items[index1].list[index2]),
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
+                return Center(
+                  child: Text("LOADING...",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      )),
                 );
-              },
-            );
+              });
+        });
   }
 }
 
@@ -176,7 +221,11 @@ class PopUpDialog extends StatelessWidget {
       title: Text(data.subject),
       content: SingleChildScrollView(
           child: Column(
-        children: [ListTile(title: Text('Lehrperson/en'), subtitle: Text(teacher(data))), Padding(padding: EdgeInsets.only(top: 25)) , ListTile(title: Text('Raum'), subtitle: Text(rooms(data)))],
+        children: [
+          ListTile(title: Text('Lehrperson/en'), subtitle: Text(teacher(data))),
+          Padding(padding: EdgeInsets.only(top: 25)),
+          ListTile(title: Text('Raum'), subtitle: Text(rooms(data)))
+        ],
       )),
     );
   }

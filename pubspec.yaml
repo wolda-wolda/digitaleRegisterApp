@@ -21,6 +21,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  line_awesome_flutter: ^1.0.1
   flutter_colorpicker: ^0.3.5
   expansion_tile_card: ^1.1.0
   intl: ^0.16.1

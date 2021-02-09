@@ -7,10 +7,9 @@ import 'package:digitales_register_app/digReg/messages.dart';
 import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:digitales_register_app/digReg/subjects.dart';
-import 'package:digitales_register_app/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:provider/provider.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 import 'PopUpMenu.dart';
 
@@ -27,7 +26,6 @@ class _HomePageState extends State<HomePage>
   void initState() {
     setState(() {
       super.initState();
-      _tabController = TabController(length: options.length, vsync: this);
       initializeDateFormatting('de_DE');
     });
   }
@@ -59,16 +57,12 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-  TabController _tabController;
 
   @override
   Widget build(BuildContext context) {
-    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
     return Scaffold(
-      appBar: AppBar(title: Text('Digitales Register'), actions: <Widget>[
+        appBar: AppBar(title: Text('Digitales Register'), actions: <Widget>[
         PopupMenuButton<String>(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(5))),
           onSelected: choiceAction,
           itemBuilder: (BuildContext context) {
             return Constants.choices.map((String choice) {
@@ -101,20 +95,47 @@ class _HomePageState extends State<HomePage>
               }
             }).toList();
           },
-        )
-      ]),
+        ),
+      ],),
       body: Center(child: _options(context, _selectedIndex)),
-      bottomNavigationBar: TabBar(
-        controller: _tabController,
-        unselectedLabelColor: Colors.grey,
-        labelColor: _themeChanger.getColor(),
-        isScrollable: true,
-        onTap: (index) => _onItemTapped(index),
-        tabs: new List.generate(options.length, (index) {
-          return new Tab(text: options[index].toUpperCase());
-        }),
-      ),
-    );
+      bottomNavigationBar: BottomNavigationBar(
+        fixedColor: Color(0xFF4285F4),
+        unselectedItemColor: Colors.grey[800],
+        currentIndex: _selectedIndex,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.book),
+            label: 'Merkheft',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.thermometer),
+            label: 'Absenzen',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.calendar),
+            label: 'Kalender',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.graduation_cap),
+            label: 'Noten',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.inbox),
+            label: 'Mitteilungen',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LineAwesomeIcons.user_tie),
+            label: 'Profil',
+          ),
+        ],
+        onTap: (index) {
+          _onItemTapped(index);
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        ),
+      );
   }
 
   Future<void> logout() async {
@@ -123,17 +144,14 @@ class _HomePageState extends State<HomePage>
 
   void choiceAction(String choice) {
     if (choice == Constants.Setting) {
-      Navigator.push(context, PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => Settings(),
-          transitionDuration: Duration(milliseconds: 100)
-      ));
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return Settings();
+      }));
     } else if (choice == Constants.Logout) {
       logout();
       Navigator.pushAndRemoveUntil(
           context,
-          PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => LoginPage(),
-              transitionDuration: Duration(milliseconds: 100)),
+          MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
               (route) => false);
     }
   }

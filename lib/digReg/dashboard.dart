@@ -4,25 +4,18 @@ import 'package:digitales_register_app/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import 'package:digitales_register_app/Data/Load&Store.dart';
 
 class Dashboard {
-  Future<String> getData() async {
-    return await Session().post(
-        'https://fallmerayer.digitalesregister.it/v2/api/student/dashboard/dashboard',
-        {'viewFuture': true});
-  }
 
   var items = List<Dash>();
   bool get = true;
 
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
-    return FutureBuilder<String>(
-        future: getData(),
-        builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+    String data = Data.dashboard;
             if (get == true) {
-              for (var i in jsonDecode(snapshot.data)) {
+              for (var i in jsonDecode(data)) {
                 items.add(Dash.fromJson(i));
               }
               get = false;
@@ -57,14 +50,6 @@ class Dashboard {
               },
             );
           }
-          return Center(
-            child: Text("LOADING...",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                )),
-          );
-        });
-  }
 }
 
 Widget title(BuildContext context, Dash item, int index2) {

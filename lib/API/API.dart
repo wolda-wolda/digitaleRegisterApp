@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:digitales_register_app/Data/Load&Store.dart';
 
 Map<String, String> headers;
 String cookie = 'empty';
@@ -21,6 +22,7 @@ class Session {
     if (jsonDecode(response.body)['error'] == null) {
       updateCookie(response);
     }
+    await Data().updateall();
     return response.body;
   }
 

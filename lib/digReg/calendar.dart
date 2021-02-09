@@ -2,13 +2,8 @@ import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
+import 'package:digitales_register_app/Data/Load&Store.dart';
 class Calendar {
-  Future<String> getData() async {
-    return await Session().post(
-        'https://fallmerayer.digitalesregister.it/v2/api/calendar/student',
-        {'startDate': '2021-02-08'});
-  }
 
   var items = List<Day>();
   List week = [];
@@ -39,15 +34,11 @@ class Calendar {
   }
 
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-        future: getData(),
-        builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData &&
-              snapshot.connectionState == ConnectionState.done) {
+    String data = Data.calendar;
             if (get == true) {
-              week = jsonDecode(snapshot.data).keys.toList();
+              week = jsonDecode(data).keys.toList();
               for (var i in week) {
-                items.add(Day.fromJson(jsonDecode(snapshot.data)[i]['1']['1']));
+                items.add(Day.fromJson(jsonDecode(data)[i]['1']['1']));
               }
               get = false;
             }
@@ -63,7 +54,7 @@ class Calendar {
                   child: ListTile(
                     title: Text(
                         Date.format(
-                                jsonDecode(snapshot.data).keys.toList()[index1])
+                                jsonDecode(data).keys.toList()[index1])
                             .date,
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
@@ -87,14 +78,6 @@ class Calendar {
                 );
               },
             );
-          }
-          return Center(
-            child: Text("LOADING...",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                )),
-          );
-        });
   }
 }
 

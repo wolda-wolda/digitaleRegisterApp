@@ -3,12 +3,9 @@ import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
+import 'package:digitales_register_app/Data/Load&Store.dart';
 
 class Absences {
-  Future<String> getData() async {
-    return await Session().get(
-        'https://fallmerayer.digitalesregister.it/v2/api/student/dashboard/absences');
-  }
 
   var items = List<Absence>();
   bool get = true;
@@ -32,13 +29,9 @@ class Absences {
   }
 
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-        future: getData(),
-        builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData &&
-              snapshot.connectionState == ConnectionState.done) {
+      String data = Data.absences;
             if (get == true) {
-              for (var i in jsonDecode(snapshot.data)['absences']) {
+              for (var i in jsonDecode(data)['absences']) {
                 items.add(Absence.fromJson(i));
               }
               get = false;
@@ -48,11 +41,11 @@ class Absences {
                 ExpansionTileCard(
                     title: Text(
                         'Fehleinheiten: ' +
-                            jsonDecode(snapshot.data)['statistics']['counter']
+                            jsonDecode(data)['statistics']['counter']
                                 .toString(),
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text('davon Entschuldigt: ' +
-                        jsonDecode(snapshot.data)['statistics']['justified']
+                        jsonDecode(data)['statistics']['justified']
                             .toString()),
                     children: <Widget>[
                       Align(
@@ -63,19 +56,19 @@ class Absences {
                             vertical: 8.0,
                           ),
                           child: Text('davon im Auftrag der Schule: ' +
-                              jsonDecode(snapshot.data)['statistics']
+                              jsonDecode(data)['statistics']
                                       ['counterForSchool']
                                   .toString() +
                               '\nAbwesenheit: ' +
-                              jsonDecode(snapshot.data)['statistics']
+                              jsonDecode(data)['statistics']
                                   ['percentage'] +
                               '%' +
                               '\nNicht entschuldigt: ' +
-                              jsonDecode(snapshot.data)['statistics']
+                              jsonDecode(data)['statistics']
                                       ['notJustified']
                                   .toString() +
                               '\nVerspätungen: ' +
-                              jsonDecode(snapshot.data)['statistics']['delayed']
+                              jsonDecode(data)['statistics']['delayed']
                                   .toString()),
                         ),
                       ),
@@ -113,14 +106,6 @@ class Absences {
               ],
             );
           }
-          return Center(
-            child: Text("LOADING...",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                )),
-          );
-        });
-  }
 }
 
 class Absence {

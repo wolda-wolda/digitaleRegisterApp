@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:digitales_register_app/digReg/profile.dart';
 import 'package:digitales_register_app/theme/theme.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:digitales_register_app/API/API.dart';
+import 'package:digitales_register_app/Data/Load&Store.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -61,14 +61,11 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
-
-    return FutureBuilder(
-      future: Profile().getData(),
-      builder: (context, AsyncSnapshot<String> snapshot) {
-        if (snapshot.hasData && snapshot.connectionState == ConnectionState.done && !snapshot.data.contains('window.location')) {
+        String data=Data.profile;
+        if (!data.contains('window.location')) {
           if (i == 0) {
             notificationsEnabled =
-            jsonDecode(snapshot.data)['notificationsEnabled'];
+            jsonDecode(data)['notificationsEnabled'];
             i++;
           }
           return Scaffold(
@@ -133,6 +130,4 @@ class _SettingsState extends State<Settings> {
           ),
         );
       }
-    );
   }
-}

@@ -1,17 +1,13 @@
 import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
+import 'package:digitales_register_app/Data/Load&Store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class Profile {
-  Future<String> getData() async {
-    String data = await Session()
-        .get('https://fallmerayer.digitalesregister.it/v2/api/profile/get');
-    return data;
-  }
-
+  String data = Data.profile;
   Widget profilePicture(String url) {
-    if (url != null) {
+    if (url != 'https://fallmerayer.digitalesregister.it/v2/api/profile/picture&pictureUrl=') {
       return Container(
         width: 250,
         height: 250,
@@ -30,23 +26,10 @@ class Profile {
   }
 
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-        future: getData(),
-        builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData &&
-              snapshot.connectionState == ConnectionState.done) {
-            String roleName = jsonDecode(snapshot.data)['roleName'];
-            String name = jsonDecode(snapshot.data)['name'];
-            String email;
-            String pictureUrl;
-            if (jsonDecode(snapshot.data)['email'] != null) {
-              email = jsonDecode(snapshot.data)['email'];
-            }
-            if (jsonDecode(snapshot.data)['picture'] != null) {
-              pictureUrl =
-                  'https://fallmerayer.digitalesregister.it/v2/api/profile/picture&pictureUrl=' +
-                      jsonDecode(snapshot.data)['picture'];
-            }
+            String roleName = jsonDecode(data)['roleName'];
+            String name = jsonDecode(data)['name'];
+            String email = jsonDecode(data)['email'] ?? 'empty';
+            String pictureUrl ='https://fallmerayer.digitalesregister.it/v2/api/profile/picture&pictureUrl=' +jsonDecode(data)['picture'] ?? '';
             cookie = Session().getCookie();
             headers = {'Cookie': cookie};
             return ListView(
@@ -62,7 +45,7 @@ class Profile {
                 ),
                 ListTile(
                   leading: Icon(Icons.alternate_email),
-                  title: email != null
+                  title: email != 'empty'
                       ? Text(email)
                       : Text('Email Adresse nicht verfügbar',
                       style: TextStyle(
@@ -70,13 +53,5 @@ class Profile {
                 ),
               ],
             );
-          }
-          return Center(
-            child: Text("LOADING...",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                )),
-          );
-        });
   }
 }

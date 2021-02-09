@@ -1,15 +1,10 @@
 import 'dart:convert';
-import 'package:digitales_register_app/API/API.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:digitales_register_app/Data/Load&Store.dart';
 
 class Messages {
-  Future<String> getData() async {
-    return await Session().post(
-        'https://fallmerayer.digitalesregister.it/v2/api/message/getMyMessages',
-        {'filterByLabelName': ''});
-  }
 
   void showMessage(BuildContext context, Mess data) {
     showDialog(
@@ -23,12 +18,9 @@ class Messages {
   bool get = true;
 
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-        future: getData(),
-        builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+    String data = Data.messages;
             if (get == true) {
-              for (var i in jsonDecode(snapshot.data)) {
+              for (var i in jsonDecode(data)) {
                 items.add(Mess.fromJson(i));
                 get = false;
               }
@@ -43,14 +35,6 @@ class Messages {
               },
             );
           }
-          return Center(
-            child: Text("LOADING...",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                )),
-          );
-        });
-  }
 }
 
 class Mess {

@@ -66,8 +66,7 @@ class Subjects {
                 double dividend = 0;
                 double divisor = 0;
                 for (var i in items[index1].tempGrades) {
-                  dividend =
-                      dividend + double.parse(i.grade) * i.weight / 100;
+                  dividend = dividend + double.parse(i.grade) * i.weight / 100;
                   divisor = divisor + i.weight / 100;
                 }
                 items[index1].average =
@@ -187,8 +186,7 @@ class Subject {
         absences: json['absences'],
         id: json['subjectId'],
         studentId: json['student']['id'],
-        tempGrades: temp
-    );
+        tempGrades: temp);
   }
 }
 

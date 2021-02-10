@@ -10,6 +10,7 @@ import 'package:digitales_register_app/digReg/subjects.dart';
 import 'package:digitales_register_app/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
 
@@ -75,55 +76,80 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       builder: (context, AsyncSnapshot<bool> snapshot) {
         if(snapshot.hasData==true) {
           return Scaffold(
-            appBar: AppBar(title: Text('Digitales Register'), actions: <Widget>[
-              PopupMenuButton<String>(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
-                onSelected: choiceAction,
-                itemBuilder: (BuildContext context) {
-                  return Constants.choices.map((String choice) {
-                    if (choice == Constants.Setting) {
-                      return PopupMenuItem<String>(
-                        value: choice,
-                        child: Row(
-                          children: <Widget>[
-                            Icon(
-                              Icons.settings_applications,
-                              color: Colors.grey,
-                            ),
-                            Text(choice),
-                          ],
-                        ),
-                      );
-                    } else if (choice == Constants.Logout) {
-                      return PopupMenuItem<String>(
-                        value: choice,
-                        child: Row(
-                          children: <Widget>[
-                            Icon(
-                              Icons.exit_to_app,
-                              color: Colors.grey,
-                            ),
-                            Text(choice),
-                          ],
-                        ),
-                      );
-                    }
-                  }).toList();
+              appBar: AppBar(title: Text('Digitales Register'), actions: <Widget>[
+                PopupMenuButton<String>(
+                  onSelected: choiceAction,
+                  itemBuilder: (BuildContext context) {
+                    return Constants.choices.map((String choice) {
+                      if (choice == Constants.Setting) {
+                        return PopupMenuItem<String>(
+                          value: choice,
+                          child: Row(
+                            children: <Widget>[
+                              Icon(
+                                Icons.settings_applications,
+                                color: Colors.grey,
+                              ),
+                              Text(choice),
+                            ],
+                          ),
+                        );
+                      } else if (choice == Constants.Logout) {
+                        return PopupMenuItem<String>(
+                          value: choice,
+                          child: Row(
+                            children: <Widget>[
+                              Icon(
+                                Icons.exit_to_app,
+                                color: Colors.grey,
+                              ),
+                              Text(choice),
+                            ],
+                          ),
+                        );
+                      }
+                    }).toList();
+                  },
+                ),
+              ],),
+              body: Center(child: _options(context, _selectedIndex)),
+              bottomNavigationBar: BottomNavigationBar(
+                fixedColor: Color(0xFF4285F4),
+                unselectedItemColor: Colors.grey[800],
+                currentIndex: _selectedIndex,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: Icon(LineAwesomeIcons.book),
+                    label: 'Merkheft',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(LineAwesomeIcons.thermometer),
+                    label: 'Absenzen',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(LineAwesomeIcons.calendar),
+                    label: 'Kalender',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(LineAwesomeIcons.graduation_cap),
+                    label: 'Noten',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(LineAwesomeIcons.inbox),
+                    label: 'Mitteilungen',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(LineAwesomeIcons.user_tie),
+                    label: 'Profil',
+                  ),
+                ],
+                onTap: (index) {
+                  _onItemTapped(index);
+                  setState(() {
+                    _selectedIndex = index;
+                  });
                 },
-              )
-            ]),
-            body: Center(child: _options(context, _selectedIndex)),
-            bottomNavigationBar: TabBar(
-              controller: _tabController,
-              unselectedLabelColor: Colors.grey,
-              labelColor: _themeChanger.getColor(),
-              isScrollable: true,
-              onTap: (index) => _onItemTapped(index),
-              tabs: new List.generate(options.length, (index) {
-                return new Tab(text: options[index].toUpperCase());
-              }),
-            ),
+              ),
           );
         }
         return Container(

@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'SizeConfig.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -52,6 +53,7 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
     return Scaffold(
       key: scaffoldKey,
@@ -59,7 +61,7 @@ class _LoginPageState extends State<LoginPage>
         child: Column(
           children: <Widget> [
             Container(
-              margin: EdgeInsets.only(left: 350, top: 30),
+              margin: EdgeInsets.only(left: SizeConfig.blockSizeHorizontal*90, top: SizeConfig.blockSizeVertical*5),
               child: PopupMenuButton<String>(
                 onSelected: choiceAction,
                 itemBuilder: (BuildContext choice) {
@@ -101,7 +103,7 @@ class _LoginPageState extends State<LoginPage>
             Container(
                 padding: EdgeInsets.only(left: 40, right: 40, bottom: 25),
                 child: Column(children: <Widget> [
-                  Text('Willkommen im digitalen Register', style: TextStyle(fontFamily: 'OpenSans', fontSize: 32, fontWeight: FontWeight.bold)),
+                  Text('Willkommen im digitalen Register', style: TextStyle(fontFamily: 'OpenSans', fontSize: SizeConfig.safeBlockVertical * 4.5, fontWeight: FontWeight.bold)),
                   SizedBox(
                     height: 50,
                   ),

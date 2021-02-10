@@ -13,6 +13,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
+import 'file:///C:/Users/android/StudioProjects/digitaleRegisterApp/lib/digReg/usefulWidgets.dart';
 
 import 'PopUpMenu.dart';
 
@@ -24,7 +25,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   Future<bool> getData() async{
-   await Data().updateAll();
+   await Data().loadAll();
     return true;
   }
 
@@ -152,22 +153,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ),
           );
         }
-        return Container(
-          alignment: Alignment.center,
-           height: 20,
-           width: 20,
-           child: CircularProgressIndicator(
-             strokeWidth: 5,
-             backgroundColor: Colors.grey[800],
-             valueColor : AlwaysStoppedAnimation(Colors.white),
-           ),
-        );
+        return Loading();
       }
     );
   }
 
   Future<void> logout() async {
-    await Session().get('https://fallmerayer.digitalesregister.it/v2/logout');
+    await Session().get(Data.link +'/v2/logout');
   }
 
   void choiceAction(String choice) {

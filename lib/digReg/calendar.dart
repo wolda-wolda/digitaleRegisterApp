@@ -35,10 +35,12 @@ class Calendar {
         itemCount: 100,
         controller: controller,
         itemBuilder: (BuildContext context, int index) {
-                Data.week2 = jsonDecode(Data.calendar[index]).keys.toList();
-                for (var i in Data.week2) {
-                  Data.calendaritems.add(Day.fromJson(jsonDecode(Data.calendar[index])[i]['1']['1']));
-                }
+                  Data.calendaritems.clear();
+                    Data.week2 = (jsonDecode(Data.calendar[index]).keys.toList());
+                    for (var i in Data.week2) {
+                      Data.calendaritems.add(
+                          Day.fromJson(jsonDecode(Data.calendar[index])[i]['1']['1']));
+                    }
                   return ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,

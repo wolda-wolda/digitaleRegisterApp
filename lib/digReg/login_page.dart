@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:digitales_register_app/Data/Load&Store.dart';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:digitales_register_app/digReg/PopUpMenu.dart';
 import 'package:digitales_register_app/digReg/homePage.dart';
@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage>
 
   Future<void> login(BuildContext context) async {
     String ret = await Session()
-        .login('https://fallmerayer.digitalesregister.it/v2/api/auth/login', {
+        .login( Data.link+ '/v2/api/auth/login', {
       "username": usernameController.text.trim(),
       "password": passwordController.text.trim()
     });

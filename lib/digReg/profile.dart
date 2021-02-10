@@ -31,7 +31,7 @@ class Profile {
             String name = jsonDecode(data)['name'];
             String email = jsonDecode(data)['email'] ?? 'empty';
             String picture = jsonDecode(data)['picture'];
-            String pictureUrl ='https://fallmerayer.digitalesregister.it/v2/api/profile/picture&pictureUrl=';
+            String pictureUrl = Data.link + '/v2/api/profile/picture&pictureUrl=';
             cookie = Session().getCookie();
             headers = {'Cookie': cookie};
             return ListView(

@@ -4,8 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
+import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 class Absences {
+  static bool firstaccess = true;
+
+  Future<bool> update() async {
+    if (firstaccess) {
+      if (await Data().updateAbsences() == false &&
+          await Data().loadAbsences() == false) {
+        print('Error');
+        return false;
+      }
+      firstaccess = false;
+    }
+    return true;
+  }
 
   var items = List<Absence>();
   bool get = true;
@@ -29,7 +43,11 @@ class Absences {
   }
 
   Widget build(BuildContext context) {
-      String data = Data.absences;
+    return FutureBuilder(
+        future: update(),
+        builder: (context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.data == true) {
+            String data = Data.absences;
             if (get == true) {
               for (var i in jsonDecode(data)['absences']) {
                 items.add(Absence.fromJson(i));
@@ -57,15 +75,15 @@ class Absences {
                           ),
                           child: Text('davon im Auftrag der Schule: ' +
                               jsonDecode(data)['statistics']
-                                      ['counterForSchool']
+                              ['counterForSchool']
                                   .toString() +
                               '\nAbwesenheit: ' +
                               jsonDecode(data)['statistics']
-                                  ['percentage'] +
+                              ['percentage'] +
                               '%' +
                               '\nNicht entschuldigt: ' +
                               jsonDecode(data)['statistics']
-                                      ['notJustified']
+                              ['notJustified']
                                   .toString() +
                               '\nVerspätungen: ' +
                               jsonDecode(data)['statistics']['delayed']
@@ -78,34 +96,43 @@ class Absences {
                 ),
                 Expanded(
                     child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    return Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: ListTile(
-                          leading: icon(items[index]),
-                          title: Text(items[index].date.date +
-                              ', ' +
-                              items[index]
-                                  .hour[items[index].hour.length - 1]
-                                  .hour
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: items.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: ListTile(
+                              leading: icon(items[index]),
+                              title: Text(items[index].date.date +
+                                  ', ' +
+                                  items[index]
+                                      .hour[items[index].hour.length - 1]
+                                      .hour
+                                      .toString() +
+                                  '. Stunde'),
+                              subtitle: Text(items[index].hour.length
                                   .toString() +
-                              '. Stunde'),
-                          subtitle: Text(items[index].hour.length.toString() +
-                              ' Einheiten'),
-                          onTap: () => showAb(context, items[index]),
-                        ));
-                  },
-                ))
+                                  ' Einheiten'),
+                              onTap: () => showAb(context, items[index]),
+                            ));
+                      },
+                    ))
               ],
             );
+          } else if (snapshot.data == null) {
+            return Loading();
           }
-}
+          else {
+            return NoConnection();
+          }
+        }
 
+    );
+  }
+}
 class Absence {
   final Date date;
   final List<Group> hour;

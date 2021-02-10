@@ -23,7 +23,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   Future<bool> getData() async{
-    await Data().updateAll();
+   await Data().updateAll();
     return true;
   }
 

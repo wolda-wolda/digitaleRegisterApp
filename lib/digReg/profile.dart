@@ -6,8 +6,9 @@ import 'package:flutter/rendering.dart';
 
 class Profile {
   String data = Data.profile;
-  Widget profilePicture(String url) {
-    if (url != 'https://fallmerayer.digitalesregister.it/v2/api/profile/picture&pictureUrl=') {
+  Widget profilePicture(String url, String code) {
+    if(code!=null){
+      url += code;
       return Container(
         width: 250,
         height: 250,
@@ -29,12 +30,13 @@ class Profile {
             String roleName = jsonDecode(data)['roleName'];
             String name = jsonDecode(data)['name'];
             String email = jsonDecode(data)['email'] ?? 'empty';
-            String pictureUrl ='https://fallmerayer.digitalesregister.it/v2/api/profile/picture&pictureUrl=' +jsonDecode(data)['picture'] ?? '';
+            String picture = jsonDecode(data)['picture'];
+            String pictureUrl ='https://fallmerayer.digitalesregister.it/v2/api/profile/picture&pictureUrl=';
             cookie = Session().getCookie();
             headers = {'Cookie': cookie};
             return ListView(
               children: <Widget>[
-                profilePicture(pictureUrl),
+                profilePicture(pictureUrl,picture),
                 ListTile(
                   leading: Icon(Icons.account_circle),
                   title: Text(name),

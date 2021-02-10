@@ -275,28 +275,40 @@ class Data {
   }
 
   Future<bool> loadAll() async {
+      print('loadProfile');
       await Data().loadProfile();
+      print('loadAbsences');
       await Data().loadAbsences();
-      await Data().loadCalendar();
+      print('loadCalendar');
+      await Data().loadCalendar(49,51);
+      print('loadDashboard');
       await Data().loadDashboard();
+      print('loadMessages');
       await Data().loadMessages();
+      print('loadSubjects');
       await Data().loadSubjects();
       return true;
   }
   Future<bool> loadProfile() async {
     final preferences = await SharedPreferences.getInstance();
+    if(preferences.containsKey('profile')==false){
+          return false;
+    }
     profile = preferences.getString('profile');
     return true;
   }
   Future<bool> loadAbsences() async {
     final preferences = await SharedPreferences.getInstance();
+    if(preferences.containsKey('absences')==false){
+      return false;
+    }
     absences = preferences.getString('absences');
     return true;
   }
-  Future<bool> loadCalendar() async {
+  Future<bool> loadCalendar(var from, var to) async {
     final preferences = await SharedPreferences.getInstance();
     var i = 0;
-    for(i=0;i<100;i++) {
+    for(i=from;i<=to;i++) {
       if(preferences.containsKey('calendardetail' + i.toString())) {
         calendardetail = preferences.getString('calendardetail' + i.toString());
         calendar[i] = calendardetail;
@@ -311,17 +323,27 @@ class Data {
   }
   Future<bool> loadDashboard() async {
     final preferences = await SharedPreferences.getInstance();
+    if(preferences.containsKey('dashboard')==false){
+      return false;
+    }
     dashboard = preferences.getString('dashboard');
     return true;
   }
   Future<bool> loadMessages() async {
     final preferences = await SharedPreferences.getInstance();
+    if(preferences.containsKey('messages')==false){
+      return false;
+    }
     messages = preferences.getString('messages');
     return true;
   }
   Future<bool> loadSubjects() async {
     final preferences = await SharedPreferences.getInstance();
+    if(preferences.containsKey('subjects')==false){
+      return false;
+    }
     subjects = preferences.getString('subjects');
+
     if(subjectcreated==false) {
       for (var i in jsonDecode(subjects)['subjects']) {
         subjectitems.add(Subject.fromJson(i));

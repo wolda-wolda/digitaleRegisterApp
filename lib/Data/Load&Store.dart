@@ -178,6 +178,7 @@ class Data {
   static var subjectitems = List<Subject>();
   static var calendaritems = List<Day>();
   static final Map<int, String> calendar = {};
+  static String link = 'https://fallmerayer.digitalesregister.it';
 
   Future<bool> updateAll() async {
     print('updateDashboard');
@@ -197,14 +198,14 @@ class Data {
   Future<bool> updateProfile() async {
     final preferences = await SharedPreferences.getInstance();
     preferences.setString('profile', await Session().get(
-        'https://fallmerayer.digitalesregister.it/v2/api/profile/get'));
+        link + '/v2/api/profile/get'));
     await Data().loadProfile();
     return true;
   }
   Future<bool> updateAbsences() async {
     final preferences = await SharedPreferences.getInstance();
     preferences.setString('absences', await Session().get(
-        'https://fallmerayer.digitalesregister.it/v2/api/student/dashboard/absences'));
+        link + '/v2/api/student/dashboard/absences'));
     await Data().loadAbsences();
     return true;
   }
@@ -222,17 +223,9 @@ class Data {
           }
         }
         String monday = DateFormat('y-MM-dd').format(week);
-        preferences.setString('calendardetail' + i.toString(),
-            await Session().post(
-                'https://fallmerayer.digitalesregister.it/v2/api/calendar/student',
-                {'startDate': monday}));
+        preferences.setString('calendardetail' + i.toString(), await Session().post(link + '/v2/api/calendar/student', {'startDate': monday}));
         calendardetail = preferences.getString('calendardetail' + i.toString());
         calendar[i] = calendardetail;
-        week2 = (jsonDecode(calendardetail).keys.toList());
-        for (var i in week2) {
-          calendaritems.add(
-              Day.fromJson(jsonDecode(calendardetail)[i]['1']['1']));
-        }
       }
 
       return true;
@@ -240,35 +233,33 @@ class Data {
   Future<bool> updateDashboard() async {
     final preferences = await SharedPreferences.getInstance();
     preferences.setString('dashboard', await Session().post(
-        'https://fallmerayer.digitalesregister.it/v2/api/student/dashboard/dashboard',
+        link + '/v2/api/student/dashboard/dashboard',
         {'viewFuture': true}));
     await Data().loadDashboard();
     return true;
   }
   Future<bool> updateSubjects() async {
+    subjectitems.clear();
     final preferences = await SharedPreferences.getInstance();
-    preferences.setString('subjects', await Session().get('https://fallmerayer.digitalesregister.it/v2/api/student/all_subjects'));
+    preferences.setString('subjects', await Session().get(link + '/v2/api/student/all_subjects'));
     subjects = preferences.getString('subjects');
-    if(subjectcreated==false) {
-      for (var i in jsonDecode(subjects)['subjects']) {
-        subjectitems.add(Subject.fromJson(i));
-      }
-      Length=subjectitems.length;
-      subjectcreated=true;
+    for (var i in jsonDecode(subjects)['subjects']) {
+      subjectitems.add(Subject.fromJson(i));
     }
     for (var i = 0; i < subjectitems.length; i++) {
       id = subjectitems[i].id;
       studentId = subjectitems[i].studentId;
-      subjectdetail = await Session().post('https://fallmerayer.digitalesregister.it/v2/api/student/subject_detail', {'subjectId': id, 'studentId': studentId});
+      subjectdetail = await Session().post(link + '/v2/api/student/subject_detail', {'subjectId': id, 'studentId': studentId});
       preferences.setString("subjectdetail" + i.toString(), subjectdetail);
       subjectitems[i].content = Content.fromJson(jsonDecode(subjectdetail));
     }
     return true;
   }
+
   Future<bool> updateMessages() async {
     final preferences = await SharedPreferences.getInstance();
     preferences.setString('messages', await Session().post(
-        'https://fallmerayer.digitalesregister.it/v2/api/message/getMyMessages',
+        link + '/v2/api/message/getMyMessages',
         {'filterByLabelName': ''}));
     await Data().loadMessages();
     return true;
@@ -312,11 +303,6 @@ class Data {
       if(preferences.containsKey('calendardetail' + i.toString())) {
         calendardetail = preferences.getString('calendardetail' + i.toString());
         calendar[i] = calendardetail;
-        week2 = (jsonDecode(calendardetail).keys.toList());
-        for (var i in week2) {
-          calendaritems.add(
-              Day.fromJson(jsonDecode(calendardetail)[i]['1']['1']));
-        }
       }
     }
     return true;
@@ -338,19 +324,18 @@ class Data {
     return true;
   }
   Future<bool> loadSubjects() async {
+    subjectitems.clear();
     final preferences = await SharedPreferences.getInstance();
     if(preferences.containsKey('subjects')==false){
       return false;
     }
     subjects = preferences.getString('subjects');
 
-    if(subjectcreated==false) {
-      for (var i in jsonDecode(subjects)['subjects']) {
-        subjectitems.add(Subject.fromJson(i));
-      }
-      Length=subjectitems.length;
-      subjectcreated=true;
+    for (var i in jsonDecode(subjects)['subjects']) {
+      subjectitems.add(Subject.fromJson(i));
     }
+    Length=subjectitems.length;
+    subjectcreated=true;
     for (var i = 0; i < Length; i++) {
       id = subjectitems[i].id;
       studentId = subjectitems[i].studentId;

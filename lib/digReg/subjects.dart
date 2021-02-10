@@ -2,8 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
+import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 class Subjects {
+  static bool firstaccess = true;
+  Future<bool> update() async {
+    if (firstaccess) {
+      if (await Data().updateSubjects() == false) {
+        if (await Data().loadSubjects() == false) {
+          print('Error');
+          return false;
+        }
+      }
+      firstaccess = false;
+    }
+    return true;
+  }
   void showSub(BuildContext context, Grades data) {
     showDialog(
         context: context,
@@ -11,7 +25,6 @@ class Subjects {
           return PopUpDialog(data);
         });
   }
-  static var length = Data.subjectitems.length;
   String note(Grades data) {
     List<String> format = data.grade.split('.');
     String ret;
@@ -26,16 +39,21 @@ class Subjects {
     return ret;
   }
 
+
   Text average(double ave) {
     if (ave.isNaN) return Text('Noch kein Durchschnitt vorhanden');
     return Text('Durchschnitt: ' + ave.toString());
   }
 
   Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: update(),
+    builder: (context, AsyncSnapshot<bool> snapshot) {
+    if(snapshot.data==true){
             return ListView.builder(
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
-              itemCount: length,
+              itemCount: Data.subjectitems.length,
               itemBuilder: (context, index1) {
                 double dividend = 0;
                 double divisor = 0;
@@ -105,10 +123,19 @@ class Subjects {
                                 ]
                               )
                       ]);
-              },
+              }
+            );
+                }
+                else if (snapshot.data == null) {
+                        return Loading();
+                      }
+              else {
+                return NoConnection();
+              }
+              }
             );
           }
-}
+  }
 
 class PopUpDialog extends StatelessWidget {
   final Grades data;

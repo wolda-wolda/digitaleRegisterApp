@@ -23,11 +23,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
-  Future<bool> getData() async{
-   await Data().updateAll();
-    return true;
-  }
-
   String profile;
 
   @override
@@ -71,10 +66,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
-    return FutureBuilder(
-      future: getData(),
-      builder: (context, AsyncSnapshot<bool> snapshot) {
-        if(snapshot.hasData==true) {
           return Scaffold(
               appBar: AppBar(title: Text('Digitales Register'), actions: <Widget>[
                 PopupMenuButton<String>(
@@ -151,23 +142,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 },
               ),
           );
-        }
-        return Container(
-          alignment: Alignment.center,
-           height: 20,
-           width: 20,
-           child: CircularProgressIndicator(
-             strokeWidth: 5,
-             backgroundColor: Colors.grey[800],
-             valueColor : AlwaysStoppedAnimation(Colors.white),
-           ),
-        );
-      }
-    );
   }
 
   Future<void> logout() async {
-    await Session().get('https://fallmerayer.digitalesregister.it/v2/logout');
+    await Session().get(Data.link +'/v2/logout');
   }
 
   void choiceAction(String choice) {

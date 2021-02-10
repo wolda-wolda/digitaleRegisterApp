@@ -5,51 +5,86 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
+import 'file:///C:/Users/android/StudioProjects/digitaleRegisterApp/lib/digReg/usefulWidgets.dart';
 
 class Dashboard {
-
+  static bool firstaccess=true;
+  Future<bool> update() async {
+    if (firstaccess) {
+      if (await Data().updateDashboard() == false) {
+        if (await Data().loadDashboard() == false) {
+          print('Error');
+          return false;
+        }
+      }
+      firstaccess = false;
+    }
+    return true;
+  }
   var items = List<Dash>();
   bool get = true;
 
 
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
-    String data = Data.dashboard;
-            if (get == true) {
-              for (var i in jsonDecode(data)) {
-                items.add(Dash.fromJson(i));
-              }
-              get = false;
-            }
-            return ListView.builder(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              itemCount: items.length,
-              itemBuilder: (context, index1) {
-                return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    title: Text(items[index1].date.toString(),
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-                    subtitle: ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: items[index1].items.length,
-                      itemBuilder: (context, index2) {
-                        return ListTile(
-                          title: title(context, items[index1], index2),
-                          trailing: title2(context, items[index1], index2, _themeChanger),
-                          subtitle: Text(
-                              items[index1].items[index2].subtitle.toString()),
-                        );
-                      },
-                    ),
-                  ),
+
+        return FutureBuilder(
+          future: update(),
+          builder: (context, AsyncSnapshot<bool> snapshot) {
+              if(snapshot.data==true){
+                String data = Data.dashboard;
+                if (get == true) {
+                  for (var i in jsonDecode(data)) {
+                    items.add(Dash.fromJson(i));
+                  }
+                  get = false;
+                }
+                return  RefreshIndicator(
+                 child: ListView.builder(
+                   scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: items.length,
+                  itemBuilder: (context, index1) {
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListTile(
+                        title: Text(items[index1].date.toString(),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),),
+                        subtitle: ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: items[index1].items.length,
+                          itemBuilder: (context, index2) {
+                            return ListTile(
+                              title: title(context, items[index1], index2),
+                              trailing: title2(
+                                  context, items[index1], index2, _themeChanger),
+                              subtitle: Text(
+                                  items[index1].items[index2].subtitle
+                                      .toString()),
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                  onRefresh: (){
+                   return Data().updateDashboard();
+                  }
                 );
-              },
-            );
+
+              }else if(snapshot.data==null){
+                return Loading();
+              }
+              else{
+                return NoConnection();
+              }
+          }
+    );
           }
 }
 
@@ -95,6 +130,7 @@ class Dash {
     return Dash(date: Date.format(json['date']).date, items: temp);
   }
 }
+
 
 class Items {
   final String title;

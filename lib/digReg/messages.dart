@@ -3,9 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
+import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 class Messages {
-
+  static bool firstaccess = true;
+  Future<bool> update() async {
+    if (firstaccess) {
+      if (await Data().updateMessages() == false &&
+          await Data().loadMessages() == false) {
+        print('Error');
+        return false;
+      }
+      firstaccess = false;
+    }
+    return true;
+  }
   void showMessage(BuildContext context, Mess data) {
     showDialog(
         context: context,
@@ -18,23 +30,41 @@ class Messages {
   bool get = true;
 
   Widget build(BuildContext context) {
-    String data = Data.messages;
-            if (get == true) {
-              for (var i in jsonDecode(data)) {
-                items.add(Mess.fromJson(i));
-                get = false;
-              }
-            }
-            return ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                    onTap: () => showMessage(context, items[index]),
-                    title: Text(items[index].subject),
-                    subtitle: Text(items[index].date));
-              },
-            );
+    return FutureBuilder(
+        future: update(),
+    builder: (context, AsyncSnapshot<bool> snapshot) {
+      if(snapshot.data==true){
+        String data = Data.messages;
+        if (get == true) {
+          for (var i in jsonDecode(data)) {
+            items.add(Mess.fromJson(i));
+            get = false;
           }
+          }
+          return RefreshIndicator(
+          child: ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+          return ListTile(
+          onTap: () => showMessage(context, items[index]),
+          title: Text(items[index].subject),
+          subtitle: Text(items[index].date));
+          },
+        ),
+            onRefresh: (){
+              return Data().updateMessages();
+            }
+          );
+      }
+      else if (snapshot.data == null) {
+        return Loading();
+      }
+      else {
+        return NoConnection();
+      }
+    }
+    );
+  }
 }
 
 class Mess {

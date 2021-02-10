@@ -239,15 +239,12 @@ class Data {
     return true;
   }
   Future<bool> updateSubjects() async {
+    subjectitems.clear();
     final preferences = await SharedPreferences.getInstance();
     preferences.setString('subjects', await Session().get(link + '/v2/api/student/all_subjects'));
     subjects = preferences.getString('subjects');
-    if(subjectcreated==false) {
-      for (var i in jsonDecode(subjects)['subjects']) {
-        subjectitems.add(Subject.fromJson(i));
-      }
-      Length=subjectitems.length;
-      subjectcreated=true;
+    for (var i in jsonDecode(subjects)['subjects']) {
+      subjectitems.add(Subject.fromJson(i));
     }
     for (var i = 0; i < subjectitems.length; i++) {
       id = subjectitems[i].id;
@@ -258,6 +255,7 @@ class Data {
     }
     return true;
   }
+
   Future<bool> updateMessages() async {
     final preferences = await SharedPreferences.getInstance();
     preferences.setString('messages', await Session().post(
@@ -326,19 +324,18 @@ class Data {
     return true;
   }
   Future<bool> loadSubjects() async {
+    subjectitems.clear();
     final preferences = await SharedPreferences.getInstance();
     if(preferences.containsKey('subjects')==false){
       return false;
     }
     subjects = preferences.getString('subjects');
 
-    if(subjectcreated==false) {
-      for (var i in jsonDecode(subjects)['subjects']) {
-        subjectitems.add(Subject.fromJson(i));
-      }
-      Length=subjectitems.length;
-      subjectcreated=true;
+    for (var i in jsonDecode(subjects)['subjects']) {
+      subjectitems.add(Subject.fromJson(i));
     }
+    Length=subjectitems.length;
+    subjectcreated=true;
     for (var i = 0; i < Length; i++) {
       id = subjectitems[i].id;
       studentId = subjectitems[i].studentId;

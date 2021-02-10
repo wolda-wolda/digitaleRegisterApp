@@ -13,7 +13,6 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
-import 'file:///C:/Users/android/StudioProjects/digitaleRegisterApp/lib/digReg/usefulWidgets.dart';
 
 import 'PopUpMenu.dart';
 
@@ -24,11 +23,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
-  Future<bool> getData() async{
-   await Data().loadAll();
-    return true;
-  }
-
   String profile;
 
   @override
@@ -72,10 +66,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
-    return FutureBuilder(
-      future: getData(),
-      builder: (context, AsyncSnapshot<bool> snapshot) {
-        if(snapshot.hasData==true) {
           return Scaffold(
               appBar: AppBar(title: Text('Digitales Register'), actions: <Widget>[
                 PopupMenuButton<String>(
@@ -152,10 +142,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 },
               ),
           );
-        }
-        return Loading();
-      }
-    );
   }
 
   Future<void> logout() async {

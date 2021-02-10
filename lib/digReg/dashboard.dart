@@ -9,13 +9,15 @@ import 'file:///C:/Users/android/StudioProjects/digitaleRegisterApp/lib/digReg/u
 
 class Dashboard {
   static bool firstaccess=true;
-  Future<bool> update() async{
-    if(firstaccess){
-      if(await Data().updateDashboard()==false && await Data().loadDashboard()==false){
-        print('Error');
-        return false;
+  Future<bool> update() async {
+    if (firstaccess) {
+      if (await Data().updateDashboard() == false) {
+        if (await Data().loadDashboard() == false) {
+          print('Error');
+          return false;
+        }
       }
-      firstaccess=false;
+      firstaccess = false;
     }
     return true;
   }
@@ -25,6 +27,7 @@ class Dashboard {
 
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
+
         return FutureBuilder(
           future: update(),
           builder: (context, AsyncSnapshot<bool> snapshot) {
@@ -36,8 +39,9 @@ class Dashboard {
                   }
                   get = false;
                 }
-                return ListView.builder(
-                  scrollDirection: Axis.vertical,
+                return  RefreshIndicator(
+                 child: ListView.builder(
+                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   itemCount: items.length,
                   itemBuilder: (context, index1) {
@@ -67,7 +71,12 @@ class Dashboard {
                       ),
                     );
                   },
+                ),
+                  onRefresh: (){
+                   return Data().updateDashboard();
+                  }
                 );
+
               }else if(snapshot.data==null){
                 return Loading();
               }

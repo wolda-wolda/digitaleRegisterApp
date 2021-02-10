@@ -11,10 +11,11 @@ class Absences {
 
   Future<bool> update() async {
     if (firstaccess) {
-      if (await Data().updateAbsences() == false &&
-          await Data().loadAbsences() == false) {
-        print('Error');
-        return false;
+      if (await Data().updateAbsences() == false) {
+        if (await Data().loadAbsences() == false) {
+          print('Error');
+          return false;
+        }
       }
       firstaccess = false;
     }
@@ -54,7 +55,8 @@ class Absences {
               }
               get = false;
             }
-            return Column(
+            return RefreshIndicator(
+            child: Column(
               children: [
                 ExpansionTileCard(
                     title: Text(
@@ -121,6 +123,9 @@ class Absences {
                       },
                     ))
               ],
+            ),
+              onRefresh: (){
+                return Data().updateAbsences();              }
             );
           } else if (snapshot.data == null) {
             return Loading();

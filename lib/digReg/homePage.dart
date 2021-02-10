@@ -153,10 +153,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           );
         }
         return Container(
-          width: 20,
-            height: 20,
-            padding: EdgeInsets.fromLTRB(40, 230, 40, 230),
-          child: CircularProgressIndicator()
+          alignment: Alignment.center,
+           height: 20,
+           width: 20,
+           child: CircularProgressIndicator(
+             strokeWidth: 5,
+             backgroundColor: Colors.grey[800],
+             valueColor : AlwaysStoppedAnimation(Colors.white),
+           ),
         );
       }
     );

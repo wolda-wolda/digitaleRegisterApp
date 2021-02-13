@@ -67,6 +67,17 @@ class Subjects {
         future: update(),
         builder: (context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.data == true) {
+            for(var i = 0;i<Data.subjectitems.length;i++){
+              double dividend = 0;
+              double divisor = 0;
+              for (var i in Data.subjectitems[i].tempGrades) {
+                dividend = dividend +
+                    double.parse(i.grade) * i.weight / 100;
+                divisor = divisor + i.weight / 100;
+              }
+              Data.subjectitems[i].average = double.parse(
+                  (dividend / divisor).toStringAsPrecision(3));
+            }
             return Column(
               children: [
                 ListTile(
@@ -80,15 +91,6 @@ class Subjects {
                         shrinkWrap: true,
                         itemCount: Data.subjectitems.length,
                         itemBuilder: (context, index1) {
-                          double dividend = 0;
-                          double divisor = 0;
-                          for (var i in Data.subjectitems[index1].tempGrades) {
-                            dividend = dividend +
-                                double.parse(i.grade) * i.weight / 100;
-                            divisor = divisor + i.weight / 100;
-                          }
-                          Data.subjectitems[index1].average = double.parse(
-                              (dividend / divisor).toStringAsPrecision(3));
                           return ExpansionTileCard(
                               borderRadius: BorderRadius.circular(10),
                               title: Text(

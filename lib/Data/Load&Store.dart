@@ -170,10 +170,8 @@ class Data {
   static List week;
   static List week2;
   static String cache;
-  static bool subjectcreated=false;
   static String calendardetail;
   static bool firsttime = false;
-  static var Length;
   static var id;
   static var studentId;
   static var subjectitems = List<Subject>();
@@ -363,9 +361,7 @@ class Data {
     for (var i in jsonDecode(subjects)['subjects']) {
       subjectitems.add(Subject.fromJson(i));
     }
-    Length=subjectitems.length;
-    subjectcreated=true;
-    for (var i = 0; i < Length; i++) {
+    for (var i = 0; i < subjectitems.length; i++) {
       id = subjectitems[i].id;
       studentId = subjectitems[i].studentId;
       subjectdetail = preferences.getString("subjectdetail" + i.toString());

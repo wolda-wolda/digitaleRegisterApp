@@ -44,7 +44,11 @@ class Absences {
   }
 
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return RefreshIndicator(
+        onRefresh: (){
+          return Data().updateAbsences();
+         },
+     child: FutureBuilder(
         future: update(),
         builder: (context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.data == true) {
@@ -55,8 +59,7 @@ class Absences {
               }
               get = false;
             }
-            return RefreshIndicator(
-            child: Column(
+            return Column(
               children: [
                 ExpansionTileCard(
                     title: Text(
@@ -123,9 +126,6 @@ class Absences {
                       },
                     ))
               ],
-            ),
-              onRefresh: (){
-                return Data().updateAbsences();              }
             );
           } else if (snapshot.data == null) {
             return Loading();
@@ -134,8 +134,7 @@ class Absences {
             return NoConnection();
           }
         }
-
-    );
+     ));
   }
 }
 class Absence {

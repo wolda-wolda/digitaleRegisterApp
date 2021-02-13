@@ -62,47 +62,49 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
         String data=Data.profile;
-        if (!data.contains('window.location')) {
-          if (i == 0) {
-            notificationsEnabled =
-            jsonDecode(data)['notificationsEnabled'];
-            i++;
-          }
-          return Scaffold(
-            appBar: AppBar(title: Text('Settings')),
-            body: Center(
-              child: SettingsList(
-                sections: [
-                  SettingsSection(
-                    tiles: [
-                      SettingsTile(
-                        leading: Icon(Icons.color_lens),
-                        title: 'Theme ändern',
-                        onPressed: (_) => showColorPicker(context, _themeChanger),
-                      ),
-                      SettingsTile.switchTile(
-                          leading: darkMode(_themeChanger.getBool()),
-                          title: 'Dark Mode',
-                          onToggle: (value) {
-                            _themeChanger.setBool(value);
-                          },
-                          switchValue: _themeChanger.getBool()),
-                      SettingsTile.switchTile(
-                        leading: notifications(notificationsEnabled),
-                          title: 'Email-Benachrichtigungen',
-                          onToggle: (value) {
-                            setState(() {
-                              notificationsEnabled = value;
-                              changeNotification();
-                            });
-                          },
-                          switchValue: notificationsEnabled)
-                    ],
-                  ),
-                ],
+        if (data != null) {
+          if (!data.contains('window.location')) {
+            if (i == 0) {
+              notificationsEnabled =
+              jsonDecode(data)['notificationsEnabled'];
+              i++;
+            }
+            return Scaffold(
+              appBar: AppBar(title: Text('Settings')),
+              body: Center(
+                child: SettingsList(
+                  sections: [
+                    SettingsSection(
+                      tiles: [
+                        SettingsTile(
+                          leading: Icon(Icons.color_lens),
+                          title: 'Theme ändern',
+                          onPressed: (_) => showColorPicker(context, _themeChanger),
+                        ),
+                        SettingsTile.switchTile(
+                            leading: darkMode(_themeChanger.getBool()),
+                            title: 'Dark Mode',
+                            onToggle: (value) {
+                              _themeChanger.setBool(value);
+                            },
+                            switchValue: _themeChanger.getBool()),
+                        SettingsTile.switchTile(
+                            leading: notifications(notificationsEnabled),
+                            title: 'Email-Benachrichtigungen',
+                            onToggle: (value) {
+                              setState(() {
+                                notificationsEnabled = value;
+                                changeNotification();
+                              });
+                            },
+                            switchValue: notificationsEnabled)
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
         return Scaffold(
           appBar: AppBar(title: Text('Settings')),

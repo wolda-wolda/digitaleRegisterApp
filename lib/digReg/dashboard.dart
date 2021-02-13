@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
-import 'file:///C:/Users/android/StudioProjects/digitaleRegisterApp/lib/digReg/usefulWidgets.dart';
+import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 class Dashboard {
   static bool firstaccess=true;

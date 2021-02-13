@@ -7,8 +7,17 @@ Map<String, String> headers;
 String cookie = 'empty';
 class Session {
   Future<String> get(String url) async {
-    http.Response response = await http.get(url, headers: headers);
-    return response.body;
+    try {
+      http.Response response = await http.get(url, headers: headers).timeout(
+          Duration(seconds: 2),
+          onTimeout: () {
+            throw Exception;
+          }
+      );
+      return response.body;
+    } on Exception{
+      return 'e';
+    }
   }
   String getCookie() {
     return cookie;
@@ -16,7 +25,8 @@ class Session {
   Future<String> login(String url, dynamic data) async {
     if (headers != null)
       headers.clear();
-    http.Response response = await http.post(url, body: jsonEncode(data), headers: headers);
+      http.Response response = await http.post(
+          url, body: jsonEncode(data), headers: headers);
     print(response.body);
     if (jsonDecode(response.body)['error'] == null) {
       updateCookie(response);
@@ -25,8 +35,17 @@ class Session {
   }
 
   Future<String> post(String url, dynamic data) async {
-    http.Response response = await http.post(url, body: jsonEncode(data), headers: headers);
-    return response.body;
+    try {
+      http.Response response = await http.post(url, body: jsonEncode(data), headers: headers).timeout(
+          Duration(seconds: 2),
+          onTimeout: () {
+            throw Exception;
+          }
+      );
+      return response.body;
+    } on Exception{
+      return 'e';
+    }
   }
 
   void updateCookie(http.Response response) {

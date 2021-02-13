@@ -5,8 +5,8 @@ class Loading extends StatelessWidget{
   Widget build(BuildContext context) {
     return Container(
         alignment: Alignment.center,
-        height: 20,
-        width: 20,
+        height: 1000,
+        width: 1000,
         child: CircularProgressIndicator(
           strokeWidth: 5,
           backgroundColor: Colors.grey[800],
@@ -17,13 +17,18 @@ class Loading extends StatelessWidget{
 }
 class NoConnection extends StatelessWidget{
   Widget build(BuildContext context) {
-    return Container(
-        alignment: Alignment.center,
-        height: 1000,
-        width: 1000,
-        child: Text(
+    return ListView(
+      children: <Widget>[
+     Container(
+         alignment: Alignment.center,
+         height: 500,
+         width: 1000,
+         child: Text(
           'No Connection'
         )
+
+    )
+    ]
     );
   }
 }

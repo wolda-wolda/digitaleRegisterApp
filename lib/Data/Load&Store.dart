@@ -169,6 +169,7 @@ class Data {
   static String subjectdetail;
   static List week;
   static List week2;
+  static String cache;
   static bool subjectcreated=false;
   static String calendardetail;
   static bool firsttime = false;
@@ -197,17 +198,27 @@ class Data {
     }
   Future<bool> updateProfile() async {
     final preferences = await SharedPreferences.getInstance();
-    preferences.setString('profile', await Session().get(
-        link + '/v2/api/profile/get'));
-    await Data().loadProfile();
-    return true;
+    cache = await Session().get(
+        link + '/v2/api/profile/get');
+    if(cache=='e'){
+      return false;
+    }else{
+      preferences.setString('profile', cache);
+      await Data().loadProfile();
+      return true;
+    }
   }
   Future<bool> updateAbsences() async {
     final preferences = await SharedPreferences.getInstance();
-    preferences.setString('absences', await Session().get(
-        link + '/v2/api/student/dashboard/absences'));
-    await Data().loadAbsences();
-    return true;
+    cache = await Session().get(
+        link + '/v2/api/student/dashboard/absences');
+    if(cache=='e'){
+      return false;
+    }else{
+      preferences.setString('absences', cache);
+      await Data().loadAbsences();
+      return true;
+    }
   }
   Future<bool> updateCalendar(var from, var to) async {
       final preferences = await SharedPreferences.getInstance();
@@ -223,20 +234,30 @@ class Data {
           }
         }
         String monday = DateFormat('y-MM-dd').format(week);
-        preferences.setString('calendardetail' + i.toString(), await Session().post(link + '/v2/api/calendar/student', {'startDate': monday}));
-        calendardetail = preferences.getString('calendardetail' + i.toString());
-        calendar[i] = calendardetail;
+        cache = await Session().post(link + '/v2/api/calendar/student', {'startDate': monday});
+        print(cache);
+        if(cache=='e'){
+          return false;
+        }else{
+          preferences.setString('calendardetail' + i.toString(), cache);
+          calendar[i] = cache;
+        }
       }
-
       return true;
   }
   Future<bool> updateDashboard() async {
     final preferences = await SharedPreferences.getInstance();
-    preferences.setString('dashboard', await Session().post(
+    cache = await Session().post(
         link + '/v2/api/student/dashboard/dashboard',
-        {'viewFuture': true}));
-    await Data().loadDashboard();
-    return true;
+        {'viewFuture': true});
+    if(cache=='e'){
+      return false;
+    }else{
+      preferences.setString('dashboard', cache );
+      await Data().loadDashboard();
+      return true;
+    }
+
   }
   Future<bool> updateSubjects() async {
     subjectitems.clear();
@@ -258,11 +279,16 @@ class Data {
 
   Future<bool> updateMessages() async {
     final preferences = await SharedPreferences.getInstance();
-    preferences.setString('messages', await Session().post(
-        link + '/v2/api/message/getMyMessages',
-        {'filterByLabelName': ''}));
-    await Data().loadMessages();
-    return true;
+    cache = await Session().post(
+      link + '/v2/api/message/getMyMessages',
+      {'filterByLabelName': ''});
+    if(cache=='e') {
+      return false;
+    }else {
+      preferences.setString('messages', cache);
+      await Data().loadMessages();
+      return true;
+    }
   }
 
   Future<bool> loadAll() async {
@@ -282,7 +308,7 @@ class Data {
   }
   Future<bool> loadProfile() async {
     final preferences = await SharedPreferences.getInstance();
-    if(preferences.containsKey('profile')==false){
+    if(preferences.getString('profile')==null){
           return false;
     }
     profile = preferences.getString('profile');
@@ -290,7 +316,7 @@ class Data {
   }
   Future<bool> loadAbsences() async {
     final preferences = await SharedPreferences.getInstance();
-    if(preferences.containsKey('absences')==false){
+    if(preferences.getString('absences')==null){
       return false;
     }
     absences = preferences.getString('absences');
@@ -300,16 +326,19 @@ class Data {
     final preferences = await SharedPreferences.getInstance();
     var i = 0;
     for(i=from;i<=to;i++) {
-      if(preferences.containsKey('calendardetail' + i.toString())) {
-        calendardetail = preferences.getString('calendardetail' + i.toString());
+      if(preferences.containsKey('calendardetail' + i.toString()) && preferences.getString('calendardetail' + i.toString()) !=null) {
+        calendardetail= preferences.getString('calendardetail' + i.toString());
         calendar[i] = calendardetail;
+      }
+      else{
+        return false;
       }
     }
     return true;
   }
   Future<bool> loadDashboard() async {
     final preferences = await SharedPreferences.getInstance();
-    if(preferences.containsKey('dashboard')==false){
+    if(preferences.getString('dashboard')==null){
       return false;
     }
     dashboard = preferences.getString('dashboard');
@@ -317,7 +346,7 @@ class Data {
   }
   Future<bool> loadMessages() async {
     final preferences = await SharedPreferences.getInstance();
-    if(preferences.containsKey('messages')==false){
+    if(preferences.getString('messages')==null){
       return false;
     }
     messages = preferences.getString('messages');
@@ -326,7 +355,7 @@ class Data {
   Future<bool> loadSubjects() async {
     subjectitems.clear();
     final preferences = await SharedPreferences.getInstance();
-    if(preferences.containsKey('subjects')==false){
+    if(preferences.getString('subjects')==null){
       return false;
     }
     subjects = preferences.getString('subjects');

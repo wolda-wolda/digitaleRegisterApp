@@ -105,7 +105,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ],),
               body: Center(child: _options(context, _selectedIndex)),
               bottomNavigationBar: BottomNavigationBar(
-                fixedColor: Color(0xFF4285F4),
+                //fixedColor: Color(0xFF4285F4),
+                fixedColor: _themeChanger.getColor(),
                 unselectedItemColor: Colors.grey[800],
                 currentIndex: _selectedIndex,
                 items: [

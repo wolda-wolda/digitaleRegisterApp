@@ -18,6 +18,7 @@ class Subjects {
     }
     return true;
   }
+
   void showSub(BuildContext context, Grades data) {
     showDialog(
         context: context,
@@ -25,6 +26,7 @@ class Subjects {
           return PopUpDialog(data);
         });
   }
+
   String note(Grades data) {
     List<String> format = data.grade.split('.');
     String ret;
@@ -36,55 +38,80 @@ class Subjects {
       ret = format[0] + '/' + (int.parse(format[0]) + 1).toString();
     else if (format[1] == '75')
       ret = (int.parse(format[0]) + 1).toString() + '-';
+    else
+      ret = data.grade;
     return ret;
   }
 
-
   Text average(double ave) {
-    if (ave.isNaN) return Text('Noch kein Durchschnitt vorhanden');
+    if (ave.isNaN) return Text('Durchschnitt: /');
     return Text('Durchschnitt: ' + ave.toString());
+  }
+
+  double total_average(List<Subject> data) {
+    double divident = 0;
+    int divisor = 0;
+    for (var i in data) {
+      if (i.average != null) {
+        if (!i.average.isNaN) {
+          divident += i.average;
+          divisor++;
+        }
+      }
+    }
+    return divident / divisor;
   }
 
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: update(),
-    builder: (context, AsyncSnapshot<bool> snapshot) {
-    if(snapshot.data==true){
-            return ListView.builder(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              itemCount: Data.subjectitems.length,
-              itemBuilder: (context, index1) {
-                double dividend = 0;
-                double divisor = 0;
-                for (var i in Data.subjectitems[index1].tempGrades) {
-                  dividend = dividend + double.parse(i.grade) * i.weight / 100;
-                  divisor = divisor + i.weight / 100;
-                }
-                Data.subjectitems[index1].average =
-                    double.parse((dividend / divisor).toStringAsPrecision(3));
-                return ExpansionTileCard(
-                    borderRadius: BorderRadius.circular(10),
-                    title: Text(Data.subjectitems[index1].name.toString(),
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: average(Data.subjectitems[index1].average),
-                    children: <Widget>[
-                      Divider(
-                        thickness: 1.0,
-                        height: 1.0,
-                      ),
-                      Column(
-                                children: [
+        builder: (context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.data == true) {
+            return Column(
+              children: [
+                ListTile(
+                    title: Text('Gesamtdurchschnitt: ' +
+                        total_average(Data.subjectitems)
+                            .toStringAsPrecision(3)),
+                    selectedTileColor: Colors.grey[800]),
+                Expanded(
+                    child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: Data.subjectitems.length,
+                        itemBuilder: (context, index1) {
+                          double dividend = 0;
+                          double divisor = 0;
+                          for (var i in Data.subjectitems[index1].tempGrades) {
+                            dividend = dividend +
+                                double.parse(i.grade) * i.weight / 100;
+                            divisor = divisor + i.weight / 100;
+                          }
+                          Data.subjectitems[index1].average = double.parse(
+                              (dividend / divisor).toStringAsPrecision(3));
+                          return ExpansionTileCard(
+                              borderRadius: BorderRadius.circular(10),
+                              title: Text(
+                                  Data.subjectitems[index1].name.toString(),
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              subtitle:
+                                  average(Data.subjectitems[index1].average),
+                              children: <Widget>[
+                                Divider(
+                                  thickness: 1.0,
+                                  height: 1.0,
+                                ),
+                                Column(children: [
                                   ListView.builder(
                                       physics: NeverScrollableScrollPhysics(),
                                       shrinkWrap: true,
                                       itemCount: Data.subjectitems[index1]
-                                          .content
-                                          .observations
-                                          .length,
+                                          .content.observations.length,
                                       itemBuilder: (context, index2) {
                                         return ListTile(
-                                            title: Text(Data.subjectitems[index1]
+                                            title: Text(Data
+                                                .subjectitems[index1]
                                                 .content
                                                 .observations[index2]
                                                 .type
@@ -93,49 +120,40 @@ class Subjects {
                                   ListView.builder(
                                       physics: NeverScrollableScrollPhysics(),
                                       shrinkWrap: true,
-                                      itemCount:
-                                          Data.subjectitems[index1].content.grades.length,
+                                      itemCount: Data.subjectitems[index1]
+                                          .content.grades.length,
                                       itemBuilder: (context, index2) {
                                         return ListTile(
                                           title: Text(Data.subjectitems[index1]
-                                                  .content
-                                                  .grades[index2]
-                                                  .type
+                                                  .content.grades[index2].type
                                                   .toString() +
                                               ': ' +
                                               note(Data.subjectitems[index1]
-                                                  .content
-                                                  .grades[index2]) +
+                                                  .content.grades[index2]) +
                                               ' - ' +
-                                              Data.subjectitems[index1]
-                                                  .content
-                                                  .grades[index2]
-                                                  .weight
+                                              Data.subjectitems[index1].content
+                                                  .grades[index2].weight
                                                   .toString() +
                                               '%'),
                                           onTap: () => showSub(
                                               context,
-                                              Data.subjectitems[index1]
-                                                  .content
+                                              Data.subjectitems[index1].content
                                                   .grades[index2]),
                                         );
                                       })
-                                ]
-                              )
-                      ]);
-              }
+                                ])
+                              ]);
+                        }))
+              ],
             );
-                }
-                else if (snapshot.data == null) {
-                        return Loading();
-                      }
-              else {
-                return NoConnection();
-              }
-              }
-            );
+          } else if (snapshot.data == null) {
+            return Loading();
+          } else {
+            return NoConnection();
           }
+        });
   }
+}
 
 class PopUpDialog extends StatelessWidget {
   final Grades data;

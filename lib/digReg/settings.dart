@@ -13,8 +13,8 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  int i = 0;
-  bool notificationsEnabled;
+  static int i = 0;
+  static bool notificationsEnabled;
   void changeNotification() {
     Session().post('https://fallmerayer.digitalesregister.it/v2/api/profile/updateNotificationSettings', {
       'notificationsEnabled': notificationsEnabled

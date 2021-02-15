@@ -15,10 +15,14 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   static int i = 0;
   static bool notificationsEnabled;
-  void changeNotification() {
-    Session().post('https://fallmerayer.digitalesregister.it/v2/api/profile/updateNotificationSettings', {
-      'notificationsEnabled': notificationsEnabled
-    });
+  Future<bool> changeNotification() async{
+    if((await Session().post('https://fallmerayer.digitalesregister.it/v2/api/profile/updateNotificationSettings', {'notificationsEnabled': notificationsEnabled}))=='e'){
+      return false;
+    }
+    else{
+      return true;
+    }
+
   }
 
   void changeColor(Color color, ThemeChanger _themeChanger) {
@@ -57,7 +61,7 @@ class _SettingsState extends State<Settings> {
           );
         });
   }
-
+  final snackbar =  GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
@@ -70,6 +74,7 @@ class _SettingsState extends State<Settings> {
               i++;
             }
             return Scaffold(
+              key: snackbar,
               appBar: AppBar(title: Text('Settings')),
               body: Center(
                 child: SettingsList(
@@ -91,11 +96,19 @@ class _SettingsState extends State<Settings> {
                         SettingsTile.switchTile(
                             leading: notifications(notificationsEnabled),
                             title: 'Email-Benachrichtigungen',
-                            onToggle: (value) {
-                              setState(() {
-                                notificationsEnabled = value;
-                                changeNotification();
-                              });
+                            onToggle: (value) async{
+                              if(await changeNotification()==true){
+                                notificationsEnabled = !notificationsEnabled;
+                                print('changed');
+                              }
+                              else{
+                                print('notchanged');
+                                snackbar.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                                    ),content: Text('Keine Netzwerkverbindung')));
+                              }
+                                setState((){});
                             },
                             switchValue: notificationsEnabled)
                       ],

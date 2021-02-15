@@ -64,11 +64,11 @@ class Grades {
 
   Grades(
       {this.grade,
-        this.weight,
-        this.date,
-        this.type,
-        this.name,
-        this.description});
+      this.weight,
+      this.date,
+      this.type,
+      this.name,
+      this.description});
 
   factory Grades.fromJson(Map<String, dynamic> json) {
     return Grades(
@@ -91,6 +91,7 @@ class Observations {
     return Observations(date: json['date'], type: json['typeName']);
   }
 }
+
 class Day {
   final List<Lesson> list;
 
@@ -120,11 +121,11 @@ class Lesson {
 
   Lesson(
       {this.hour,
-        this.isLesson,
-        this.subject,
-        this.teachers,
-        this.rooms,
-        this.linkedHours});
+      this.isLesson,
+      this.subject,
+      this.teachers,
+      this.rooms,
+      this.linkedHours});
 
   factory Lesson.fromJson(Map<String, dynamic> json) {
     bool intToBool(int i) {
@@ -153,12 +154,31 @@ class Lesson {
   }
 }
 
+class Unread {
+  final String title;
+  final String subTitle;
+  final String timeSent;
+  final String type;
+
+  Unread({this.title, this.subTitle, this.timeSent, this.type});
+
+  factory Unread.fromJson(Map<String, dynamic> json) {
+    return Unread(
+        title: json['title'],
+        subTitle: json['subTitle'],
+        timeSent: Date.format(json['timeSent']).date,
+        type: json['type']
+    );
+  }
+}
+
 DateTime setWeek(int addNow) {
   DateTime now = DateTime.now();
   addNow = addNow - 50;
   print(addNow);
-  return DateTime(now.year, now.month, now.day + addNow*7);
+  return DateTime(now.year, now.month, now.day + addNow * 7);
 }
+
 class Data {
   static String profile;
   static String absences;
@@ -187,80 +207,83 @@ class Data {
     print('updateAbsences');
     await Data().updateAbsences();
     print('updateCalendar');
-    await Data().updateCalendar(49,51);
+    await Data().updateCalendar(49, 51);
     print('updateSubjects');
     await Data().updateSubjects();
     print('updateMessages');
     await Data().updateMessages();
-      return true;
-    }
+    return true;
+  }
+
   Future<bool> updateProfile() async {
     final preferences = await SharedPreferences.getInstance();
-    cache = await Session().get(
-        link + '/v2/api/profile/get');
-    if(cache=='e'){
+    cache = await Session().get(link + '/v2/api/profile/get');
+    if (cache == 'e') {
       return false;
-    }else{
+    } else {
       preferences.setString('profile', cache);
       await Data().loadProfile();
       return true;
     }
   }
+
   Future<bool> updateAbsences() async {
     final preferences = await SharedPreferences.getInstance();
-    cache = await Session().get(
-        link + '/v2/api/student/dashboard/absences');
-    if(cache=='e'){
+    cache = await Session().get(link + '/v2/api/student/dashboard/absences');
+    if (cache == 'e') {
       return false;
-    }else{
+    } else {
       preferences.setString('absences', cache);
       await Data().loadAbsences();
       return true;
     }
   }
+
   Future<bool> updateCalendar(var from, var to) async {
-      final preferences = await SharedPreferences.getInstance();
-      for( var i=from;i<=to;i++) {
-        DateTime week = setWeek(i);
-        if (week.weekday == 6) {
-          week = week.add(Duration(days: 2));
-        } else if (week.weekday == 7) {
-          week = week.add(Duration(days: 1));
-        } else {
-          while (week.weekday != 1) {
-            week = week.subtract(Duration(days: 1));
-          }
-        }
-        String monday = DateFormat('y-MM-dd').format(week);
-        cache = await Session().post(link + '/v2/api/calendar/student', {'startDate': monday});
-        print(cache);
-        if(cache=='e'){
-          return false;
-        }else{
-          preferences.setString('calendardetail' + i.toString(), cache);
-          calendar[i] = cache;
+    final preferences = await SharedPreferences.getInstance();
+    for (var i = from; i <= to; i++) {
+      DateTime week = setWeek(i);
+      if (week.weekday == 6) {
+        week = week.add(Duration(days: 2));
+      } else if (week.weekday == 7) {
+        week = week.add(Duration(days: 1));
+      } else {
+        while (week.weekday != 1) {
+          week = week.subtract(Duration(days: 1));
         }
       }
-      return true;
+      String monday = DateFormat('y-MM-dd').format(week);
+      cache = await Session()
+          .post(link + '/v2/api/calendar/student', {'startDate': monday});
+      print(cache);
+      if (cache == 'e') {
+        return false;
+      } else {
+        preferences.setString('calendardetail' + i.toString(), cache);
+        calendar[i] = cache;
+      }
+    }
+    return true;
   }
+
   Future<bool> updateDashboard() async {
     final preferences = await SharedPreferences.getInstance();
     cache = await Session().post(
-        link + '/v2/api/student/dashboard/dashboard',
-        {'viewFuture': true});
-    if(cache=='e'){
+        link + '/v2/api/student/dashboard/dashboard', {'viewFuture': true});
+    if (cache == 'e') {
       return false;
-    }else{
-      preferences.setString('dashboard', cache );
+    } else {
+      preferences.setString('dashboard', cache);
       await Data().loadDashboard();
       return true;
     }
-
   }
+
   Future<bool> updateSubjects() async {
     subjectitems.clear();
     final preferences = await SharedPreferences.getInstance();
-    preferences.setString('subjects', await Session().get(link + '/v2/api/student/all_subjects'));
+    preferences.setString(
+        'subjects', await Session().get(link + '/v2/api/student/all_subjects'));
     subjects = preferences.getString('subjects');
     for (var i in jsonDecode(subjects)['subjects']) {
       subjectitems.add(Subject.fromJson(i));
@@ -268,7 +291,9 @@ class Data {
     for (var i = 0; i < subjectitems.length; i++) {
       id = subjectitems[i].id;
       studentId = subjectitems[i].studentId;
-      subjectdetail = await Session().post(link + '/v2/api/student/subject_detail', {'subjectId': id, 'studentId': studentId});
+      subjectdetail = await Session().post(
+          link + '/v2/api/student/subject_detail',
+          {'subjectId': id, 'studentId': studentId});
       preferences.setString("subjectdetail" + i.toString(), subjectdetail);
       subjectitems[i].content = Content.fromJson(jsonDecode(subjectdetail));
     }
@@ -278,11 +303,10 @@ class Data {
   Future<bool> updateMessages() async {
     final preferences = await SharedPreferences.getInstance();
     cache = await Session().post(
-      link + '/v2/api/message/getMyMessages',
-      {'filterByLabelName': ''});
-    if(cache=='e') {
+        link + '/v2/api/message/getMyMessages', {'filterByLabelName': ''});
+    if (cache == 'e') {
       return false;
-    }else {
+    } else {
       preferences.setString('messages', cache);
       await Data().loadMessages();
       return true;
@@ -290,70 +314,76 @@ class Data {
   }
 
   Future<bool> loadAll() async {
-      print('loadProfile');
-      await Data().loadProfile();
-      print('loadAbsences');
-      await Data().loadAbsences();
-      print('loadCalendar');
-      await Data().loadCalendar(49,51);
-      print('loadDashboard');
-      await Data().loadDashboard();
-      print('loadMessages');
-      await Data().loadMessages();
-      print('loadSubjects');
-      await Data().loadSubjects();
-      return true;
+    print('loadProfile');
+    await Data().loadProfile();
+    print('loadAbsences');
+    await Data().loadAbsences();
+    print('loadCalendar');
+    await Data().loadCalendar(49, 51);
+    print('loadDashboard');
+    await Data().loadDashboard();
+    print('loadMessages');
+    await Data().loadMessages();
+    print('loadSubjects');
+    await Data().loadSubjects();
+    return true;
   }
+
   Future<bool> loadProfile() async {
     final preferences = await SharedPreferences.getInstance();
-    if(preferences.getString('profile')==null){
-          return false;
+    if (preferences.getString('profile') == null) {
+      return false;
     }
     profile = preferences.getString('profile');
     return true;
   }
+
   Future<bool> loadAbsences() async {
     final preferences = await SharedPreferences.getInstance();
-    if(preferences.getString('absences')==null){
+    if (preferences.getString('absences') == null) {
       return false;
     }
     absences = preferences.getString('absences');
     return true;
   }
+
   Future<bool> loadCalendar(var from, var to) async {
     final preferences = await SharedPreferences.getInstance();
     var i = 0;
-    for(i=from;i<=to;i++) {
-      if(preferences.containsKey('calendardetail' + i.toString()) && preferences.getString('calendardetail' + i.toString()) !=null) {
-        calendardetail= preferences.getString('calendardetail' + i.toString());
+    for (i = from; i <= to; i++) {
+      if (preferences.containsKey('calendardetail' + i.toString()) &&
+          preferences.getString('calendardetail' + i.toString()) != null) {
+        calendardetail = preferences.getString('calendardetail' + i.toString());
         calendar[i] = calendardetail;
-      }
-      else{
+      } else {
         return false;
       }
     }
     return true;
   }
+
   Future<bool> loadDashboard() async {
     final preferences = await SharedPreferences.getInstance();
-    if(preferences.getString('dashboard')==null){
+    if (preferences.getString('dashboard') == null) {
       return false;
     }
     dashboard = preferences.getString('dashboard');
     return true;
   }
+
   Future<bool> loadMessages() async {
     final preferences = await SharedPreferences.getInstance();
-    if(preferences.getString('messages')==null){
+    if (preferences.getString('messages') == null) {
       return false;
     }
     messages = preferences.getString('messages');
     return true;
   }
+
   Future<bool> loadSubjects() async {
     subjectitems.clear();
     final preferences = await SharedPreferences.getInstance();
-    if(preferences.getString('subjects')==null){
+    if (preferences.getString('subjects') == null) {
       return false;
     }
     subjects = preferences.getString('subjects');
@@ -369,6 +399,4 @@ class Data {
     }
     return true;
   }
-
 }
-

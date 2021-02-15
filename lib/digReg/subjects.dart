@@ -1,8 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
 import 'package:digitales_register_app/digReg/usefulWidgets.dart';
+import 'package:digitales_register_app/theme/theme.dart';
+import 'package:provider/provider.dart';
 
 class Subjects {
   static bool firstaccess = true;
@@ -63,6 +67,7 @@ class Subjects {
   }
 
   Widget build(BuildContext context) {
+    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
     return FutureBuilder(
         future: update(),
         builder: (context, AsyncSnapshot<bool> snapshot) {
@@ -80,11 +85,42 @@ class Subjects {
             }
             return Column(
               children: [
+                SizedBox(
+                  height: 25,
+                ),
                 ListTile(
-                    title: Text('Gesamtdurchschnitt: ' +
-                        total_average(Data.subjectitems)
-                            .toStringAsPrecision(3)),
-                    selectedTileColor: Colors.grey[800]),
+                    title: Text('Gesamtdurchschnitt: ', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),),
+                    trailing: Container(
+                        height: 50,
+                        width: 70,
+                        child: Column(
+                          children: [
+                            Transform(
+                              transform: Matrix4.translationValues(0, 15, 0),
+                              child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  color: _themeChanger.getColor(),
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text(total_average(Data.subjectitems)
+                                        .toStringAsPrecision(3),style: TextStyle(fontSize: 15),),
+                                  )
+                              ),
+                            )
+                          ],
+                        )
+                    ),
+                    selectedTileColor: Colors.grey[800],
+                ),
+                Divider(
+                  height: 30,
+                  endIndent: 150,
+                  indent: 150,
+                  thickness: 2,
+                  color: _themeChanger.getColor(),
+                ),
                 Expanded(
                     child: ListView.builder(
                         scrollDirection: Axis.vertical,

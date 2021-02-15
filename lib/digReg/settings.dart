@@ -99,10 +99,8 @@ class _SettingsState extends State<Settings> {
                             onToggle: (value) async{
                               if(await changeNotification()==true){
                                 notificationsEnabled = !notificationsEnabled;
-                                print('changed');
                               }
                               else{
-                                print('notchanged');
                                 snackbar.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.all(Radius.circular(10.0)),

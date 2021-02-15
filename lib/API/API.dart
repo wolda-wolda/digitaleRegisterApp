@@ -44,7 +44,6 @@ class Session {
       );
       return response.body;
     } on Exception{
-      print('error');
       return 'e';
     }
   }

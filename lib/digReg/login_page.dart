@@ -97,15 +97,12 @@ class _LoginPageState extends State<LoginPage>
                 },
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
             Container(
                 padding: EdgeInsets.only(left: 40, right: 40, bottom: 25),
                 child: Column(children: <Widget> [
                   Text('Willkommen im digitalen Register', style: TextStyle(fontFamily: 'OpenSans', fontSize: SizeConfig.safeBlockVertical * 4.5, fontWeight: FontWeight.bold)),
                   SizedBox(
-                    height: 50,
+                    height: 40,
                   ),
                   TextField(
                     controller: usernameController,
@@ -150,20 +147,20 @@ class _LoginPageState extends State<LoginPage>
                     },
                   )
                 ])),
-            Container(
-              height: 50,
-              width: 150,
-              child: RaisedButton(
-                onPressed: () {
-                  login(context);
-                },
-                shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0),
+              Container(
+                height: 40,
+                width: 70,
+                child: RaisedButton(
+                  onPressed: () {
+                    login(context);
+                  },
+                  shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0),
+                  ),
+                  child: Icon(LineAwesomeIcons.arrow_circle_right),
+                  color: _themeChanger.getColor(),
                 ),
-                child: Text('Login'),
-                color: _themeChanger.getColor(),
-              ),
-            )
+              )
           ],
         ),
       ),

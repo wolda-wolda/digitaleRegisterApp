@@ -8,15 +8,13 @@ import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 var currentindex=0;
 class Calendar{
-  PageController controller = PageController(initialPage: 50);
+  final controller = PageController(initialPage: 50);
   Widget build(BuildContext context) {
     return PageView.builder(
         itemCount: 100,
         controller: controller,
         itemBuilder: (BuildContext context, int index) {
           print('index: ' + index.toString());
-          print(index);
-          print(controller.page);
           currentindex=index;
          return DrawCalendar();
         }
@@ -51,7 +49,7 @@ class DrawCalendarState extends State<DrawCalendar>{
   }
   Future<bool> update() async {
     initload();
-    print('loaded[' + currentindex.toString() +']: ' + loaded[currentindex].toString() + ' 2');
+    print('loaded[currentindex]: ' + loaded[currentindex].toString());
     if(loaded[currentindex]==false || loaded[currentindex] ==null) {
       if (await Data().updateCalendar(currentindex, currentindex) == false) {
         if (await Data().loadCalendar(currentindex, currentindex) == false) {

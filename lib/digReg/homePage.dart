@@ -37,7 +37,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   int _selectedIndex = 0;
   List<String> options = <String>[
     'Merkheft',
-    'Unread'
     'Absenzen',
     'Kalender',
     'Noten',
@@ -48,7 +47,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget _options(BuildContext context, int select) {
     return <Widget>[
       Dashboard().build(context),
-      Dashboard().unread(context),
       Absences().build(context),
       Calendar().build(context),
       Subjects().build(context),
@@ -115,10 +113,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             BottomNavigationBarItem(
               icon: Icon(LineAwesomeIcons.book),
               label: 'Merkheft',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(LineAwesomeIcons.book),
-              label: 'Unread',
             ),
             BottomNavigationBarItem(
               icon: Icon(LineAwesomeIcons.thermometer),

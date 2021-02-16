@@ -20,7 +20,7 @@ class DrawProfileState extends State<DrawProfile>{
   static bool firstaccess = true;
   Future<void> refresh() async{
     bool success =await Data().updateProfile();
-   firstaccess = firstaccess==true?success:false;
+   firstaccess = firstaccess==true?!success:false;
     return;
   }
   Future<bool> update() async {

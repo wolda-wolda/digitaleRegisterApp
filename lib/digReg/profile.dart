@@ -66,19 +66,14 @@ class DrawProfileState extends State<DrawProfile>{
       return Container();
     }
   }
-
-  Future<bool> done() async{
-    return true;
-  }
   @override
   Widget build(BuildContext context){
-    print('nochmal!!!!');
     return RefreshIndicator(
         onRefresh: () async {
           await refresh();
           setState((){});
           print('update');
-          return done();
+          return Future.value(true);
         },
       child: FutureBuilder(
           future: update(),

@@ -43,9 +43,6 @@ class DrawCalendarState extends State<DrawCalendar>{
     loaded[currentindex]=  loaded[currentindex]==false?await Data().updateCalendar(currentindex,currentindex):true;
     return;
   }
-  Future<bool> done() async{
-    return true;
-  }
   Future<bool> update() async {
     initload();
     print('loaded[currentindex]: ' + loaded[currentindex].toString());
@@ -88,7 +85,7 @@ class DrawCalendarState extends State<DrawCalendar>{
         onRefresh: () async {
           await refresh();
           setState((){});
-          return done();
+          return Future.value(true);
         },
         child: FutureBuilder(
             future: update(),

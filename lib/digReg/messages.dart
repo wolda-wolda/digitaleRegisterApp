@@ -6,6 +6,17 @@ import 'package:digitales_register_app/Data/Load&Store.dart';
 import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 class Messages {
+
+
+  Widget build(BuildContext context) {
+    return DrawMessages();
+  }
+}
+class DrawMessages extends StatefulWidget{
+  @override
+  DrawMessagesState createState() => DrawMessagesState();
+}
+class DrawMessagesState extends State<DrawMessages>{
   static bool firstaccess = true;
   Future<bool> update() async {
     if (firstaccess) {
@@ -28,41 +39,48 @@ class Messages {
 
   List<Mess> items = List<Mess>();
   bool get = true;
-
-  Widget build(BuildContext context) {
-    return FutureBuilder(
+  void refresh() async{
+    bool success =await Data().updateMessages();
+    firstaccess = firstaccess==true?success:false;
+    return;
+  }
+  @override
+  Widget build(BuildContext context){
+    return RefreshIndicator(
+      onRefresh: () async {
+        await refresh();
+        setState((){});
+        return Future.value(true);
+      },
+    child: FutureBuilder(
         future: update(),
-    builder: (context, AsyncSnapshot<bool> snapshot) {
-      if(snapshot.data==true){
-        String data = Data.messages;
-        if (get == true) {
-          for (var i in jsonDecode(data)) {
-            items.add(Mess.fromJson(i));
-            get = false;
-          }
-          }
-          return RefreshIndicator(
-          child: ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-          return ListTile(
-          onTap: () => showMessage(context, items[index]),
-          title: Text(items[index].subject),
-          subtitle: Text(items[index].date));
-          },
-        ),
-            onRefresh: (){
-              return Data().updateMessages();
+        builder: (context, AsyncSnapshot<bool> snapshot) {
+          if(snapshot.data==true){
+            String data = Data.messages;
+            if (get == true) {
+              for (var i in jsonDecode(data)) {
+                items.add(Mess.fromJson(i));
+                get = false;
+              }
             }
-          );
-      }
-      else if (snapshot.data == null) {
-        return Loading();
-      }
-      else {
-        return NoConnection();
-      }
-    }
+                return ListView.builder(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                        onTap: () => showMessage(context, items[index]),
+                        title: Text(items[index].subject),
+                        subtitle: Text(items[index].date));
+                  },
+                );
+          }
+          else if (snapshot.data == null) {
+            return Loading();
+          }
+          else {
+            return NoConnection();
+          }
+        }
+    ),
     );
   }
 }

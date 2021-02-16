@@ -42,7 +42,7 @@ class DrawSubjectsState extends State<DrawSubjects>{
   Future<void> refresh() async{
     bool success =await Data().updateSubjects();
     Detail.firstaccess2=true;
-    firstaccess = firstaccess==true?success:false;
+    firstaccess = firstaccess==true?!success:false;
     return;
   }
 

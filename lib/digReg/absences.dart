@@ -55,7 +55,7 @@ class DrawAbsencesState extends State<DrawAbsences>{
   }
   Future<void> refresh() async{
     bool success =await Data().updateAbsences();
-    firstaccess = firstaccess==true?success:false;
+    firstaccess = firstaccess==true?!success:false;
     return;
   }
   @override

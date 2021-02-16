@@ -8,7 +8,7 @@ import 'package:digitales_register_app/Data/Load&Store.dart';
 import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 class Dashboard {
-  static bool firstaccess=true;
+  static bool firstaccess = true;
   Future<bool> update() async {
     if (firstaccess) {
       if (await Data().updateDashboard() == false) {
@@ -21,27 +21,27 @@ class Dashboard {
     }
     return true;
   }
+
   var items = List<Dash>();
   bool get = true;
-
 
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
 
-        return FutureBuilder(
-          future: update(),
-          builder: (context, AsyncSnapshot<bool> snapshot) {
-              if(snapshot.data==true){
-                String data = Data.dashboard;
-                if (get == true) {
-                  for (var i in jsonDecode(data)) {
-                    items.add(Dash.fromJson(i));
-                  }
-                  get = false;
-                }
-                return  RefreshIndicator(
-                 child: ListView.builder(
-                   scrollDirection: Axis.vertical,
+    return FutureBuilder(
+        future: update(),
+        builder: (context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.data == true) {
+            String data = Data.dashboard;
+            if (get == true) {
+              for (var i in jsonDecode(data)) {
+                items.add(Dash.fromJson(i));
+              }
+              get = false;
+            }
+            return RefreshIndicator(
+                child: ListView.builder(
+                  scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   itemCount: items.length,
                   itemBuilder: (context, index1) {
@@ -50,9 +50,11 @@ class Dashboard {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: ListTile(
-                        title: Text(items[index1].date.toString(),
+                        title: Text(
+                          items[index1].date.toString(),
                           style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),),
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
                         subtitle: ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
@@ -60,11 +62,12 @@ class Dashboard {
                           itemBuilder: (context, index2) {
                             return ListTile(
                               title: title(context, items[index1], index2),
-                              trailing: title2(
-                                  context, items[index1], index2, _themeChanger),
-                              subtitle: Text(
-                                  items[index1].items[index2].subtitle
-                                      .toString()),
+                              trailing: title2(context, items[index1], index2,
+                                  _themeChanger),
+                              subtitle: Text(items[index1]
+                                  .items[index2]
+                                  .subtitle
+                                  .toString()),
                             );
                           },
                         ),
@@ -72,50 +75,95 @@ class Dashboard {
                     );
                   },
                 ),
-                  onRefresh: (){
-                   return Data().updateDashboard();
-                  }
-                );
+                onRefresh: () {
+                  return Data().updateDashboard();
+                });
+          } else if (snapshot.data == null) {
+            return Loading();
+          } else {
+            return NoConnection();
+          }
+        });
+  }
 
-              }else if(snapshot.data==null){
-                return Loading();
+  Future<String> getData() async {
+    return await Session().get(
+        'https://fallmerayer.digitalesregister.it/v2/api/notification/unread');
+  }
+
+  bool get1 = true;
+  List<Unread> list = List<Unread>();
+  Widget unread(BuildContext context) {
+    return FutureBuilder<String>(
+        future: getData(),
+        builder: (context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.hasData) {
+            if (get1 == true) {
+              for (var i in jsonDecode(snapshot.data)) {
+                list.add(Unread.fromJson(i));
               }
-              else{
-                return NoConnection();
-              }
+              get1 = false;
+            }
+            return ListView.builder(
+                itemCount: list.length,
+                itemBuilder: (context, index2) {
+                  return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListTile(
+                          title: Text(list[index2].title),
+                          subtitle: Column(children: [
+                            Text(list[index2].subTitle),
+                            Text(list[index2].type),
+                            Text(list[index2].timeSent)
+                          ])));
+                });
+          } else if (!snapshot.hasData) {
+            return Loading();
+          } else {
+            return NoConnection();
           }
-    );
-          }
+        });
+  }
 }
 
 Widget title(BuildContext context, Dash item, int index2) {
   if (item.items[index2].label != null)
-    return Text(item.items[index2].title.toString(),
-    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),);
-  return Text(item.items[index2].title.toString(),
-      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),);
+    return Text(
+      item.items[index2].title.toString(),
+      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+    );
+  return Text(
+    item.items[index2].title.toString(),
+    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+  );
 }
 
-Widget title2(BuildContext context, Dash item, int index2, ThemeChanger _themeChanger) {
+Widget title2(
+    BuildContext context, Dash item, int index2, ThemeChanger _themeChanger) {
   if (item.items[index2].label != null)
     return Container(
-      height: 40,
-      width: 130,
-      child: Transform(
-        transform: Matrix4.translationValues(22, 0.0, 0.0),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-            color: _themeChanger.getColor(),
-          child: Align(
-            alignment: Alignment.center,
-            child: Text(item.items[index2].label.toString(),textAlign: TextAlign.center, style: TextStyle(color: Colors.white),),
-          )
-        ),
-      )
-      );
+        height: 40,
+        width: 130,
+        child: Transform(
+          transform: Matrix4.translationValues(22, 0.0, 0.0),
+          child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              color: _themeChanger.getColor(),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  item.items[index2].label.toString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white),
+                ),
+              )),
+        ));
 }
+
 class Dash {
   final String date;
   final List<Items> items;
@@ -130,7 +178,6 @@ class Dash {
     return Dash(date: Date.format(json['date']).date, items: temp);
   }
 }
-
 
 class Items {
   final String title;
@@ -164,7 +211,6 @@ class Items {
         deletable: json['deleteable'],
         warning: json['warning'],
         type: json['type'],
-        id: json['id']
-    );
+        id: json['id']);
   }
 }

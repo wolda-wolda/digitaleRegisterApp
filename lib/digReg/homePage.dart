@@ -37,6 +37,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   int _selectedIndex = 0;
   List<String> options = <String>[
     'Merkheft',
+    'Unread'
     'Absenzen',
     'Kalender',
     'Noten',
@@ -47,6 +48,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget _options(BuildContext context, int select) {
     return <Widget>[
       Dashboard().build(context),
+      Dashboard().unread(context),
       Absences().build(context),
       Calendar().build(context),
       Subjects().build(context),
@@ -64,85 +66,89 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   TabController _tabController;
 
   @override
-  Widget build(BuildContext context) {
-    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
-          return Scaffold(
-              appBar: AppBar(title: Text('Digitales Register'), actions: <Widget>[
-                PopupMenuButton<String>(
-                  onSelected: choiceAction,
-                  itemBuilder: (BuildContext context) {
-                    return Constants.choices.map((String choice) {
-                      if (choice == Constants.Setting) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Row(
-                            children: <Widget>[
-                              Icon(
-                                Icons.settings_applications,
-                                color: Colors.grey,
-                              ),
-                              Text(choice),
-                            ],
-                          ),
-                        );
-                      } else if (choice == Constants.Logout) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Row(
-                            children: <Widget>[
-                              Icon(
-                                Icons.exit_to_app,
-                                color: Colors.grey,
-                              ),
-                              Text(choice),
-                            ],
-                          ),
-                        );
-                      }
-                    }).toList();
-                  },
-                ),
-              ],),
-              body: Center(child: _options(context, _selectedIndex)),
-              bottomNavigationBar: BottomNavigationBar(
-                //fixedColor: Color(0xFF4285F4),
-                fixedColor: _themeChanger.getColor(),
-                unselectedItemColor: Colors.grey[800],
-                currentIndex: _selectedIndex,
-                items: [
-                  BottomNavigationBarItem(
-                    icon: Icon(LineAwesomeIcons.book),
-                    label: 'Merkheft',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(LineAwesomeIcons.thermometer),
-                    label: 'Absenzen',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(LineAwesomeIcons.calendar),
-                    label: 'Kalender',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(LineAwesomeIcons.graduation_cap),
-                    label: 'Noten',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(LineAwesomeIcons.inbox),
-                    label: 'Mitteilungen',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(LineAwesomeIcons.user_tie),
-                    label: 'Profil',
-                  ),
-                ],
-                onTap: (index) {
-                  _onItemTapped(index);
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-              ),
-          );
+    Widget build(BuildContext context) {
+      ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
+      return Scaffold(
+        appBar: AppBar(title: Text('Digitales Register'), actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: choiceAction,
+            itemBuilder: (BuildContext context) {
+              return Constants.choices.map((String choice) {
+                if (choice == Constants.Setting) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.settings_applications,
+                          color: Colors.grey,
+                        ),
+                        Text(choice),
+                      ],
+                    ),
+                  );
+                } else if (choice == Constants.Logout) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.exit_to_app,
+                          color: Colors.grey,
+                        ),
+                        Text(choice),
+                      ],
+                    ),
+                  );
+                }
+              }).toList();
+            },
+          ),
+        ],),
+        body: Center(child: _options(context, _selectedIndex)),
+        bottomNavigationBar: BottomNavigationBar(
+          //fixedColor: Color(0xFF4285F4),
+          fixedColor: _themeChanger.getColor(),
+          unselectedItemColor: Colors.grey[800],
+          currentIndex: _selectedIndex,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(LineAwesomeIcons.book),
+              label: 'Merkheft',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LineAwesomeIcons.book),
+              label: 'Unread',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LineAwesomeIcons.thermometer),
+              label: 'Absenzen',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LineAwesomeIcons.calendar),
+              label: 'Kalender',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LineAwesomeIcons.graduation_cap),
+              label: 'Noten',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LineAwesomeIcons.inbox),
+              label: 'Mitteilungen',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LineAwesomeIcons.user_tie),
+              label: 'Profil',
+            ),
+          ],
+          onTap: (index) {
+            _onItemTapped(index);
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+        ),
+      );
   }
 
   Future<void> logout() async {

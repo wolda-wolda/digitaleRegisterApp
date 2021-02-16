@@ -44,7 +44,7 @@ class DrawMessagesState extends State<DrawMessages> {
   bool get = true;
   void refresh() async {
     bool success = await Data().updateMessages();
-    firstaccess = firstaccess == true ? success : false;
+    firstaccess = firstaccess==true?!success : false;
     return;
   }
 

@@ -1,11 +1,28 @@
+import 'dart:io';
+import 'package:ext_storage/ext_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Map<String, String> headers;
 String cookie = 'empty';
 class Session {
+  Future<File> downloadFile(String url, String filename) async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted)
+      await Permission.storage.request();
+    var req = await http.get(url, headers: headers);
+    String path = await ExtStorage.getExternalStoragePublicDirectory(ExtStorage.DIRECTORY_DOWNLOADS) + '/' + filename;
+    File file = new File(path);
+    print(file.absolute.path);
+    await file.writeAsBytes(req.bodyBytes);
+    OpenFile.open(path);
+    return file;
+  }
+
   Future<String> get(String url) async {
     try {
       http.Response response = await http.get(url, headers: headers).timeout(

@@ -18,7 +18,7 @@ class DrawProfile extends StatefulWidget{
 }
 class DrawProfileState extends State<DrawProfile>{
   static bool firstaccess = true;
-  void refresh() async{
+  Future<void> refresh() async{
     bool success =await Data().updateProfile();
    firstaccess = firstaccess==true?success:false;
     return;

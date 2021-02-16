@@ -72,7 +72,6 @@ class DrawProfileState extends State<DrawProfile>{
         onRefresh: () async {
           await refresh();
           setState((){});
-          print('update');
           return Future.value(true);
         },
       child: FutureBuilder(

@@ -186,6 +186,7 @@ class Data {
   static String data2;
   static String messages;
   static String subjectdetail;
+  static String unread;
   static List week;
   static List week2;
   static String cache;
@@ -212,6 +213,8 @@ class Data {
     await Data().updateSubjects();
     print('updateMessages');
     await Data().updateMessages();
+    print('updateUnread');
+    await Data().updateUnread();
     return true;
   }
 
@@ -235,6 +238,17 @@ class Data {
     } else {
       preferences.setString('absences', cache);
       await Data().loadAbsences();
+      return true;
+    }
+  }
+  Future<bool> updateUnread() async {
+    final preferences = await SharedPreferences.getInstance();
+    cache = await Session().get(link + '/v2/api/notification/unread');
+    if (cache == 'e') {
+      return false;
+    } else {
+      preferences.setString('unread', cache);
+      await Data().loadUnread();
       return true;
     }
   }
@@ -345,6 +359,8 @@ class Data {
     await Data().loadMessages();
     print('loadSubjects');
     await Data().loadSubjects();
+    print('loadUnread');
+    await Data().loadUnread();
     return true;
   }
 
@@ -395,6 +411,14 @@ class Data {
       return false;
     }
     messages = preferences.getString('messages');
+    return true;
+  }
+  Future<bool> loadUnread() async {
+    final preferences = await SharedPreferences.getInstance();
+    if (preferences.getString('unread') == null) {
+      return false;
+    }
+    unread = preferences.getString('unread');
     return true;
   }
 

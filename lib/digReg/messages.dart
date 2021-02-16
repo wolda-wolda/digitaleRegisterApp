@@ -44,7 +44,7 @@ class DrawMessagesState extends State<DrawMessages> {
   bool get = true;
   void refresh() async {
     bool success = await Data().updateMessages();
-    firstaccess = firstaccess==true?!success : false;
+    firstaccess = firstaccess == true ? !success : false;
     return;
   }
 
@@ -179,14 +179,13 @@ class PopUpDialog extends StatelessWidget {
         title: Text(data.subject),
         content: Container(
             width: 300,
-            height: 300,
             child: SingleChildScrollView(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                   Text(data.text),
                   ListView.builder(
-                    shrinkWrap: true,
+                      shrinkWrap: true,
                       itemCount: items.length,
                       itemBuilder: (context, index) {
                         return ListTile(

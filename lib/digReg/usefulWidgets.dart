@@ -15,6 +15,21 @@ class Loading extends StatelessWidget{
     );
   }
 }
+class LoadingBar extends StatelessWidget{
+  Widget build(BuildContext context) {
+    return Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.all(10),
+        height: 50,
+        width: 50,
+        child: CircularProgressIndicator(
+          strokeWidth: 5,
+          backgroundColor: Colors.grey[800],
+          valueColor: AlwaysStoppedAnimation(Colors.white),
+        )
+    );
+  }
+}
 class NoConnection extends StatelessWidget{
   Widget build(BuildContext context) {
     return ListView(
@@ -26,7 +41,6 @@ class NoConnection extends StatelessWidget{
          child: Text(
           'No Connection'
         )
-
     )
     ]
     );

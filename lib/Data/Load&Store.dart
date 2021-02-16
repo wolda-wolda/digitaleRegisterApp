@@ -34,7 +34,6 @@ class Subject {
         tempGrades: temp);
   }
 }
-
 class Content {
   List<Grades> grades = List<Grades>();
   List<Observations> observations = List<Observations>();
@@ -195,6 +194,7 @@ class Data {
   static var id;
   static var studentId;
   static var subjectitems = List<Subject>();
+  static var subjectitems2 = List<Subject>();
   static var calendaritems = List<Day>();
   static final Map<int, String> calendar = {};
   static String link = 'https://fallmerayer.digitalesregister.it';
@@ -280,22 +280,41 @@ class Data {
   }
 
   Future<bool> updateSubjects() async {
-    subjectitems.clear();
     final preferences = await SharedPreferences.getInstance();
-    preferences.setString(
-        'subjects', await Session().get(link + '/v2/api/student/all_subjects'));
-    subjects = preferences.getString('subjects');
-    for (var i in jsonDecode(subjects)['subjects']) {
-      subjectitems.add(Subject.fromJson(i));
+    cache = await Session().get(link + '/v2/api/student/all_subjects');
+    if (cache == 'e') {
+      return false;
+    } else {
+      preferences.setString('subjects', cache);
+      subjectitems2.clear();
+      subjects = preferences.getString('subjects');
+        for (var i in jsonDecode(subjects)['subjects']) {
+          subjectitems2.add(Subject.fromJson(i));
+        }
+        loadSubjectDetail(0,subjectitems.length);
+      subjectitems = subjectitems2;
+      return true;
     }
-    for (var i = 0; i < subjectitems.length; i++) {
+  }
+  Future<bool> updateSubjectDetail(var from, var to) async{
+    final preferences = await SharedPreferences.getInstance();
+    if (preferences.getString('subjects') == null) {
+      return false;
+    }
+    subjects = preferences.getString('subjects');
+    for (var i = from; i <= to; i++ ) {
       id = subjectitems[i].id;
       studentId = subjectitems[i].studentId;
       subjectdetail = await Session().post(
           link + '/v2/api/student/subject_detail',
           {'subjectId': id, 'studentId': studentId});
-      preferences.setString("subjectdetail" + i.toString(), subjectdetail);
-      subjectitems[i].content = Content.fromJson(jsonDecode(subjectdetail));
+      if(subjectdetail=='e'){
+        return false;
+      }
+      else {
+        preferences.setString("subjectdetail" + i.toString(), subjectdetail);
+        subjectitems[i].content = Content.fromJson(jsonDecode(subjectdetail));
+      }
     }
     return true;
   }
@@ -349,8 +368,7 @@ class Data {
 
   Future<bool> loadCalendar(var from, var to) async {
     final preferences = await SharedPreferences.getInstance();
-    var i = 0;
-    for (i = from; i <= to; i++) {
+    for (var i = from; i <= to; i++) {
       if (preferences.containsKey('calendardetail' + i.toString()) &&
           preferences.getString('calendardetail' + i.toString()) != null) {
         calendardetail = preferences.getString('calendardetail' + i.toString());
@@ -381,21 +399,31 @@ class Data {
   }
 
   Future<bool> loadSubjects() async {
-    subjectitems.clear();
     final preferences = await SharedPreferences.getInstance();
     if (preferences.getString('subjects') == null) {
       return false;
     }
     subjects = preferences.getString('subjects');
-
+    subjectitems.clear();
     for (var i in jsonDecode(subjects)['subjects']) {
       subjectitems.add(Subject.fromJson(i));
     }
-    for (var i = 0; i < subjectitems.length; i++) {
-      id = subjectitems[i].id;
-      studentId = subjectitems[i].studentId;
-      subjectdetail = preferences.getString("subjectdetail" + i.toString());
-      subjectitems[i].content = Content.fromJson(jsonDecode(subjectdetail));
+    return true;
+  }
+  Future<bool> loadSubjectDetail(var from, var to) async{
+    bool error=false;
+    final preferences = await SharedPreferences.getInstance();
+    for(var i=from;i<=to;i++) {
+      if(preferences.containsKey("subjectdetail" + i.toString())==false || preferences.getString("subjectdetail" + i.toString())==null){
+        error=true;
+      }
+      else {
+        subjectdetail = preferences.getString("subjectdetail" + i.toString());
+        subjectitems2[i].content = Content.fromJson(jsonDecode(subjectdetail));
+      }
+    }
+    if(error==true){
+      return false;
     }
     return true;
   }

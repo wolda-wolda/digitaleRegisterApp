@@ -82,7 +82,7 @@ class DrawProfileState extends State<DrawProfile>{
               String name = jsonDecode(data)['name'];
               String email = jsonDecode(data)['email'] ?? 'empty';
               String picture = jsonDecode(data)['picture'];
-              String pictureUrl = Data.link + '/v2/api/profile/picture&pictureUrl=';
+              String pictureUrl = Data.currentlink + '/v2/api/profile/picture&pictureUrl=';
               cookie = Session().getCookie();
               headers = {'Cookie': cookie};
                   return ListView(

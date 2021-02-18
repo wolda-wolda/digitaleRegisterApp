@@ -7,18 +7,21 @@ class User{
   final String username;
   final String password;
   final String title;
-  User(this.username,this.password,this.title);
+  final String link;
+  User(this.username,this.password,this.title,this.link);
   Map toJson() =>
       {
         "username": username,
         "password": password,
         "title": title,
+        "link": link,
       };
   factory User.Decode(Map<String, dynamic> json){
     return User(
       json["username"],
       json["password"],
       json["title"],
+      json["link"],
     );
   }
 }
@@ -219,7 +222,7 @@ class Data {
   static var subjectitems2 = List<Subject>();
   static var calendaritems = List<Day>();
   static final Map<int, String> calendar = {};
-  static String link = 'https://fallmerayer.digitalesregister.it';
+  static String currentlink = 'https://fallmerayer.digitalesregister.it';
   static var user = List<User>();
   static String currentuser;
   static String currentpassword;
@@ -234,42 +237,45 @@ class Data {
     firstaccess["profile"]=true;
     firstaccess["subjects"]=true;
   }
-  Future<bool> updateAll() async {
-    print('updateDashboard');
-    await Data().updateDashboard();
-    print('updateProfile');
-    await Data().updateProfile();
-    print('updateAbsences');
-    await Data().updateAbsences();
-    print('updateCalendar');
-    await Data().updateCalendar(49, 51);
-    print('updateSubjects');
-    await Data().updateSubjects();
-    print('updateMessages');
-    await Data().updateMessages();
-    print('updateUnread');
-    await Data().updateUnread();
-    return true;
-  }
-  Future<bool> SetCurrentUser(String username, String password, String title) async{
-    currentuser=username;
-    currentpassword=password;
-    currenttitle= title;
-    var exists = -1;
+  Future<bool> loadUser() async{
     final preferences = await SharedPreferences.getInstance();
     String jsonUser = preferences.getString("User");
     user.clear();
     if(jsonUser!=null) {
       for (var i = 0; i < jsonDecode(jsonUser).length; i++) {
         user.add(User.Decode(jsonDecode(jsonUser)[i]));
-        if(user[i].username ==username){
+      }
+    }else{
+      return false;
+    }
+    return true;
+  }
+  bool SetUser(var index) {
+    currentuser=user[index].username;
+    currentpassword=user[index].password;
+    currentlink=user[index].link;
+  }
+  Future<bool> SetCurrentUser(String username, String password, String title, String link) async{
+    currentuser=username;
+    currentpassword=password;
+    currenttitle= title;
+    currentlink=link;
+    var exists = -1;
+    final preferences = await SharedPreferences.getInstance();
+    String jsonUser = preferences.getString("User");
+    user.clear();
+    if(jsonUser!=null) {
+      for (var i = 0; i < jsonDecode(jsonUser).length; i++) {
+        if(jsonDecode(jsonUser)[i]["username"]==username){
+          user.add(User(username,password,title,link));
           exists=i;
-          break;
+        }else {
+          user.add(User.Decode(jsonDecode(jsonUser)[i]));
         }
       }
     }
     if(exists==-1){
-      user.add(User(username,password,title));
+      user.add(User(username,password,title,link));
     }
     jsonUser = jsonEncode(user);
     print(jsonUser);
@@ -284,7 +290,7 @@ class Data {
   }
   Future<bool> updateProfile() async {
     final preferences = await SharedPreferences.getInstance();
-    cache = await Session().get(link + '/v2/api/profile/get');
+    cache = await Session().get(currentlink + '/v2/api/profile/get');
     if (cache == 'e') {
       return false;
     } else {
@@ -295,7 +301,7 @@ class Data {
   }
   Future<bool> updateAbsences() async {
     final preferences = await SharedPreferences.getInstance();
-    cache = await Session().get(link + '/v2/api/student/dashboard/absences');
+    cache = await Session().get(currentlink + '/v2/api/student/dashboard/absences');
     if (cache == 'e') {
       return false;
     } else {
@@ -306,7 +312,7 @@ class Data {
   }
   Future<bool> updateUnread() async {
     final preferences = await SharedPreferences.getInstance();
-    cache = await Session().get(link + '/v2/api/notification/unread');
+    cache = await Session().get(currentlink + '/v2/api/notification/unread');
     if (cache == 'e') {
       return false;
     } else {
@@ -331,7 +337,7 @@ class Data {
       }
       String monday = DateFormat('y-MM-dd').format(week);
       cache = await Session()
-          .post(link + '/v2/api/calendar/student', {'startDate': monday});
+          .post(currentlink + '/v2/api/calendar/student', {'startDate': monday});
       if (cache == 'e') {
         return false;
       } else {
@@ -345,7 +351,7 @@ class Data {
   Future<bool> updateDashboard() async {
     final preferences = await SharedPreferences.getInstance();
     cache = await Session().post(
-        link + '/v2/api/student/dashboard/dashboard', {'viewFuture': true});
+        currentlink + '/v2/api/student/dashboard/dashboard', {'viewFuture': true});
     if (cache == 'e') {
       return false;
     } else {
@@ -357,7 +363,7 @@ class Data {
 
   Future<bool> updateSubjects() async {
     final preferences = await SharedPreferences.getInstance();
-    cache = await Session().get(link + '/v2/api/student/all_subjects');
+    cache = await Session().get(currentlink + '/v2/api/student/all_subjects');
     if (cache == 'e') {
       return false;
     } else {
@@ -382,7 +388,7 @@ class Data {
       id = subjectitems[i].id;
       studentId = subjectitems[i].studentId;
       subjectdetail = await Session().post(
-          link + '/v2/api/student/subject_detail',
+          currentlink + '/v2/api/student/subject_detail',
           {'subjectId': id, 'studentId': studentId});
       if(subjectdetail=='e'){
         return false;
@@ -398,7 +404,7 @@ class Data {
   Future<bool> updateMessages() async {
     final preferences = await SharedPreferences.getInstance();
     cache = await Session().post(
-        link + '/v2/api/message/getMyMessages', {'filterByLabelName': ''});
+        currentlink + '/v2/api/message/getMyMessages', {'filterByLabelName': ''});
     if (cache == 'e') {
       return false;
     } else {
@@ -407,25 +413,6 @@ class Data {
       return true;
     }
   }
-
-  Future<bool> loadAll() async {
-    print('loadProfile');
-    await Data().loadProfile();
-    print('loadAbsences');
-    await Data().loadAbsences();
-    print('loadCalendar');
-    await Data().loadCalendar(49, 51);
-    print('loadDashboard');
-    await Data().loadDashboard();
-    print('loadMessages');
-    await Data().loadMessages();
-    print('loadSubjects');
-    await Data().loadSubjects();
-    print('loadUnread');
-    await Data().loadUnread();
-    return true;
-  }
-
   Future<bool> loadProfile() async {
     final preferences = await SharedPreferences.getInstance();
     if (preferences.getString(currentuser + 'profile') == null) {

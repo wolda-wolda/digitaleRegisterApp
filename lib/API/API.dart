@@ -24,26 +24,38 @@ class Session {
   }
 
   Future<String> get(String url) async {
-    try {
-      http.Response response = await http.get(url, headers: headers).timeout(
-          Duration(seconds: 2),
-          onTimeout: () {
-            throw Exception;
-          }
-      );
-      return response.body;
-    } on Exception{
-      return 'e';
+      try {
+        http.Response response = await http.get(url, headers: headers).timeout(
+            Duration(seconds: 2),
+            onTimeout: () {
+              throw Exception;
+            }
+        );
+        return response.body;
+      } on Exception {
+        return 'e';
+      }
     }
-  }
   String getCookie() {
     return cookie;
   }
   Future<String> login(String url, dynamic data) async {
-    if (headers != null)
+    http.Response response;
+    if (headers != null){
       headers.clear();
-      http.Response response = await http.post(
-          url, body: jsonEncode(data), headers: headers);
+    }
+      try {
+        response = await http.post(
+            url, body: jsonEncode(data), headers: headers).timeout(
+            Duration(seconds: 2),
+            onTimeout: () {
+              throw Exception;
+            });
+      }on Exception {
+        return 'e';
+      }catch (exception){
+        return 'e';
+      }
     print(response.body);
     if (jsonDecode(response.body)['error'] == null) {
       updateCookie(response);

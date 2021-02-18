@@ -157,10 +157,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ));
     } else if (choice == Constants.Logout) {
       logout();
+      Data().initFirstaccess();
       Navigator.pushAndRemoveUntil(
           context,
           PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => LoginPage(),
+              pageBuilder: (context, animation1, animation2) {
+                return LoginPage();
+              },
               transitionDuration: Duration(milliseconds: 100)),
               (route) => false);
     }

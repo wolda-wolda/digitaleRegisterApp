@@ -17,17 +17,16 @@ class DrawSubjects extends StatefulWidget{
   DrawSubjectsState createState() => DrawSubjectsState();
 }
 class DrawSubjectsState extends State<DrawSubjects>{
-
-  static bool firstaccess = true;
   Future<bool> update() async {
-    if (firstaccess) {
+    if (Data.firstaccess["subjects"]) {
+      Detail.firstaccess2=true;
       if (await Data().updateSubjects() == false) {
         if (await Data().loadSubjects() == false) {
           print('Error');
           return false;
         }
       }
-      firstaccess = false;
+      Data.firstaccess["subjects"] = false;
     }
     return true;
   }
@@ -42,7 +41,7 @@ class DrawSubjectsState extends State<DrawSubjects>{
   Future<void> refresh() async{
     bool success =await Data().updateSubjects();
     Detail.firstaccess2=true;
-    firstaccess = firstaccess==true?!success:false;
+    Data.firstaccess["subjects"] = Data.firstaccess["subjects"]==true?!success:false;
     return;
   }
 

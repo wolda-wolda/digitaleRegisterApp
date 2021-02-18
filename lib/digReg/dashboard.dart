@@ -18,37 +18,35 @@ class DrawDashboard extends StatefulWidget{
   DrawDashboardState createState() => DrawDashboardState();
 }
 class DrawDashboardState extends State<DrawDashboard>{
-  static bool firstaccess = true;
-  static bool firstaccess2 = true;
   Future<bool> update() async {
-    if (firstaccess) {
+    if (Data.firstaccess["dashboard1"]) {
       if (await Data().updateDashboard() == false) {
         if (await Data().loadDashboard() == false) {
           print('Error');
           return false;
         }
       }
-      firstaccess = false;
+      Data.firstaccess["dashboard1"] = false;
     }
     return true;
   }
   Future<bool> update2() async {
-    if(firstaccess2) {
+    if(Data.firstaccess["dashboard2"]) {
       if (await Data().updateUnread() == false) {
         if (await Data().loadUnread() == false) {
           print('Error');
           return false;
         }
       }
-      firstaccess2 = false;
+      Data.firstaccess["dashboard2"] = false;
     }
     return true;
   }
   Future<void> refresh() async{
     bool success =await Data().updateDashboard();
-    firstaccess = firstaccess==true?!success:false;
+    Data.firstaccess["dashboard1"] = Data.firstaccess["dashboard1"]==true?!success:false;
     success = await Data().updateUnread();
-    firstaccess2 = firstaccess2==true?!success:false;
+    Data.firstaccess["dashboard2"] = Data.firstaccess["dashboard2"]==true?!success:false;
     return;
   }
 

@@ -17,21 +17,20 @@ class DrawProfile extends StatefulWidget{
   DrawProfileState createState() => DrawProfileState();
 }
 class DrawProfileState extends State<DrawProfile>{
-  static bool firstaccess = true;
   Future<void> refresh() async{
     bool success =await Data().updateProfile();
-   firstaccess = firstaccess==true?!success:false;
+   Data.firstaccess["profile"] = Data.firstaccess["profile"]==true?!success:false;
     return;
   }
   Future<bool> update() async {
-    if (firstaccess) {
+    if (Data.firstaccess["profile"]) {
       if (await Data().updateProfile() == false) {
         if (await Data().loadProfile() == false) {
           print('Error');
           return false;
         }
       }
-      firstaccess = false;
+      Data.firstaccess["profile"] = false;
     }
     return true;
   }

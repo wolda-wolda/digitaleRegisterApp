@@ -3,6 +3,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
+class User{
+  final String username;
+  final String password;
+  final String title;
+  User(this.username,this.password,this.title);
+  Map toJson() =>
+      {
+        "username": username,
+        "password": password,
+        "title": title,
+      };
+  factory User.Decode(Map<String, dynamic> json){
+    return User(
+      json["username"],
+      json["password"],
+      json["title"],
+    );
+  }
+}
+
 class Subject {
   final String name;
   final int absences;
@@ -179,6 +199,7 @@ DateTime setWeek(int addNow) {
 }
 
 class Data {
+  static Map<String,bool> firstaccess={};
   static String profile;
   static String absences;
   static String dashboard;
@@ -199,7 +220,20 @@ class Data {
   static var calendaritems = List<Day>();
   static final Map<int, String> calendar = {};
   static String link = 'https://fallmerayer.digitalesregister.it';
+  static var user = List<User>();
+  static String currentuser;
+  static String currentpassword;
+  static String currenttitle;
 
+  void initFirstaccess(){
+    firstaccess["absences"]=true;
+    firstaccess["calendar"]=true;
+    firstaccess["dashboard1"]=true;
+    firstaccess["dashboard2"]=true;
+    firstaccess["messages"]=true;
+    firstaccess["profile"]=true;
+    firstaccess["subjects"]=true;
+  }
   Future<bool> updateAll() async {
     print('updateDashboard');
     await Data().updateDashboard();
@@ -217,26 +251,55 @@ class Data {
     await Data().updateUnread();
     return true;
   }
-
+  Future<bool> SetCurrentUser(String username, String password, String title) async{
+    currentuser=username;
+    currentpassword=password;
+    currenttitle= title;
+    var exists = -1;
+    final preferences = await SharedPreferences.getInstance();
+    String jsonUser = preferences.getString("User");
+    user.clear();
+    if(jsonUser!=null) {
+      for (var i = 0; i < jsonDecode(jsonUser).length; i++) {
+        user.add(User.Decode(jsonDecode(jsonUser)[i]));
+        if(user[i].username ==username){
+          exists=i;
+          break;
+        }
+      }
+    }
+    if(exists==-1){
+      user.add(User(username,password,title));
+    }
+    jsonUser = jsonEncode(user);
+    print(jsonUser);
+    preferences.setString("User",jsonUser);
+    if(exists==-1){
+      print(currentuser);
+      print(currentpassword);
+      return false;
+    }else{
+      return true;
+    }
+  }
   Future<bool> updateProfile() async {
     final preferences = await SharedPreferences.getInstance();
     cache = await Session().get(link + '/v2/api/profile/get');
     if (cache == 'e') {
       return false;
     } else {
-      preferences.setString('profile', cache);
+      preferences.setString(currentuser + 'profile', cache);
       await Data().loadProfile();
       return true;
     }
   }
-
   Future<bool> updateAbsences() async {
     final preferences = await SharedPreferences.getInstance();
     cache = await Session().get(link + '/v2/api/student/dashboard/absences');
     if (cache == 'e') {
       return false;
     } else {
-      preferences.setString('absences', cache);
+      preferences.setString(currentuser + 'absences', cache);
       await Data().loadAbsences();
       return true;
     }
@@ -247,7 +310,7 @@ class Data {
     if (cache == 'e') {
       return false;
     } else {
-      preferences.setString('unread', cache);
+      preferences.setString(currentuser + 'unread', cache);
       await Data().loadUnread();
       return true;
     }
@@ -269,11 +332,10 @@ class Data {
       String monday = DateFormat('y-MM-dd').format(week);
       cache = await Session()
           .post(link + '/v2/api/calendar/student', {'startDate': monday});
-      print(cache);
       if (cache == 'e') {
         return false;
       } else {
-        preferences.setString('calendardetail' + i.toString(), cache);
+        preferences.setString(currentuser + 'calendardetail' + i.toString(), cache);
         calendar[i] = cache;
       }
     }
@@ -287,7 +349,7 @@ class Data {
     if (cache == 'e') {
       return false;
     } else {
-      preferences.setString('dashboard', cache);
+      preferences.setString(currentuser + 'dashboard', cache);
       await Data().loadDashboard();
       return true;
     }
@@ -299,9 +361,9 @@ class Data {
     if (cache == 'e') {
       return false;
     } else {
-      preferences.setString('subjects', cache);
+      preferences.setString(currentuser + 'subjects', cache);
       subjectitems2.clear();
-      subjects = preferences.getString('subjects');
+      subjects = preferences.getString(currentuser + 'subjects');
         for (var i in jsonDecode(subjects)['subjects']) {
           subjectitems2.add(Subject.fromJson(i));
         }
@@ -312,10 +374,10 @@ class Data {
   }
   Future<bool> updateSubjectDetail(var from, var to) async{
     final preferences = await SharedPreferences.getInstance();
-    if (preferences.getString('subjects') == null) {
+    if (preferences.getString(currentuser + 'subjects') == null) {
       return false;
     }
-    subjects = preferences.getString('subjects');
+    subjects = preferences.getString(currentuser + 'subjects');
     for (var i = from; i <= to; i++ ) {
       id = subjectitems[i].id;
       studentId = subjectitems[i].studentId;
@@ -326,7 +388,7 @@ class Data {
         return false;
       }
       else {
-        preferences.setString("subjectdetail" + i.toString(), subjectdetail);
+        preferences.setString(currentuser + "subjectdetail" + i.toString(), subjectdetail);
         subjectitems[i].content = Content.fromJson(jsonDecode(subjectdetail));
       }
     }
@@ -340,7 +402,7 @@ class Data {
     if (cache == 'e') {
       return false;
     } else {
-      preferences.setString('messages', cache);
+      preferences.setString(currentuser + 'messages', cache);
       await Data().loadMessages();
       return true;
     }
@@ -366,19 +428,19 @@ class Data {
 
   Future<bool> loadProfile() async {
     final preferences = await SharedPreferences.getInstance();
-    if (preferences.getString('profile') == null) {
+    if (preferences.getString(currentuser + 'profile') == null) {
       return false;
     }
-    profile = preferences.getString('profile');
+    profile = preferences.getString(currentuser + 'profile');
     return true;
   }
 
   Future<bool> loadAbsences() async {
     final preferences = await SharedPreferences.getInstance();
-    if (preferences.getString('absences') == null) {
+    if (preferences.getString(currentuser + 'absences') == null) {
       return false;
     }
-    absences = preferences.getString('absences');
+    absences = preferences.getString(currentuser + 'absences');
     return true;
   }
 
@@ -386,8 +448,8 @@ class Data {
     final preferences = await SharedPreferences.getInstance();
     for (var i = from; i <= to; i++) {
       if (preferences.containsKey('calendardetail' + i.toString()) &&
-          preferences.getString('calendardetail' + i.toString()) != null) {
-        calendardetail = preferences.getString('calendardetail' + i.toString());
+          preferences.getString(currentuser + 'calendardetail' + i.toString()) != null) {
+        calendardetail = preferences.getString(currentuser + 'calendardetail' + i.toString());
         calendar[i] = calendardetail;
       } else {
         return false;
@@ -398,36 +460,36 @@ class Data {
 
   Future<bool> loadDashboard() async {
     final preferences = await SharedPreferences.getInstance();
-    if (preferences.getString('dashboard') == null) {
+    if (preferences.getString(currentuser + 'dashboard') == null) {
       return false;
     }
-    dashboard = preferences.getString('dashboard');
+    dashboard = preferences.getString(currentuser + 'dashboard');
     return true;
   }
 
   Future<bool> loadMessages() async {
     final preferences = await SharedPreferences.getInstance();
-    if (preferences.getString('messages') == null) {
+    if (preferences.getString(currentuser + 'messages') == null) {
       return false;
     }
-    messages = preferences.getString('messages');
+    messages = preferences.getString(currentuser + 'messages');
     return true;
   }
   Future<bool> loadUnread() async {
     final preferences = await SharedPreferences.getInstance();
-    if (preferences.getString('unread') == null) {
+    if (preferences.getString(currentuser + 'unread') == null) {
       return false;
     }
-    unread = preferences.getString('unread');
+    unread = preferences.getString(currentuser + 'unread');
     return true;
   }
 
   Future<bool> loadSubjects() async {
     final preferences = await SharedPreferences.getInstance();
-    if (preferences.getString('subjects') == null) {
+    if (preferences.getString(currentuser + 'subjects') == null) {
       return false;
     }
-    subjects = preferences.getString('subjects');
+    subjects = preferences.getString(currentuser + 'subjects');
     subjectitems.clear();
     for (var i in jsonDecode(subjects)['subjects']) {
       subjectitems.add(Subject.fromJson(i));
@@ -438,11 +500,11 @@ class Data {
     bool error=false;
     final preferences = await SharedPreferences.getInstance();
     for(var i=from;i<=to;i++) {
-      if(preferences.containsKey("subjectdetail" + i.toString())==false || preferences.getString("subjectdetail" + i.toString())==null){
+      if(preferences.containsKey("subjectdetail" + i.toString())==false || preferences.getString(currentuser + "subjectdetail" + i.toString())==null){
         error=true;
       }
       else {
-        subjectdetail = preferences.getString("subjectdetail" + i.toString());
+        subjectdetail = preferences.getString(currentuser + "subjectdetail" + i.toString());
         subjectitems2[i].content = Content.fromJson(jsonDecode(subjectdetail));
       }
     }

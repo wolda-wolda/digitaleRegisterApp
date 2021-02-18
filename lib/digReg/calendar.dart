@@ -14,7 +14,6 @@ class Calendar{
         itemCount: 100,
         controller: controller,
         itemBuilder: (BuildContext context, int index) {
-          print('index: ' + index.toString());
           currentindex=index;
          return DrawCalendar();
         }
@@ -29,13 +28,12 @@ class DrawCalendar extends StatefulWidget{
 }
 class DrawCalendarState extends State<DrawCalendar>{
   static Map<int,bool> loaded={};
-  static bool firsttime=true;
   void initload(){
-    if(firsttime==true){
+    if(Data.firstaccess["calendar"]==true){
       for(var i=0;i<100;i++){
         loaded[i]=false;
       }
-      firsttime=false;
+      Data.firstaccess["calendar"]=false;
     }
     return;
   }
@@ -45,7 +43,6 @@ class DrawCalendarState extends State<DrawCalendar>{
   }
   Future<bool> update() async {
     initload();
-    print('loaded[currentindex]: ' + loaded[currentindex].toString());
     if(loaded[currentindex]==false || loaded[currentindex] ==null) {
       if (await Data().updateCalendar(currentindex, currentindex) == false) {
         if (await Data().loadCalendar(currentindex, currentindex) == false) {

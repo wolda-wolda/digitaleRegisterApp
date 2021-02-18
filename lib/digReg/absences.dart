@@ -18,17 +18,16 @@ class DrawAbsences extends StatefulWidget{
   DrawAbsencesState createState() => DrawAbsencesState();
 }
 class DrawAbsencesState extends State<DrawAbsences>{
-  static bool firstaccess = true;
 
   Future<bool> update() async {
-    if (firstaccess) {
+    if (Data.firstaccess["absences"]) {
       if (await Data().updateAbsences() == false) {
         if (await Data().loadAbsences() == false) {
           print('Error');
           return false;
         }
       }
-      firstaccess = false;
+      Data.firstaccess["absences"] = false;
     }
     return true;
   }
@@ -55,7 +54,7 @@ class DrawAbsencesState extends State<DrawAbsences>{
   }
   Future<void> refresh() async{
     bool success =await Data().updateAbsences();
-    firstaccess = firstaccess==true?!success:false;
+    Data.firstaccess["absences"] = Data.firstaccess["absences"]==true?!success:false;
     return;
   }
   @override

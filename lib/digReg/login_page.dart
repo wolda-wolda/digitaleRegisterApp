@@ -39,10 +39,12 @@ class _LoginPageState extends State<LoginPage>
       "password": passwordController.text.trim()
     });
     if (jsonDecode(ret)['error'] == null) {
+      await Data().SetCurrentUser(usernameController.text.trim(),passwordController.text.trim(),"empty");
+      Data().initFirstaccess();
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (BuildContext context) => HomePage()),
-          (route) => false);
+              (route) => false);
     } else {
       scaffoldKey.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -147,20 +149,20 @@ class _LoginPageState extends State<LoginPage>
                     },
                   )
                 ])),
-              Container(
-                height: 40,
-                width: 70,
-                child: RaisedButton(
-                  onPressed: () {
-                    login(context);
-                  },
-                  shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0),
-                  ),
-                  child: Icon(LineAwesomeIcons.arrow_circle_right),
-                  color: _themeChanger.getColor(),
+            Container(
+              height: 40,
+              width: 70,
+              child: RaisedButton(
+                onPressed: () {
+                  login(context);
+                },
+                shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0),
                 ),
-              )
+                child: Icon(LineAwesomeIcons.arrow_circle_right),
+                color: _themeChanger.getColor(),
+              ),
+            )
           ],
         ),
       ),

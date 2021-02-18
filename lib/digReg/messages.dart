@@ -19,15 +19,14 @@ class DrawMessages extends StatefulWidget {
 }
 
 class DrawMessagesState extends State<DrawMessages> {
-  static bool firstaccess = true;
   Future<bool> update() async {
-    if (firstaccess) {
+    if (Data.firstaccess["messages"]) {
       if (await Data().updateMessages() == false &&
           await Data().loadMessages() == false) {
         print('Error');
         return false;
       }
-      firstaccess = false;
+      Data.firstaccess["messages"] = false;
     }
     return true;
   }
@@ -44,7 +43,7 @@ class DrawMessagesState extends State<DrawMessages> {
   bool get = true;
   void refresh() async {
     bool success = await Data().updateMessages();
-    firstaccess = firstaccess == true ? !success : false;
+    Data.firstaccess["messages"] = Data.firstaccess["messages"] == true ? !success : false;
     return;
   }
 

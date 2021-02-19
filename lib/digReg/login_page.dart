@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage>
     return FutureBuilder(
       future: Data().loadUser(),
     builder: (context, AsyncSnapshot<bool> snapshot){
-        if(snapshot.data==true){
+        if(snapshot.hasData){
     SizeConfig().init(context);
     return Scaffold(
       key: scaffoldKey,
@@ -201,7 +201,6 @@ class _LoginPageState extends State<LoginPage>
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            key: GlobalKey(),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0))),
               content:

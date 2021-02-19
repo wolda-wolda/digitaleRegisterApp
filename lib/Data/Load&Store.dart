@@ -259,6 +259,9 @@ class Data {
     currentuser=username;
     currentpassword=password;
     currenttitle= title;
+    if(link.contains('https://') && link.contains('.digitalesregister.it')){
+
+    }
     currentlink=link;
     var exists = -1;
     final preferences = await SharedPreferences.getInstance();

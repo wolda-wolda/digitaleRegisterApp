@@ -11,6 +11,7 @@ import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'SizeConfig.dart';
+import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -19,7 +20,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
-
+  bool autologin=true;
   bool _isHidden = true;
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -70,7 +71,11 @@ class _LoginPageState extends State<LoginPage>
   @override
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
-    Data().loadUser();
+
+    return FutureBuilder(
+      future: Data().loadUser(),
+    builder: (context, AsyncSnapshot<bool> snapshot){
+        if(snapshot.data==true){
     SizeConfig().init(context);
     return Scaffold(
       key: scaffoldKey,
@@ -143,7 +148,7 @@ class _LoginPageState extends State<LoginPage>
                         height: 40,
                         width: 80,
                         child: RaisedButton(
-                          onPressed: ()=>NewUser(context),
+                          onPressed: ()=>EditUser(context,-1),
                           shape: new RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(30.0),
                           ),
@@ -158,7 +163,9 @@ class _LoginPageState extends State<LoginPage>
           ],
         ),
       ),
-    );
+    );}
+        return Loading();
+      });
   }
 
   void _togglePasswordView() {
@@ -178,19 +185,31 @@ class _LoginPageState extends State<LoginPage>
     }
   }
   EditUser(context,var index){
+    if(index<0){
+      titleController.clear();
+      linkController.clear();
+      passwordController.clear();
+      usernameController.clear();
+    }else{
+      titleController..text = Data.user[index].title;
+      linkController..text = Data.user[index].link;
+      usernameController..text = Data.user[index].username;
+      passwordController..text = Data.user[index].password;
+    }
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context, listen: false);
     return showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            key: GlobalKey(),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0))),
               content:
               Container(
-                  height: 330,
+                  height: 350,
                   child: Column(children: <Widget>[
                     TextFormField(
-                      controller: titleController..text = Data.user[index].title,
+                      controller: titleController,
                       cursorColor: _themeChanger.getColor(),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -210,7 +229,7 @@ class _LoginPageState extends State<LoginPage>
                       color: _themeChanger.getColor(),
                     ),
                     TextField(
-                      controller: linkController..text = Data.user[index].link,
+                      controller: linkController,
                       cursorColor: _themeChanger.getColor(),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -231,7 +250,7 @@ class _LoginPageState extends State<LoginPage>
                       color: _themeChanger.getColor(),
                     ),
                     TextField(
-                      controller: usernameController..text = Data.user[index].username,
+                      controller: usernameController,
                       cursorColor: _themeChanger.getColor(),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -252,7 +271,7 @@ class _LoginPageState extends State<LoginPage>
                       color: _themeChanger.getColor(),
                     ),
                     TextField(
-                      controller: passwordController..text = Data.user[index].password,
+                      controller: passwordController,
                       obscureText: _isHidden,
                       cursorColor: _themeChanger.getColor(),
                       decoration: InputDecoration(
@@ -273,6 +292,17 @@ class _LoginPageState extends State<LoginPage>
                     SizedBox(
                       height: 10,
                     ),
+                    Row(
+                      children: <Widget>[
+                       Switch(
+                         value: autologin,
+                         onChanged: (bool state){
+                           this.setState((){
+                             autologin=!autologin;
+                             print(autologin);
+                           });
+                         }
+                       ),
                     Container(
                       height: 40,
                       width: 80,
@@ -294,132 +324,10 @@ class _LoginPageState extends State<LoginPage>
                       ),
                     )
                   ])
+
+
+                  ])
               ));
-        }
-    );
-  }
-  NewUser(context){
-    titleController.clear();
-    linkController.clear();
-    passwordController.clear();
-    usernameController.clear();
-    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context, listen: false);
-    return showDialog(
-      context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
-          content:
-          Container(
-            height: 330,
-          child: Column(children: <Widget>[
-            TextField(
-              controller: titleController,
-              cursorColor: _themeChanger.getColor(),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                prefixIcon: Icon(LineAwesomeIcons.info_circle),
-                labelText: 'Titel',
-                hintText: 'Titel (Beliebig)',
-              ),
-              textInputAction: TextInputAction.next,
-            ),
-            Divider(
-              height: 10,
-              endIndent: 100,
-              indent: 100,
-              thickness: 2,
-              color: _themeChanger.getColor(),
-            ),
-            TextField(
-              controller: linkController,
-              cursorColor: _themeChanger.getColor(),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                prefixIcon: Icon(LineAwesomeIcons.link),
-                labelText: 'Link',
-                hintText: 'Link für das Register',
-              ),
-              textInputAction: TextInputAction.next,
-            ),
-
-            Divider(
-              height: 10,
-              endIndent: 100,
-              indent: 100,
-              thickness: 2,
-              color: _themeChanger.getColor(),
-            ),
-            TextField(
-              controller: usernameController,
-              cursorColor: _themeChanger.getColor(),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                prefixIcon: Icon(LineAwesomeIcons.user),
-                labelText: 'Benutzername',
-                hintText: 'Benutzername zum Register',
-              ),
-              textInputAction: TextInputAction.next,
-            ),
-
-            Divider(
-              height: 10,
-              endIndent: 100,
-              indent: 100,
-              thickness: 2,
-              color: _themeChanger.getColor(),
-            ),
-            TextField(
-              controller: passwordController,
-              obscureText: _isHidden,
-              cursorColor: _themeChanger.getColor(),
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  prefixIcon: Icon(LineAwesomeIcons.lock),
-                  labelText: 'Passwort',
-                  hintText: 'Passwort eingeben',
-                  suffix: InkWell(
-                    onTap: _togglePasswordView,
-                    child: Icon(
-                      _isHidden ? Icons.visibility : Icons.visibility_off,
-                    ),
-                  )),
-              textInputAction: TextInputAction.done,
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              height: 40,
-              width: 80,
-              child: RaisedButton(
-                onPressed: () async{
-                  bool exists = await loginExists(usernameController.text.trim(), passwordController.text.trim(),linkController.text.trim());
-                  if(exists==true && titleController.text.trim()!=null){
-                      await Data().SetCurrentUser(usernameController.text.trim(),passwordController.text.trim(),titleController.text.trim(),linkController.text.trim());
-                      Navigator.pop(context,false);
-                  }else{
-                    print('Bitte überprüfen Sie Ihre Anmeldedaten');
-                  }
-                },
-                shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0),
-                ),
-                child: Icon(LineAwesomeIcons.check_circle),
-                color: _themeChanger.getColor(),
-              ),
-            )
-          ])
-          ));
         }
     );
   }

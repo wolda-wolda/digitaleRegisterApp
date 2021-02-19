@@ -17,21 +17,20 @@ class DrawProfile extends StatefulWidget{
   DrawProfileState createState() => DrawProfileState();
 }
 class DrawProfileState extends State<DrawProfile>{
-  static bool firstaccess = true;
-  void refresh() async{
+  Future<void> refresh() async{
     bool success =await Data().updateProfile();
-   firstaccess = firstaccess==true?success:false;
+   Data.firstaccess["profile"] = Data.firstaccess["profile"]==true?!success:false;
     return;
   }
   Future<bool> update() async {
-    if (firstaccess) {
+    if (Data.firstaccess["profile"]) {
       if (await Data().updateProfile() == false) {
         if (await Data().loadProfile() == false) {
           print('Error');
           return false;
         }
       }
-      firstaccess = false;
+      Data.firstaccess["profile"] = false;
     }
     return true;
   }
@@ -66,19 +65,13 @@ class DrawProfileState extends State<DrawProfile>{
       return Container();
     }
   }
-
-  Future<bool> done() async{
-    return true;
-  }
   @override
   Widget build(BuildContext context){
-    print('nochmal!!!!');
     return RefreshIndicator(
         onRefresh: () async {
           await refresh();
           setState((){});
-          print('update');
-          return done();
+          return Future.value(true);
         },
       child: FutureBuilder(
           future: update(),
@@ -89,7 +82,7 @@ class DrawProfileState extends State<DrawProfile>{
               String name = jsonDecode(data)['name'];
               String email = jsonDecode(data)['email'] ?? 'empty';
               String picture = jsonDecode(data)['picture'];
-              String pictureUrl = Data.link + '/v2/api/profile/picture&pictureUrl=';
+              String pictureUrl = Data.currentlink + '/v2/api/profile/picture&pictureUrl=';
               cookie = Session().getCookie();
               headers = {'Cookie': cookie};
                   return ListView(

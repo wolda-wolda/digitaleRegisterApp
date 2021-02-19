@@ -11,6 +11,7 @@ import 'package:digitales_register_app/digReg/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'SizeConfig.dart';
+import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -19,10 +20,12 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
-
+  bool autologin=true;
   bool _isHidden = true;
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  final linkController = TextEditingController();
+  final titleController = TextEditingController();
   final scaffoldKey =  GlobalKey<ScaffoldState>();
 
   @override
@@ -31,18 +34,33 @@ class _LoginPageState extends State<LoginPage>
     passwordController.dispose();
     super.dispose();
   }
-
+  Future<bool> loginExists(String username, String password, String link) async{
+    String ret = await Session()
+        .login( link + '/v2/api/auth/login', {
+      "username": username,
+      "password": password,
+    });
+    if(ret=='e'){
+      return false;
+    }
+    if (jsonDecode(ret)['error'] == null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
   Future<void> login(BuildContext context) async {
     String ret = await Session()
-        .login( Data.link+ '/v2/api/auth/login', {
-      "username": usernameController.text.trim(),
-      "password": passwordController.text.trim()
+        .login( Data.currentlink + '/v2/api/auth/login', {
+      "username": Data.currentuser,
+      "password": Data.currentpassword,
     });
     if (jsonDecode(ret)['error'] == null) {
+      Data().initFirstaccess();
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (BuildContext context) => HomePage()),
-          (route) => false);
+              (route) => false);
     } else {
       scaffoldKey.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -50,11 +68,15 @@ class _LoginPageState extends State<LoginPage>
           ),content: Text(jsonDecode(ret)['message'])));
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
+
+    return FutureBuilder(
+      future: Data().loadUser(),
+    builder: (context, AsyncSnapshot<bool> snapshot){
+        if(snapshot.hasData){
+    SizeConfig().init(context);
     return Scaffold(
       key: scaffoldKey,
       body: Container(
@@ -104,67 +126,46 @@ class _LoginPageState extends State<LoginPage>
                   SizedBox(
                     height: 40,
                   ),
-                  TextField(
-                    controller: usernameController,
-                    cursorColor: _themeChanger.getColor(),
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      prefixIcon: Icon(LineAwesomeIcons.user),
-                      labelText: 'Benutzername',
-                      hintText: 'Benutzername für das Register',
-                    ),
-                    textInputAction: TextInputAction.next,
-                  ),
-                  Divider(
-                    height: 50,
-                    endIndent: 100,
-                    indent: 100,
-                    thickness: 2,
-                    color: _themeChanger.getColor(),
-                  ),
-                  TextField(
-                    controller: passwordController,
-                    obscureText: _isHidden,
-                    cursorColor: _themeChanger.getColor(),
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        prefixIcon: Icon(LineAwesomeIcons.lock),
-                        labelText: 'Passwort',
-                        hintText: 'Passwort eingeben',
-                        suffix: InkWell(
-                          onTap: _togglePasswordView,
-                          child: Icon(
-                            _isHidden ? Icons.visibility : Icons.visibility_off,
-                          ),
-                        )),
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (passwordController) {
-                      login(context);
+                  Column(
+                    children: <Widget>[
+                      Data.user.isNotEmpty?
+                  ListView.builder(
+                   shrinkWrap: true,
+                   scrollDirection: Axis.vertical,
+                 itemCount: Data.user.length,
+                  itemBuilder: (context, index) {
+                  return ListTile(
+                      onLongPress: ()=>  EditUser(context,index),
+                    onTap: () async{
+                      Data().SetUser(index);
+                      return login(context);
                     },
-                  )
-                ])),
-              Container(
-                height: 40,
-                width: 70,
-                child: RaisedButton(
-                  onPressed: () {
-                    login(context);
+                    title: Text(Data.user[index].title),
+                    subtitle: Text(Data.user[index].username));
                   },
-                  shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0),
-                  ),
-                  child: Icon(LineAwesomeIcons.arrow_circle_right),
-                  color: _themeChanger.getColor(),
-                ),
-              )
+                  ):Container(),
+                       Container(
+                        height: 40,
+                        width: 80,
+                        child: RaisedButton(
+                          onPressed: ()=>EditUser(context,-1),
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0),
+                          ),
+                          child: Icon(LineAwesomeIcons.plus_circle),
+                          color: _themeChanger.getColor(),
+                        ),
+                      ),
+                    ]
+                  )
+                 ])),
+
           ],
         ),
       ),
-    );
+    );}
+        return Loading();
+      });
   }
 
   void _togglePasswordView() {
@@ -182,5 +183,151 @@ class _LoginPageState extends State<LoginPage>
       SystemNavigator.pop();
       return;
     }
+  }
+  EditUser(context,var index){
+    if(index<0){
+      titleController.clear();
+      linkController.clear();
+      passwordController.clear();
+      usernameController.clear();
+    }else{
+      titleController..text = Data.user[index].title;
+      linkController..text = Data.user[index].link;
+      usernameController..text = Data.user[index].username;
+      passwordController..text = Data.user[index].password;
+    }
+    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context, listen: false);
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
+              content:
+              Container(
+                  height: 350,
+                  child: Column(children: <Widget>[
+                    TextFormField(
+                      controller: titleController,
+                      cursorColor: _themeChanger.getColor(),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        prefixIcon: Icon(LineAwesomeIcons.info_circle),
+                        labelText: 'Titel',
+                        hintText: 'Titel (Beliebig)',
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                    Divider(
+                      height: 10,
+                      endIndent: 100,
+                      indent: 100,
+                      thickness: 2,
+                      color: _themeChanger.getColor(),
+                    ),
+                    TextField(
+                      controller: linkController,
+                      cursorColor: _themeChanger.getColor(),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        prefixIcon: Icon(LineAwesomeIcons.link),
+                        labelText: 'Link',
+                        hintText: 'Link für das Register',
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+
+                    Divider(
+                      height: 10,
+                      endIndent: 100,
+                      indent: 100,
+                      thickness: 2,
+                      color: _themeChanger.getColor(),
+                    ),
+                    TextField(
+                      controller: usernameController,
+                      cursorColor: _themeChanger.getColor(),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        prefixIcon: Icon(LineAwesomeIcons.user),
+                        labelText: 'Benutzername',
+                        hintText: 'Benutzername zum Register',
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+
+                    Divider(
+                      height: 10,
+                      endIndent: 100,
+                      indent: 100,
+                      thickness: 2,
+                      color: _themeChanger.getColor(),
+                    ),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: _isHidden,
+                      cursorColor: _themeChanger.getColor(),
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          prefixIcon: Icon(LineAwesomeIcons.lock),
+                          labelText: 'Passwort',
+                          hintText: 'Passwort eingeben',
+                          suffix: InkWell(
+                            onTap: _togglePasswordView,
+                            child: Icon(
+                              _isHidden ? Icons.visibility : Icons.visibility_off,
+                            ),
+                          )),
+                      textInputAction: TextInputAction.done,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      children: <Widget>[
+                       Switch(
+                         value: autologin,
+                         onChanged: (bool state){
+                           this.setState((){
+                             autologin=!autologin;
+                             print(autologin);
+                           });
+                         }
+                       ),
+                    Container(
+                      height: 40,
+                      width: 80,
+                      child: RaisedButton(
+                        onPressed: () async{
+                          bool exists = await loginExists(usernameController.text.trim(), passwordController.text.trim(),linkController.text.trim());
+                          if(exists==true && titleController.text.trim()!=null){
+                            await Data().SetCurrentUser(usernameController.text.trim(),passwordController.text.trim(),titleController.text.trim(),linkController.text.trim());
+                            Navigator.pop(context,false);
+                          }else{
+                            print('Bitte überprüfen Sie Ihre Anmeldedaten');
+                          }
+                        },
+                        shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(30.0),
+                        ),
+                        child: Icon(LineAwesomeIcons.check_circle),
+                        color: _themeChanger.getColor(),
+                      ),
+                    )
+                  ])
+
+
+                  ])
+              ));
+        }
+    );
   }
 }

@@ -37,7 +37,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   int _selectedIndex = 0;
   List<String> options = <String>[
     'Merkheft',
-    'Unread'
     'Absenzen',
     'Kalender',
     'Noten',
@@ -48,7 +47,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget _options(BuildContext context, int select) {
     return <Widget>[
       Dashboard().build(context),
-      Dashboard().unread(context),
       Absences().build(context),
       Calendar().build(context),
       Subjects().build(context),
@@ -117,10 +115,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               label: 'Merkheft',
             ),
             BottomNavigationBarItem(
-              icon: Icon(LineAwesomeIcons.book),
-              label: 'Unread',
-            ),
-            BottomNavigationBarItem(
               icon: Icon(LineAwesomeIcons.thermometer),
               label: 'Absenzen',
             ),
@@ -152,7 +146,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> logout() async {
-    await Session().get(Data.link +'/v2/logout');
+    await Session().get(Data.currentlink +'/v2/logout');
   }
 
   void choiceAction(String choice) {
@@ -163,10 +157,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ));
     } else if (choice == Constants.Logout) {
       logout();
+      Data().initFirstaccess();
       Navigator.pushAndRemoveUntil(
           context,
           PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => LoginPage(),
+              pageBuilder: (context, animation1, animation2) {
+                return LoginPage();
+              },
               transitionDuration: Duration(milliseconds: 100)),
               (route) => false);
     }

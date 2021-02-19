@@ -1,32 +1,61 @@
+import 'dart:io';
+import 'package:ext_storage/ext_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Map<String, String> headers;
 String cookie = 'empty';
 class Session {
-  Future<String> get(String url) async {
-    try {
-      http.Response response = await http.get(url, headers: headers).timeout(
-          Duration(seconds: 2),
-          onTimeout: () {
-            throw Exception;
-          }
-      );
-      return response.body;
-    } on Exception{
-      return 'e';
-    }
+  Future<File> downloadFile(String url, String filename) async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted)
+      await Permission.storage.request();
+    var req = await http.get(url, headers: headers);
+    String path = await ExtStorage.getExternalStoragePublicDirectory(ExtStorage.DIRECTORY_DOWNLOADS) + '/' + filename;
+    File file = new File(path);
+    print(file.absolute.path);
+    await file.writeAsBytes(req.bodyBytes);
+    OpenFile.open(path);
+    return file;
   }
+
+  Future<String> get(String url) async {
+      try {
+        http.Response response = await http.get(url, headers: headers).timeout(
+            Duration(seconds: 2),
+            onTimeout: () {
+              throw Exception;
+            }
+        );
+        return response.body;
+      } on Exception {
+        return 'e';
+      }
+    }
   String getCookie() {
     return cookie;
   }
   Future<String> login(String url, dynamic data) async {
-    if (headers != null)
+    http.Response response;
+    if (headers != null){
       headers.clear();
-      http.Response response = await http.post(
-          url, body: jsonEncode(data), headers: headers);
+    }
+      try {
+        response = await http.post(
+            url, body: jsonEncode(data), headers: headers).timeout(
+            Duration(seconds: 2),
+            onTimeout: () {
+              throw Exception;
+            });
+      }on Exception {
+        return 'e';
+      }catch (exception){
+        return 'e';
+      }
     print(response.body);
     if (jsonDecode(response.body)['error'] == null) {
       updateCookie(response);

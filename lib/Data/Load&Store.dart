@@ -2,6 +2,7 @@ import 'package:digitales_register_app/API/API.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 
 class User{
   final String username;
@@ -255,13 +256,56 @@ class Data {
     currentpassword=user[index].password;
     currentlink=user[index].link;
   }
+  String getLink(String link){
+    if(link.contains('https://') && link.contains('.digitalesregister.it')){
+      link=link;
+    }else if(link.contains('https://') && !link.contains('.digitalesregister.it')){
+      link = link+ '.digitalesregister.it';
+    }else{
+      link = 'https://' +link+'.digitalesregister.it';
+    }
+    return link;
+  }
+  Future<int> GetAutoLogin()async{
+    final preferences = await SharedPreferences.getInstance();
+    if(preferences.getInt("Autologin")==null){
+      return -1;
+    }else{
+      return preferences.getInt("Autologin");
+    }
+  }
+  Future<bool> SetAutoLogin(int index)async{
+    final preferences = await SharedPreferences.getInstance();
+    if(user.isNotEmpty){
+      preferences.setInt("Autologin",index);
+      return true;
+    }else{
+      return false;
+    }
+  }
+  Future<bool> StoreTheme(Color color,bool theme) async{
+    final preferences = await SharedPreferences.getInstance();
+    preferences.setInt("Color", color.value);
+    preferences.setBool("Theme",theme);
+    return true;
+  }
+  Future<bool> LoadTheme(_themeChanger) async{
+    final preferences = await SharedPreferences.getInstance();
+    if(preferences.getInt("Color")!=null){
+      _themeChanger.setColor(Color(preferences.getInt('Color')));
+      print(Color(preferences.getInt('Color')));
+      print('loadcolor');
+    }
+    if(preferences.getBool('Theme')!=null){
+      _themeChanger.setBool(preferences.getBool('Theme'));
+      print('loadTheme');
+    }
+    return true;
+  }
   Future<bool> SetCurrentUser(String username, String password, String title, String link) async{
     currentuser=username;
     currentpassword=password;
     currenttitle= title;
-    if(link.contains('https://') && link.contains('.digitalesregister.it')){
-
-    }
     currentlink=link;
     var exists = -1;
     final preferences = await SharedPreferences.getInstance();

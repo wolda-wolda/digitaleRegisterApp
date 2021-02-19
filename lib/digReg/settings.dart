@@ -16,7 +16,7 @@ class _SettingsState extends State<Settings> {
   static int i = 0;
   static bool notificationsEnabled;
   Future<bool> changeNotification() async{
-    if((await Session().post('https://fallmerayer.digitalesregister.it/v2/api/profile/updateNotificationSettings', {'notificationsEnabled': notificationsEnabled}))=='e'){
+    if((await Session().post(Data.currentlink +'/v2/api/profile/updateNotificationSettings', {'notificationsEnabled': notificationsEnabled}))=='e'){
       return false;
     }
     else{
@@ -45,7 +45,7 @@ class _SettingsState extends State<Settings> {
       return Icon(Icons.wb_incandescent_outlined);
   }
 
-  void showColorPicker(BuildContext context, ThemeChanger _themeChanger) {
+  void showColorPicker(BuildContext context, ThemeChanger _themeChanger) async{
     showDialog(
         context: context,
         builder: (context) {
@@ -55,11 +55,16 @@ class _SettingsState extends State<Settings> {
                 child: ColorPicker(
                   pickerColor: _themeChanger.getColor(),
                   showLabel: true,
-                  onColorChanged: (color) => changeColor(color, _themeChanger),
+                  onColorChanged: (color)async{
+                    changeColor(color, _themeChanger);
+                  },
             ),
-            )
+            ),
           );
-        });
+        }).then((context) async{
+          await Data().StoreTheme(_themeChanger.getColor(),_themeChanger.getBool());
+          return;
+    });
   }
   final snackbar =  GlobalKey<ScaffoldState>();
   @override
@@ -127,13 +132,16 @@ class _SettingsState extends State<Settings> {
                     SettingsTile(
                       leading: Icon(Icons.color_lens),
                       title: 'Theme ändern',
-                      onPressed: (_) => showColorPicker(context, _themeChanger),
+                      onPressed: (_){
+                        showColorPicker(context, _themeChanger);
+                        },
                     ),
                     SettingsTile.switchTile(
                         leading: darkMode(_themeChanger.getBool()),
                         title: 'Dark Mode',
-                        onToggle: (value) {
+                        onToggle: (value) async{
                           _themeChanger.setBool(value);
+                          await Data().StoreTheme(_themeChanger.getColor(),_themeChanger.getBool());
                         },
                         switchValue: _themeChanger.getBool())
                   ],

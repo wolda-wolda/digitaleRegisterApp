@@ -40,13 +40,15 @@ class Session {
     return cookie;
   }
   Future<String> login(String url, dynamic data) async {
+    print(url);
     http.Response response;
     if (headers != null){
       headers.clear();
     }
+    print('jep');
       try {
         response = await http.post(
-            url, body: jsonEncode(data), headers: headers).timeout(
+            url, body: jsonEncode(data), headers: headers,).timeout(
             Duration(seconds: 2),
             onTimeout: () {
               throw Exception;
@@ -54,6 +56,9 @@ class Session {
       }on Exception {
         return 'e';
       }catch (exception){
+        return 'e';
+      }
+      if(response.statusCode!=200){
         return 'e';
       }
     print(response.body);

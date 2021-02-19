@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'SizeConfig.dart';
 import 'package:digitales_register_app/digReg/usefulWidgets.dart';
+import 'package:async/async.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -27,7 +28,7 @@ class _LoginPageState extends State<LoginPage>
   final linkController = TextEditingController();
   final titleController = TextEditingController();
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
   @override
   void dispose() {
     usernameController.dispose();
@@ -73,12 +74,19 @@ class _LoginPageState extends State<LoginPage>
     }
   }
 
+  load(_themeChanger)async{
+    return this._memoizer.runOnce(() async {
+      await Data().loadUser();
+      await Data().LoadTheme(_themeChanger);
+      return true;
+    });
+  }
   @override
   Widget build(BuildContext context) {
-    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
+    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context, listen: false);
     return FutureBuilder(
-        future: Data().loadUser(),
-        builder: (context, AsyncSnapshot<bool> snapshot) {
+        future: load(_themeChanger) ,
+        builder: (context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasData) {
             SizeConfig().init(context);
             return Scaffold(

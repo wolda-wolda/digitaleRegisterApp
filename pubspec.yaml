@@ -21,6 +21,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  async: ^2.4.2
   ext_storage: ^1.0.3
   open_file: ^3.0.3
   permission_handler: ^5.1.0+2

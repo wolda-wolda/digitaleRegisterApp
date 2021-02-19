@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> logout() async {
-    await Session().get(Data.link +'/v2/logout');
+    await Session().get(Data.currentlink +'/v2/logout');
   }
 
   void choiceAction(String choice) {

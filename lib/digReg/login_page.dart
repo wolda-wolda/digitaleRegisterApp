@@ -21,7 +21,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
-  bool autologin = true;
   bool _passwordVisible = true;
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -73,11 +72,19 @@ class _LoginPageState extends State<LoginPage>
               ), content: Text(jsonDecode(ret)['message'])));
     }
   }
-
-  load(_themeChanger)async{
+  static bool firstlogin=true;
+  load(_themeChanger,BuildContext context)async{
     return this._memoizer.runOnce(() async {
       await Data().loadUser();
       await Data().LoadTheme(_themeChanger);
+      await Data().GetAutoLogin();
+      if(firstlogin==true){
+        if(Data.autologin!=-1){
+          await Data().SetUser(Data.autologin);
+          await login(context);
+        }
+        firstlogin=false;
+        }
       return true;
     });
   }
@@ -85,9 +92,9 @@ class _LoginPageState extends State<LoginPage>
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context, listen: false);
     return FutureBuilder(
-        future: load(_themeChanger) ,
+        future: load(_themeChanger,context) ,
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.data!=null) {
             SizeConfig().init(context);
             return Scaffold(
               key: scaffoldKey,
@@ -157,12 +164,16 @@ class _LoginPageState extends State<LoginPage>
                                     itemCount: Data.user.length,
                                     itemBuilder: (context, index) {
                                       return ListTile(
-                                          onLongPress: () =>
-                                              EditUser(context, index),
+                                          onLongPress: () {
+                                            EditUser(context, index).then((context){
+                                              setState((){});
+                                            });
+                                          },
                                           onTap: () async {
                                             Data().SetUser(index);
                                             return login(context);
                                           },
+                                          trailing: index==Data.autologin?Icon(LineAwesomeIcons.check):SizedBox.shrink(),
                                           leading: Icon(
                                             LineAwesomeIcons.user, size: 35,),
                                           title: Text(Data.user[index].title),
@@ -176,7 +187,11 @@ class _LoginPageState extends State<LoginPage>
                                   height: 40,
                                   width: 80,
                                   child: RaisedButton(
-                                    onPressed: () => EditUser(context, -1),
+                                    onPressed: () {
+                                      EditUser(context, -1).then((context){
+                                      setState((){});
+                                    });
+                                    },
                                     shape: new RoundedRectangleBorder(
                                       borderRadius: new BorderRadius.circular(
                                           30.0),
@@ -194,7 +209,7 @@ class _LoginPageState extends State<LoginPage>
               ),
             );
           }
-          return Loading();
+          return Login();
         });
   }
 
@@ -209,19 +224,23 @@ class _LoginPageState extends State<LoginPage>
       return;
     }
   }
-
+  bool autologin = true;
   EditUser(context, var index) {
     if (index < 0) {
       titleController.clear();
       linkController.clear();
       passwordController.clear();
       usernameController.clear();
-    } else {
+      autologin=false;
+      }
+    else {
       titleController..text = Data.user[index].title;
       linkController..text = Data.user[index].link;
       usernameController..text = Data.user[index].username;
       passwordController..text = Data.user[index].password;
-    }
+      autologin = Data.autologin==index?true:false;
+      }
+
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(
         context, listen: false);
     return showDialog(
@@ -332,7 +351,6 @@ class _LoginPageState extends State<LoginPage>
                                     onChanged: (bool state) {
                                       setState(() {
                                         autologin = !autologin;
-                                        print(autologin);
                                       });
                                     }
                                 ),
@@ -353,6 +371,7 @@ class _LoginPageState extends State<LoginPage>
                                             passwordController.text.trim(),
                                             titleController.text.trim(),
                                             linkController.text.trim());
+                                        Data().SetAutoLogin(index!=-1?index:-1,autologin);
                                         Navigator.pop(context, false);
                                       } else {
                                         print(

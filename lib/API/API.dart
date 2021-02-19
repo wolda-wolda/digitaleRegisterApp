@@ -40,12 +40,11 @@ class Session {
     return cookie;
   }
   Future<String> login(String url, dynamic data) async {
-    print(url);
+    print('hier');
     http.Response response;
     if (headers != null){
       headers.clear();
     }
-    print('jep');
       try {
         response = await http.post(
             url, body: jsonEncode(data), headers: headers,).timeout(

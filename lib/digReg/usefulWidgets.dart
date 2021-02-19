@@ -15,6 +15,21 @@ class Loading extends StatelessWidget{
     );
   }
 }
+class Login extends StatelessWidget{
+  Widget build(BuildContext context) {
+    return Container(
+        //decoration: Cool Logo by Manuel Mitterrutzner
+        alignment: Alignment.center,
+        height: 1000,
+        width: 1000,
+        child: CircularProgressIndicator(
+          strokeWidth: 5,
+          backgroundColor: Colors.grey[800],
+          valueColor: AlwaysStoppedAnimation(Colors.white),
+        ),
+    );
+  }
+}
 class LoadingBar extends StatelessWidget{
   Widget build(BuildContext context) {
     return Container(

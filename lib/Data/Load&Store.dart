@@ -228,6 +228,7 @@ class Data {
   static String currentuser;
   static String currentpassword;
   static String currenttitle;
+  static var autologin=-1;
 
   void initFirstaccess(){
     firstaccess["absences"]=true;
@@ -269,19 +270,29 @@ class Data {
   Future<int> GetAutoLogin()async{
     final preferences = await SharedPreferences.getInstance();
     if(preferences.getInt("Autologin")==null){
-      return -1;
+      autologin =-1;
     }else{
-      return preferences.getInt("Autologin");
+      autologin = preferences.getInt("Autologin");
     }
+    return autologin;
   }
-  Future<bool> SetAutoLogin(int index)async{
+  Future<bool> SetAutoLogin(int index,bool toggle)async{
     final preferences = await SharedPreferences.getInstance();
-    if(user.isNotEmpty){
+    if(toggle && index != autologin){
+      autologin=index;
       preferences.setInt("Autologin",index);
-      return true;
-    }else{
-      return false;
+    }else if(!toggle && index==autologin){
+      autologin = -1;
+      preferences.remove("Autologin");
+    }else if(index==-1){
+      for(var i =0;i<user.length;i++){
+        if(user[i].username==currentuser){
+          autologin=index;
+          break;
+        }
+      }
     }
+    return true;
   }
   Future<bool> StoreTheme(Color color,bool theme) async{
     final preferences = await SharedPreferences.getInstance();

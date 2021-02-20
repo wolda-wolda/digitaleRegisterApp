@@ -13,17 +13,6 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  static int i = 0;
-  static bool notificationsEnabled;
-  Future<bool> changeNotification() async{
-    if((await Session().post(Data.currentlink +'/v2/api/profile/updateNotificationSettings', {'notificationsEnabled': notificationsEnabled}))=='e'){
-      return false;
-    }
-    else{
-      return true;
-    }
-
-  }
 
   void changeColor(Color color, ThemeChanger _themeChanger) {
     setState(() {
@@ -31,12 +20,6 @@ class _SettingsState extends State<Settings> {
     });
   }
 
-  Widget notifications(bool notificationsEnabled) {
-    if (notificationsEnabled == true)
-      return Icon(Icons.notifications_active);
-    else
-      return Icon(Icons.notifications);
-  }
 
   Widget darkMode(bool theme) {
     if (theme == true)
@@ -66,62 +49,9 @@ class _SettingsState extends State<Settings> {
           return;
     });
   }
-  final snackbar =  GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
-        String data=Data.profile;
-        if (data != null) {
-          if (!data.contains('window.location')) {
-            if (i == 0) {
-              notificationsEnabled =
-              jsonDecode(data)['notificationsEnabled'];
-              i++;
-            }
-            return Scaffold(
-              key: snackbar,
-              appBar: AppBar(title: Text('Settings')),
-              body: Center(
-                child: SettingsList(
-                  sections: [
-                    SettingsSection(
-                      tiles: [
-                        SettingsTile(
-                          leading: Icon(Icons.color_lens),
-                          title: 'Theme ändern',
-                          onPressed: (_) => showColorPicker(context, _themeChanger),
-                        ),
-                        SettingsTile.switchTile(
-                            leading: darkMode(_themeChanger.getBool()),
-                            title: 'Dark Mode',
-                            onToggle: (value) {
-                              _themeChanger.setBool(value);
-                            },
-                            switchValue: _themeChanger.getBool()),
-                        SettingsTile.switchTile(
-                            leading: notifications(notificationsEnabled),
-                            title: 'Email-Benachrichtigungen',
-                            onToggle: (value) async{
-                              if(await changeNotification()==true){
-                                notificationsEnabled = !notificationsEnabled;
-                              }
-                              else{
-                                snackbar.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                                    ),content: Text('Keine Netzwerkverbindung')));
-                              }
-                                setState((){});
-                            },
-                            switchValue: notificationsEnabled)
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-        }
         return Scaffold(
           appBar: AppBar(title: Text('Settings')),
           body: Center(
@@ -150,5 +80,5 @@ class _SettingsState extends State<Settings> {
             ),
           ),
         );
-      }
   }
+}

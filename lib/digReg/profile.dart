@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:settings_ui/settings_ui.dart';
+import 'package:flutter/material.dart';
 
 class Profile {
 
@@ -22,6 +24,25 @@ class DrawProfileState extends State<DrawProfile>{
    Data.firstaccess["profile"] = Data.firstaccess["profile"]==true?!success:false;
     return;
   }
+
+  static int i = 0;
+  static bool notificationsEnabled;
+  Future<bool> changeNotification() async{
+    if((await Session().post(Data.currentlink +'/v2/api/profile/updateNotificationSettings', {'notificationsEnabled': notificationsEnabled}))=='e'){
+      return false;
+    }
+    else{
+      return true;
+    }
+  }
+  Widget notifications(bool notificationsEnabled) {
+    if (notificationsEnabled == true)
+      return Icon(Icons.notifications_active);
+    else
+      return Icon(Icons.notifications);
+  }
+
+
   Future<bool> update() async {
     if (Data.firstaccess["profile"]) {
       if (await Data().updateProfile() == false) {
@@ -66,6 +87,7 @@ class DrawProfileState extends State<DrawProfile>{
     }
   }
   @override
+  final snackbar =  GlobalKey<ScaffoldState>();
   Widget build(BuildContext context){
     return RefreshIndicator(
         onRefresh: () async {
@@ -77,7 +99,13 @@ class DrawProfileState extends State<DrawProfile>{
           future: update(),
           builder: (context, AsyncSnapshot<bool> snapshot) {
             if(snapshot.data==true){
+
               String data = Data.profile;
+              if (i == 0) {
+                notificationsEnabled =
+                jsonDecode(data)['notificationsEnabled'];
+                i++;
+              }
               String roleName = jsonDecode(data)['roleName'];
               String name = jsonDecode(data)['name'];
               String email = jsonDecode(data)['email'] ?? 'empty';
@@ -85,7 +113,9 @@ class DrawProfileState extends State<DrawProfile>{
               String pictureUrl = Data.currentlink + '/v2/api/profile/picture&pictureUrl=';
               cookie = Session().getCookie();
               headers = {'Cookie': cookie};
-                  return ListView(
+              return Scaffold(
+                  key: snackbar,
+                  body: ListView(
                     children: <Widget>[
                       profilePicture(pictureUrl,picture),
                       ListTile(
@@ -104,8 +134,27 @@ class DrawProfileState extends State<DrawProfile>{
                             style: TextStyle(
                                 color: Colors.grey, fontStyle: FontStyle.italic)),
                       ),
+                      email!='empty'?
+                      SettingsTile.switchTile(
+                          leading: notifications(notificationsEnabled),
+                          title: 'Email-Benachrichtigungen',
+                          onToggle: (value) async{
+                            if(await changeNotification()==true){
+                              notificationsEnabled = !notificationsEnabled;
+                            }
+                            else{
+                              snackbar.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                                  ),content: Text('Keine Netzwerkverbindung')));
+                            }
+                            setState((){});
+                          },
+                          switchValue: notificationsEnabled
+                      ):
+                          SizedBox.shrink(),
                     ],
-                  );
+                  ));
             }
             else if (snapshot.data == null) {
               return Loading();

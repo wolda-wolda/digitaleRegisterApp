@@ -252,6 +252,39 @@ class Data {
     }
     return true;
   }
+   Future<bool> RemoveUser(var index) async{
+    String username = user[index].username;
+    user.clear();
+    final preferences = await SharedPreferences.getInstance();
+    String jsonUser = preferences.getString("User");
+    if(jsonUser!=null) {
+      for (var i = 0; i < jsonDecode(jsonUser).length; i++) {
+        if(i!=index){
+          user.add(User.Decode(jsonDecode(jsonUser)[i]));
+      }
+    }
+   }
+    jsonUser = jsonEncode(user);
+    preferences.setString("User",jsonUser);
+    preferences.remove(username + 'profile');
+    preferences.remove(username + 'absences');
+    preferences.remove(username + 'unread');
+    preferences.remove(username + 'dashboard');
+    preferences.remove(username + 'calendar');
+    if(preferences.containsKey(username+'subjects')){
+      String subjects = preferences.getString(username+'subjects');
+      print(subjects);
+    }
+    preferences.remove(username + 'subjects');
+    for(var i=0;preferences.containsKey(username + 'subjectdetail' + i.toString())==true;i++){
+      print(i);
+      preferences.remove(username + 'subjectdetail' + i.toString());
+    }
+    for(var i=0;i<100;i++){
+      preferences.remove(username + 'calendardetail' + i.toString());
+    }
+   return true;
+  }
   bool SetUser(var index) {
     currentuser=user[index].username;
     currentpassword=user[index].password;
@@ -287,7 +320,7 @@ class Data {
     }else if(index==-1){
       for(var i =0;i<user.length;i++){
         if(user[i].username==currentuser){
-          autologin=index;
+          autologin=i;
           break;
         }
       }
@@ -492,7 +525,7 @@ class Data {
   Future<bool> loadCalendar(var from, var to) async {
     final preferences = await SharedPreferences.getInstance();
     for (var i = from; i <= to; i++) {
-      if (preferences.containsKey('calendardetail' + i.toString()) &&
+      if (preferences.containsKey(currentuser + 'calendardetail' + i.toString()) &&
           preferences.getString(currentuser + 'calendardetail' + i.toString()) != null) {
         calendardetail = preferences.getString(currentuser + 'calendardetail' + i.toString());
         calendar[i] = calendardetail;

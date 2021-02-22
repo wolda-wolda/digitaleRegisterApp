@@ -40,7 +40,6 @@ class Session {
     return cookie;
   }
   Future<String> login(String url, dynamic data) async {
-    print('hier');
     http.Response response;
     if (headers != null){
       headers.clear();

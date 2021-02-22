@@ -37,6 +37,7 @@ class _LoginPageState extends State<LoginPage>
 
   Future<bool> loginExists(String username, String password,
       String link) async {
+    print(link);
     String ret = await Session()
         .login(link + '/v2/api/auth/login', {
       "username": username,
@@ -58,6 +59,9 @@ class _LoginPageState extends State<LoginPage>
       "username": Data.currentuser,
       "password": Data.currentpassword,
     });
+    if(ret=='e'){
+      SizedBox.shrink();
+    }
     if (jsonDecode(ret)['error'] == null) {
       Data().initFirstaccess();
       Navigator.pushAndRemoveUntil(
@@ -88,6 +92,7 @@ class _LoginPageState extends State<LoginPage>
       return true;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context, listen: false);
@@ -163,7 +168,34 @@ class _LoginPageState extends State<LoginPage>
                                     scrollDirection: Axis.vertical,
                                     itemCount: Data.user.length,
                                     itemBuilder: (context, index) {
-                                      return ListTile(
+                                      return Dismissible(
+                                        confirmDismiss: ((DismissDirection direction){
+                                          return showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                                              title: const Text("Entfernen bestätigen"),
+                                              content: const Text("Sind Sie sicher, dass Sie diesen Benutzer Löschen möchten"),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  onPressed: () => Navigator.of(context).pop(false),
+                                                  child: const Text("Abbrechen"),
+                                                ),
+                                                FlatButton(
+                                                    onPressed: () => Navigator.of(context).pop(true),
+                                                    child: const Text("Löschen")
+                                                ),
+                                              ],
+                                            );
+                                          });}),
+                                          key: Key(Data.user[index].toString()),
+                                        onDismissed: ((direction){
+                                            Data().RemoveUser(index);
+                                          }
+                                        ),
+                                      child: ListTile(
                                           onLongPress: () {
                                             EditUser(context, index).then((context){
                                               setState((){});
@@ -178,7 +210,7 @@ class _LoginPageState extends State<LoginPage>
                                             LineAwesomeIcons.user, size: 35,),
                                           title: Text(Data.user[index].title),
                                           subtitle: Text(
-                                              Data.user[index].username));
+                                              Data.user[index].username)));
                                     },
                                   ),
                                 ) : Container(),
@@ -363,14 +395,14 @@ class _LoginPageState extends State<LoginPage>
                                       bool exists = await loginExists(
                                           usernameController.text.trim(),
                                           passwordController.text.trim(),
-                                          linkController.text.trim());
+                                          Data().getLink(linkController.text.trim()));
                                       if (exists == true &&
                                           titleController.text.trim() != null) {
                                         await Data().SetCurrentUser(
                                             usernameController.text.trim(),
                                             passwordController.text.trim(),
                                             titleController.text.trim(),
-                                            linkController.text.trim());
+                                            Data().getLink(linkController.text.trim()));
                                         Data().SetAutoLogin(index!=-1?index:-1,autologin);
                                         Navigator.pop(context, false);
                                       } else {

@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage>
       await Data().LoadTheme(_themeChanger);
       await Data().GetAutoLogin();
       if(firstlogin==true){
-        if(Data.autologin!=-1){
+        if(Data.autologin!='e'){
           await Data().SetUser(Data.autologin);
           await login(context);
         }
@@ -100,6 +100,7 @@ class _LoginPageState extends State<LoginPage>
         future: load(_themeChanger,context) ,
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.data!=null) {
+            List<String> userkeys = Data.user.keys.toList();
             SizeConfig().init(context);
             return Scaffold(
               key: scaffoldKey,
@@ -168,6 +169,7 @@ class _LoginPageState extends State<LoginPage>
                                     scrollDirection: Axis.vertical,
                                     itemCount: Data.user.length,
                                     itemBuilder: (context, index) {
+                                      String userkey = userkeys[index];
                                       return Dismissible(
                                         confirmDismiss: ((DismissDirection direction){
                                           return showDialog(
@@ -190,27 +192,28 @@ class _LoginPageState extends State<LoginPage>
                                               ],
                                             );
                                           });}),
-                                          key: Key(Data.user[index].toString()),
+                                          key: UniqueKey(),
                                         onDismissed: ((direction){
-                                            Data().RemoveUser(index);
+                                            Data().RemoveUser(userkey);
+                                            setState((){});
                                           }
                                         ),
                                       child: ListTile(
                                           onLongPress: () {
-                                            EditUser(context, index).then((context){
+                                            EditUser(context, userkey).then((context){
                                               setState((){});
                                             });
                                           },
                                           onTap: () async {
-                                            Data().SetUser(index);
+                                            Data().SetUser(userkey);
                                             return login(context);
                                           },
-                                          trailing: index==Data.autologin?Icon(LineAwesomeIcons.check):SizedBox.shrink(),
+                                          trailing: userkey==Data.autologin?Icon(LineAwesomeIcons.check):SizedBox.shrink(),
                                           leading: Icon(
                                             LineAwesomeIcons.user, size: 35,),
-                                          title: Text(Data.user[index].title),
+                                          title: Text(Data.user[userkey].title),
                                           subtitle: Text(
-                                              Data.user[index].username)));
+                                              Data.user[userkey].username)));
                                     },
                                   ),
                                 ) : Container(),
@@ -220,7 +223,7 @@ class _LoginPageState extends State<LoginPage>
                                   width: 80,
                                   child: RaisedButton(
                                     onPressed: () {
-                                      EditUser(context, -1).then((context){
+                                      EditUser(context, 'new').then((context){
                                       setState((){});
                                     });
                                     },
@@ -257,8 +260,8 @@ class _LoginPageState extends State<LoginPage>
     }
   }
   bool autologin = true;
-  EditUser(context, var index) {
-    if (index < 0) {
+  EditUser(context, String userkey) {
+    if (userkey =='new') {
       titleController.clear();
       linkController.clear();
       passwordController.clear();
@@ -266,11 +269,11 @@ class _LoginPageState extends State<LoginPage>
       autologin=false;
       }
     else {
-      titleController..text = Data.user[index].title;
-      linkController..text = Data.user[index].link;
-      usernameController..text = Data.user[index].username;
-      passwordController..text = Data.user[index].password;
-      autologin = Data.autologin==index?true:false;
+      titleController..text = Data.user[userkey].title;
+      linkController..text = Data.user[userkey].link;
+      usernameController..text = Data.user[userkey].username;
+      passwordController..text = Data.user[userkey].password;
+      autologin = Data.autologin==userkey?true:false;
       }
 
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(
@@ -403,7 +406,7 @@ class _LoginPageState extends State<LoginPage>
                                             passwordController.text.trim(),
                                             titleController.text.trim(),
                                             Data().getLink(linkController.text.trim()));
-                                        Data().SetAutoLogin(index!=-1?index:-1,autologin);
+                                        Data().SetAutoLogin(userkey!='new'?userkey:'e',autologin);
                                         Navigator.pop(context, false);
                                       } else {
                                         print(

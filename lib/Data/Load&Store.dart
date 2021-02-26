@@ -224,11 +224,11 @@ class Data {
   static var calendaritems = List<Day>();
   static final Map<int, String> calendar = {};
   static String currentlink = 'https://fallmerayer.digitalesregister.it';
-  static var user = List<User>();
+  static Map<String,dynamic> user = {};
   static String currentuser;
   static String currentpassword;
   static String currenttitle;
-  static var autologin=-1;
+  static String autologin='e';
 
   void initFirstaccess(){
     firstaccess["absences"]=true;
@@ -239,88 +239,27 @@ class Data {
     firstaccess["profile"]=true;
     firstaccess["subjects"]=true;
   }
-  Future<bool> loadUser() async{
+  Future<String> GetAutoLogin()async{
     final preferences = await SharedPreferences.getInstance();
-    String jsonUser = preferences.getString("User");
-    user.clear();
-    if(jsonUser!=null) {
-      for (var i = 0; i < jsonDecode(jsonUser).length; i++) {
-        user.add(User.Decode(jsonDecode(jsonUser)[i]));
-      }
+    if(preferences.getString("Autologin")==null){
+      autologin ='e';
     }else{
-      return false;
-    }
-    return true;
-  }
-   Future<bool> RemoveUser(var index) async{
-    String username = user[index].username;
-    user.clear();
-    final preferences = await SharedPreferences.getInstance();
-    String jsonUser = preferences.getString("User");
-    if(jsonUser!=null) {
-      for (var i = 0; i < jsonDecode(jsonUser).length; i++) {
-        if(i!=index){
-          user.add(User.Decode(jsonDecode(jsonUser)[i]));
-      }
-    }
-   }
-    jsonUser = jsonEncode(user);
-    preferences.setString("User",jsonUser);
-    preferences.remove(username + 'profile');
-    preferences.remove(username + 'absences');
-    preferences.remove(username + 'unread');
-    preferences.remove(username + 'dashboard');
-    preferences.remove(username + 'calendar');
-    if(preferences.containsKey(username+'subjects')){
-      String subjects = preferences.getString(username+'subjects');
-      print(subjects);
-    }
-    preferences.remove(username + 'subjects');
-    for(var i=0;preferences.containsKey(username + 'subjectdetail' + i.toString())==true;i++){
-      print(i);
-      preferences.remove(username + 'subjectdetail' + i.toString());
-    }
-    for(var i=0;i<100;i++){
-      preferences.remove(username + 'calendardetail' + i.toString());
-    }
-   return true;
-  }
-  bool SetUser(var index) {
-    currentuser=user[index].username;
-    currentpassword=user[index].password;
-    currentlink=user[index].link;
-  }
-  String getLink(String link){
-    if(link.contains('https://') && link.contains('.digitalesregister.it')){
-      link=link;
-    }else if(link.contains('https://') && !link.contains('.digitalesregister.it')){
-      link = link+ '.digitalesregister.it';
-    }else{
-      link = 'https://' +link+'.digitalesregister.it';
-    }
-    return link;
-  }
-  Future<int> GetAutoLogin()async{
-    final preferences = await SharedPreferences.getInstance();
-    if(preferences.getInt("Autologin")==null){
-      autologin =-1;
-    }else{
-      autologin = preferences.getInt("Autologin");
+      autologin = preferences.getString("Autologin");
     }
     return autologin;
   }
-  Future<bool> SetAutoLogin(int index,bool toggle)async{
+  Future<bool> SetAutoLogin(String userkey,bool toggle)async{
     final preferences = await SharedPreferences.getInstance();
-    if(toggle && index != autologin){
-      autologin=index;
-      preferences.setInt("Autologin",index);
-    }else if(!toggle && index==autologin){
-      autologin = -1;
+    if(toggle && userkey != autologin){
+      autologin='i';
+      preferences.setString("Autologin",userkey);
+    }else if(!toggle && userkey==autologin){
+      autologin = 'e';
       preferences.remove("Autologin");
-    }else if(index==-1){
+    }else if(userkey=='e'){
       for(var i =0;i<user.length;i++){
-        if(user[i].username==currentuser){
-          autologin=i;
+        if(user[i.toString()].username==currentuser){
+          autologin='i';
           break;
         }
       }
@@ -346,6 +285,62 @@ class Data {
     }
     return true;
   }
+  Future<bool> loadUser() async{
+    final preferences = await SharedPreferences.getInstance();
+    String jsonUser = preferences.getString("User");
+    print(jsonUser);
+    if(jsonUser!=null) {
+      Map<String,dynamic> usermap = jsonDecode(jsonUser);
+      for (var i in usermap.keys.toList()) {
+        user[i]=(User.Decode(usermap[i]));
+      }
+    }else{
+      return false;
+    }
+    return true;
+  }
+   Future<bool> RemoveUser(String userkey) async{
+    String username = user[userkey].username;
+    final preferences = await SharedPreferences.getInstance();
+    user.remove(userkey);
+      String jsonUser = jsonEncode(user);
+      preferences.setString("User",jsonUser);
+    preferences.remove(username + 'profile');
+    preferences.remove(username + 'absences');
+    preferences.remove(username + 'unread');
+    preferences.remove(username + 'dashboard');
+
+    preferences.remove(username + 'calendar');
+    for(var i=0;i<100;i++){
+      preferences.remove(username + 'calendardetail' + i.toString());
+    }
+
+    String temp;
+    if(preferences.containsKey(username+'subjects')){
+      temp = preferences.getString(username+'subjects');
+      for(var i=0;i<jsonDecode(temp).length;i++){
+        preferences.remove(username + 'subjectdetail' + i.toString());
+      }
+    }
+    preferences.remove(username + 'subjects');
+
+   return true;
+  }
+  bool SetUser(String userkey) {
+    currentuser=user[userkey].username;
+    currentpassword=user[userkey].password;
+    currentlink=user[userkey].link;
+  }
+  String getLink(String link){
+    if(link.contains('https://') && link.contains('.digitalesregister.it')){
+      link=link;
+    }else if(link.contains('https://') && !link.contains('.digitalesregister.it')){
+      link = link+ '.digitalesregister.it';
+    }else{
+      link = 'https://' +link+'.digitalesregister.it';
+    }
+    return link;
+  }
   Future<bool> SetCurrentUser(String username, String password, String title, String link) async{
     currentuser=username;
     currentpassword=password;
@@ -353,23 +348,8 @@ class Data {
     currentlink=link;
     var exists = -1;
     final preferences = await SharedPreferences.getInstance();
-    String jsonUser = preferences.getString("User");
-    user.clear();
-    if(jsonUser!=null) {
-      for (var i = 0; i < jsonDecode(jsonUser).length; i++) {
-        if(jsonDecode(jsonUser)[i]["username"]==username){
-          user.add(User(username,password,title,link));
-          exists=i;
-        }else {
-          user.add(User.Decode(jsonDecode(jsonUser)[i]));
-        }
-      }
-    }
-    if(exists==-1){
-      user.add(User(username,password,title,link));
-    }
-    jsonUser = jsonEncode(user);
-    print(jsonUser);
+    user[username]=(User(username,password,title,link));
+    String jsonUser = jsonEncode(user);
     preferences.setString("User",jsonUser);
     if(exists==-1){
       print(currentuser);

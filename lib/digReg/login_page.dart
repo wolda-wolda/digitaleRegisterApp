@@ -103,7 +103,6 @@ class _LoginPageState extends State<LoginPage>
             List<String> userkeys = Data.user.keys.toList();
             SizeConfig().init(context);
             return Scaffold(
-              key: snackbar,
               body: Container(
                 child: Column(
                   children: <Widget>[
@@ -259,7 +258,6 @@ class _LoginPageState extends State<LoginPage>
       return;
     }
   }
-  final snackbar =  GlobalKey<ScaffoldState>();
   bool autologin = true;
   EditUser(context, String userkey) {
     if (userkey =='new') {
@@ -412,10 +410,7 @@ class _LoginPageState extends State<LoginPage>
                                       } else {
                                         print(
                                             'Bitte überprüfen Sie Ihre Anmeldedaten');
-                                        snackbar.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                                            ),content: Text('Bitte überprüfen Sie Ihre Anmeldedaten')));
+
                                       }
                                     },
                                     shape: new RoundedRectangleBorder(

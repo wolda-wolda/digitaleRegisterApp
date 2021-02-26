@@ -103,7 +103,7 @@ class _LoginPageState extends State<LoginPage>
             List<String> userkeys = Data.user.keys.toList();
             SizeConfig().init(context);
             return Scaffold(
-              key: scaffoldKey,
+              key: snackbar,
               body: Container(
                 child: Column(
                   children: <Widget>[
@@ -259,6 +259,7 @@ class _LoginPageState extends State<LoginPage>
       return;
     }
   }
+  final snackbar =  GlobalKey<ScaffoldState>();
   bool autologin = true;
   EditUser(context, String userkey) {
     if (userkey =='new') {
@@ -275,12 +276,12 @@ class _LoginPageState extends State<LoginPage>
       passwordController..text = Data.user[userkey].password;
       autologin = Data.autologin==userkey?true:false;
       }
-
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(
         context, listen: false);
     return showDialog(
         context: context,
         builder: (BuildContext context) {
+
           return StatefulBuilder(
               builder: (context, setState) {
                 return AlertDialog(
@@ -406,11 +407,15 @@ class _LoginPageState extends State<LoginPage>
                                             passwordController.text.trim(),
                                             titleController.text.trim(),
                                             Data().getLink(linkController.text.trim()));
-                                        Data().SetAutoLogin(userkey!='new'?userkey:'e',autologin);
+                                        Data().SetAutoLogin(userkey!='new'?userkey:usernameController.text.trim(),autologin);
                                         Navigator.pop(context, false);
                                       } else {
                                         print(
                                             'Bitte überprüfen Sie Ihre Anmeldedaten');
+                                        snackbar.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                                            ),content: Text('Bitte überprüfen Sie Ihre Anmeldedaten')));
                                       }
                                     },
                                     shape: new RoundedRectangleBorder(

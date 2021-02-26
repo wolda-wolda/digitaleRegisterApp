@@ -62,7 +62,7 @@ class DrawAbsencesState extends State<DrawAbsences>{
     return RefreshIndicator(
         onRefresh: () async {
           await refresh();
-          setState((){});
+          setState(() {});
           return Future.value(true);
         },
         child: FutureBuilder(
@@ -70,6 +70,7 @@ class DrawAbsencesState extends State<DrawAbsences>{
             builder: (context, AsyncSnapshot<bool> snapshot) {
               if (snapshot.data == true) {
                 String data = Data.absences;
+                print(data);
                 if (get == true) {
                   items.clear();
                   for (var i in jsonDecode(data)['absences']) {
@@ -102,7 +103,7 @@ class DrawAbsencesState extends State<DrawAbsences>{
                                       .toString() +
                                   '\nAbwesenheit: ' +
                                   jsonDecode(data)['statistics']
-                                  ['percentage'] +
+                                  ['percentage'].toString() +
                                   '%' +
                                   '\nNicht entschuldigt: ' +
                                   jsonDecode(data)['statistics']

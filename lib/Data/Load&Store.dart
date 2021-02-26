@@ -238,6 +238,7 @@ class Data {
     firstaccess["messages"]=true;
     firstaccess["profile"]=true;
     firstaccess["subjects"]=true;
+    firstaccess["notifications"]=true;
   }
   Future<String> GetAutoLogin()async{
     final preferences = await SharedPreferences.getInstance();
@@ -251,7 +252,7 @@ class Data {
   Future<bool> SetAutoLogin(String userkey,bool toggle)async{
     final preferences = await SharedPreferences.getInstance();
     if(toggle && userkey != autologin){
-      autologin='i';
+      autologin=userkey;
       preferences.setString("Autologin",userkey);
     }else if(!toggle && userkey==autologin){
       autologin = 'e';

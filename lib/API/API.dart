@@ -8,6 +8,7 @@ import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Map<String, String> headers;
+bool signedin=false;
 String cookie = 'empty';
 class Session {
   Future<File> downloadFile(String url, String filename) async {
@@ -22,8 +23,10 @@ class Session {
     OpenFile.open(path);
     return file;
   }
-
   Future<String> get(String url) async {
+    if(signedin==false){
+      return 'e';
+    }
       try {
         http.Response response = await http.get(url, headers: headers).timeout(
             Duration(seconds: 2),
@@ -40,6 +43,10 @@ class Session {
     return cookie;
   }
   Future<String> login(String url, dynamic data) async {
+    Timer(Duration(seconds: 500),(){
+        print("new Session");
+        login(url,data);
+    });
     http.Response response;
     if (headers != null){
       headers.clear();
@@ -63,10 +70,14 @@ class Session {
     if (jsonDecode(response.body)['error'] == null) {
       updateCookie(response);
     }
+    signedin=true;
     return response.body;
   }
 
   Future<String> post(String url, dynamic data) async {
+    if(signedin==false){
+      return 'e';
+    }
     try {
       http.Response response = await http.post(url, body: jsonEncode(data), headers: headers).timeout(
           Duration(seconds: 2),

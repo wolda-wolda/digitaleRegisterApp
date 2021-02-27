@@ -229,6 +229,7 @@ class Data {
   static String currentpassword;
   static String currenttitle;
   static String autologin='e';
+  static String currentid;
 
   void initFirstaccess(){
     firstaccess["absences"]=true;
@@ -257,13 +258,9 @@ class Data {
     }else if(!toggle && userkey==autologin){
       autologin = 'e';
       preferences.remove("Autologin");
-    }else if(userkey=='e'){
-      for(var i =0;i<user.length;i++){
-        if(user[i.toString()].username==currentuser){
-          autologin='i';
-          break;
-        }
-      }
+    }else if(userkey=='e'&& toggle){
+      autologin = currentid;
+      preferences.setString("Autologin",currentid);
     }
     return true;
   }
@@ -303,19 +300,20 @@ class Data {
    Future<bool> RemoveUser(String userkey) async{
     String username = user[userkey].username;
     final preferences = await SharedPreferences.getInstance();
-    user.remove(userkey);
+    await SetAutoLogin(userkey,false);
+    List<String> userlist = user.keys.toList();
+    user[userkey]= user[userlist[userlist.length-1]];
+    user.remove(userlist[userlist.length-1]);
       String jsonUser = jsonEncode(user);
       preferences.setString("User",jsonUser);
     preferences.remove(username + 'profile');
     preferences.remove(username + 'absences');
     preferences.remove(username + 'unread');
     preferences.remove(username + 'dashboard');
-
     preferences.remove(username + 'calendar');
     for(var i=0;i<100;i++){
       preferences.remove(username + 'calendardetail' + i.toString());
     }
-
     String temp;
     if(preferences.containsKey(username+'subjects')){
       temp = preferences.getString(username+'subjects');
@@ -331,6 +329,7 @@ class Data {
     currentuser=user[userkey].username;
     currentpassword=user[userkey].password;
     currentlink=user[userkey].link;
+    currentid=userkey;
   }
   String getLink(String link){
     if(link.contains('https://') && link.contains('.digitalesregister.it')){
@@ -342,23 +341,32 @@ class Data {
     }
     return link;
   }
-  Future<bool> SetCurrentUser(String username, String password, String title, String link) async{
+  Future<bool> SetCurrentUser(String userkey, String username, String password, String title, String link) async{
     currentuser=username;
     currentpassword=password;
     currenttitle= title;
     currentlink=link;
-    var exists = -1;
+
     final preferences = await SharedPreferences.getInstance();
-    user[username]=(User(username,password,title,link));
+    if(userkey=='e') {
+      if (user.isNotEmpty) {
+        var newuser = (User(username, password, title, link));
+        List<String> userkeys = user.keys.toList();
+        String newid = (int.parse(userkeys[userkeys.length - 1]) + 1).toString();
+        user[newid] =
+            newuser;
+        currentid=newid;
+      } else {
+        user["0"] = (User(username, password, title, link));
+        currentid='0';
+      }
+    }else{
+      user[userkey] = (User(username, password, title, link));
+      currentid=userkey;
+    }
     String jsonUser = jsonEncode(user);
     preferences.setString("User",jsonUser);
-    if(exists==-1){
-      print(currentuser);
-      print(currentpassword);
-      return false;
-    }else{
-      return true;
-    }
+    return true;
   }
   Future<bool> updateProfile() async {
     final preferences = await SharedPreferences.getInstance();

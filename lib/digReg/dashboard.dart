@@ -62,13 +62,13 @@ class DrawDashboardState extends State<DrawDashboard> {
 
   var reminderController = new TextEditingController();
 
-  Future<void> safeReminder(String date, String text) async {
+  Future<bool> safeReminder(String date, String text) async {
     var ret = await Session().post(
-        'https://fallmerayer.digitalesregister.it/v2/api/student/dashboard/save_reminder',
+        Data.currentlink+ '/v2/api/student/dashboard/save_reminder',
         {'date': date, 'text': text});
     print(ret);
+    return true;
   }
-
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
     return RefreshIndicator(
@@ -76,21 +76,21 @@ class DrawDashboardState extends State<DrawDashboard> {
           // TODO: setState funktioniert et
           await refresh().then((data) {
             print(data);
-            setState(() {});
+            this.setState(() {});
           });
           return Future.value(true);
         },
         child: FutureBuilder(
             future: update(),
             builder: (context, AsyncSnapshot<bool> snapshot) {
+              print("neu");
               if (snapshot.data == true) {
                 String data = Data.dashboard;
-                if (get == true) {
+                items.clear();
                   for (var i in jsonDecode(data)) {
                     items.add(Dash.fromJson(i));
                   }
-                  get = false;
-                }
+                print(data);
                 return ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
@@ -140,14 +140,13 @@ class DrawDashboardState extends State<DrawDashboard> {
                                                             'de_DE')
                                                         .parse(
                                                             items[index1].date);
-                                                    safeReminder(
+                                                    await safeReminder(
                                                         DateFormat('yyyy-MM-d')
                                                             .format(date)
                                                             .toString(),
                                                         reminderController
-                                                            .text);
-                                                    await refresh();
-                                                    setState(() {});
+                                                            .text).then((data) async{
+                                                    await refresh().then((data){setState((){});});});
                                                     Navigator.of(context).pop();
                                                   },
                                                 )));
@@ -228,14 +227,13 @@ class DrawDashboardState extends State<DrawDashboard> {
     } else {
       if (item.items[index2].deletable == true) {
         return GestureDetector(
-          onTap: () {
-            Session().post(
-                'https://fallmerayer.digitalesregister.it/v2/api/student/dashboard/delete_reminder',
+          onTap: () async{
+            await Session().post(
+                Data.currentlink+'/v2/api/student/dashboard/delete_reminder',
                 {'id': item.items[index2].id});
             item.items.removeAt(index2);
             // TODO: schaug do a mol drübo
-            refresh();
-            setState(() {});
+            await refresh().then((data){setState((){});});
           },
           child: Icon(Icons.delete),
         );

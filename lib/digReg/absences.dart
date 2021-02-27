@@ -7,18 +7,17 @@ import 'package:digitales_register_app/Data/Load&Store.dart';
 import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 class Absences {
-
-
   Widget build(BuildContext context) {
     return DrawAbsences();
   }
 }
-class DrawAbsences extends StatefulWidget{
+
+class DrawAbsences extends StatefulWidget {
   @override
   DrawAbsencesState createState() => DrawAbsencesState();
 }
-class DrawAbsencesState extends State<DrawAbsences>{
 
+class DrawAbsencesState extends State<DrawAbsences> {
   Future<bool> update() async {
     if (Data.firstaccess["absences"]) {
       if (await Data().updateAbsences() == false) {
@@ -32,7 +31,7 @@ class DrawAbsencesState extends State<DrawAbsences>{
     return true;
   }
 
-  var items = List<Absence>();
+  List<Absence> items = List<Absence>();
   bool get = true;
 
   void showAb(BuildContext context, Absence data) {
@@ -52,13 +51,17 @@ class DrawAbsencesState extends State<DrawAbsences>{
       return Icon(Icons.circle, color: Colors.orange);
     }
   }
-  Future<void> refresh() async{
-    bool success =await Data().updateAbsences();
-    Data.firstaccess["absences"] = Data.firstaccess["absences"]==true?!success:false;
+
+  Future<void> refresh() async {
+    bool success = await Data().updateAbsences();
+    Data.firstaccess["absences"] =
+        Data.firstaccess["absences"] == true ? !success : false;
     return;
   }
+
   @override
   Widget build(BuildContext context) {
+    print('items ' + items.length.toString());
     return RefreshIndicator(
         onRefresh: () async {
           await refresh();
@@ -70,92 +73,92 @@ class DrawAbsencesState extends State<DrawAbsences>{
             builder: (context, AsyncSnapshot<bool> snapshot) {
               if (snapshot.data == true) {
                 String data = Data.absences;
-                print(data);
-                if (get == true) {
-                  items.clear();
-                  for (var i in jsonDecode(data)['absences']) {
-                    items.add(Absence.fromJson(i));
+                if (data != null) {
+                  if (get == true) {
+                    for (var i in jsonDecode(data)['absences']) {
+                      items.add(Absence.fromJson(i));
+                    }
+                    get = false;
                   }
-                  get = false;
-                }
-                return Column(
-                  children: [
-                    ExpansionTileCard(
-                        title: Text(
-                            'Fehleinheiten: ' +
-                                jsonDecode(data)['statistics']['counter']
-                                    .toString(),
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text('davon Entschuldigt: ' +
-                            jsonDecode(data)['statistics']['justified']
-                                .toString()),
-                        children: <Widget>[
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                                vertical: 8.0,
-                              ),
-                              child: Text('davon im Auftrag der Schule: ' +
-                                  jsonDecode(data)['statistics']
-                                  ['counterForSchool']
-                                      .toString() +
-                                  '\nAbwesenheit: ' +
-                                  jsonDecode(data)['statistics']
-                                  ['percentage'].toString() +
-                                  '%' +
-                                  '\nNicht entschuldigt: ' +
-                                  jsonDecode(data)['statistics']
-                                  ['notJustified']
-                                      .toString() +
-                                  '\nVerspätungen: ' +
-                                  jsonDecode(data)['statistics']['delayed']
-                                      .toString()),
-                            ),
-                          ),
-                        ]),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Expanded(
-                        child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: items.length,
-                          itemBuilder: (context, index) {
-                            return Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                  return Column(
+                    children: [
+                      ExpansionTileCard(
+                          title: Text(
+                              'Fehleinheiten: ' +
+                                  jsonDecode(data)['statistics']['counter']
+                                      .toString(),
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text('davon Entschuldigt: ' +
+                              jsonDecode(data)['statistics']['justified']
+                                  .toString()),
+                          children: <Widget>[
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                  vertical: 8.0,
                                 ),
-                                child: ListTile(
-                                  leading: icon(items[index]),
-                                  title: Text(items[index].date.date +
-                                      ', ' +
-                                      items[index]
-                                          .hour[items[index].hour.length - 1]
-                                          .hour
-                                          .toString() +
-                                      '. Stunde'),
-                                  subtitle: Text(items[index].hour.length
-                                      .toString() +
-                                      ' Einheiten'),
-                                  onTap: () => showAb(context, items[index]),
-                                ));
-                          },
-                        ))
-                  ],
-                );
-              } else if (snapshot.data == null) {
-                return Loading();
+                                child: Text('davon im Auftrag der Schule: ' +
+                                    jsonDecode(data)['statistics']
+                                            ['counterForSchool']
+                                        .toString() +
+                                    '\nAbwesenheit: ' +
+                                    jsonDecode(data)['statistics']['percentage']
+                                        .toString() +
+                                    '%' +
+                                    '\nNicht entschuldigt: ' +
+                                    jsonDecode(data)['statistics']
+                                            ['notJustified']
+                                        .toString() +
+                                    '\nVerspätungen: ' +
+                                    jsonDecode(data)['statistics']['delayed']
+                                        .toString()),
+                              ),
+                            ),
+                          ]),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Expanded(
+                          child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          return Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: ListTile(
+                                leading: icon(items[index]),
+                                title: Text(items[index].date.date +
+                                    ', ' +
+                                    items[index]
+                                        .hour[items[index].hour.length - 1]
+                                        .hour
+                                        .toString() +
+                                    '. Stunde'),
+                                subtitle: Text(
+                                    items[index].hour.length.toString() +
+                                        ' Einheiten'),
+                                onTap: () => showAb(context, items[index]),
+                              ));
+                        },
+                      ))
+                    ],
+                  );
+                } else if (snapshot.data == null) {
+                  return Loading();
+                } else {
+                  return NoConnection();
+                }
               }
-              else {
-                return NoConnection();
-              }
-            }
-        ));
+              return Container();
+            }));
   }
 }
+
 class Absence {
   final Date date;
   final List<Group> hour;

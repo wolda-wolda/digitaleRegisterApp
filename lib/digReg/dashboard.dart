@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:digitales_register_app/API/API.dart';
 import 'package:digitales_register_app/theme/theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
@@ -47,14 +48,14 @@ class DrawDashboardState extends State<DrawDashboard> {
     return true;
   }
 
-  Future<bool> refresh() async {
+  Future<void> refresh() async {
     bool success = await Data().updateDashboard();
     Data.firstaccess["dashboard1"] =
         Data.firstaccess["dashboard1"] == true ? !success : false;
     success = await Data().updateUnread();
     Data.firstaccess["dashboard2"] =
         Data.firstaccess["dashboard2"] == true ? !success : false;
-    return true;
+    return;
   }
 
   var items = List<Dash>();
@@ -62,132 +63,168 @@ class DrawDashboardState extends State<DrawDashboard> {
 
   var reminderController = new TextEditingController();
 
-  Future<bool> safeReminder(String date, String text) async {
+  Future<void> safeReminder(String date, String text) async {
     var ret = await Session().post(
-        Data.currentlink+ '/v2/api/student/dashboard/save_reminder',
+        Data.currentlink + '/v2/api/student/dashboard/save_reminder',
         {'date': date, 'text': text});
     print(ret);
-    return true;
+    return;
   }
+
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
     return RefreshIndicator(
-        onRefresh: () async {
-          // TODO: setState funktioniert et
-          await refresh().then((data) {
-            print(data);
-            this.setState(() {});
-          });
-          return Future.value(true);
-        },
-        child: FutureBuilder(
-            future: update(),
-            builder: (context, AsyncSnapshot<bool> snapshot) {
-              print("neu");
-              if (snapshot.data == true) {
-                String data = Data.dashboard;
-                items.clear();
-                  for (var i in jsonDecode(data)) {
-                    items.add(Dash.fromJson(i));
-                  }
-                print(data);
-                return ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  itemCount: items.length,
-                  itemBuilder: (context, index1) {
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: ListTile(
-                          title: Text(
-                            items[index1].date.toString(),
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Column(
-                            children: [
-                              ListTile(
-                                leading: Icon(Icons.add),
-                                title: Text('Erinnerung hinzufügen'),
-                                onTap: () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        reminderController.clear();
-                                        return AlertDialog(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10.0))),
-                                            content: Container(
-                                                height: 60,
-                                                child: TextFormField(
-                                                  controller:
-                                                      reminderController,
-                                                  cursorColor:
-                                                      _themeChanger.getColor(),
-                                                  decoration: InputDecoration(
-                                                    labelText: 'Erinnerung',
-                                                    hintText:
-                                                        'Erinnerung (z.B. Hausaufgabe)',
-                                                  ),
-                                                  textInputAction:
-                                                      TextInputAction.done,
-                                                  onFieldSubmitted: (_) async {
-                                                    DateTime date = new DateFormat(
-                                                            'EEEE, d. MMM yyyy',
-                                                            'de_DE')
-                                                        .parse(
-                                                            items[index1].date);
-                                                    await safeReminder(
-                                                        DateFormat('yyyy-MM-d')
-                                                            .format(date)
-                                                            .toString(),
-                                                        reminderController
-                                                            .text).then((data) async{
-                                                    await refresh().then((data){setState((){});});});
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                )));
-                                      });
-                                },
-                              ),
-                              Divider(
-                                height: 20,
-                                endIndent: 150,
-                                indent: 150,
-                                thickness: 2,
-                                color: _themeChanger.getColor(),
-                              ),
-                              ListView.builder(
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: items[index1].items.length,
-                                itemBuilder: (context, index2) {
-                                  return ListTile(
-                                    title:
-                                        title(context, items[index1], index2),
-                                    trailing: title2(context, items[index1],
-                                        index2, _themeChanger),
-                                    subtitle: Text(items[index1]
-                                        .items[index2]
-                                        .subtitle
-                                        .toString()),
-                                  );
-                                },
-                              )
-                            ],
-                          )),
-                    );
-                  },
-                );
-              } else if (snapshot.data == null) {
-                return Loading();
-              } else {
-                return NoConnection();
-              }
-            }));
+      onRefresh: () async {
+        await refresh();
+        setState(() {});
+        return Future.value(true);
+      },
+      child: Column(
+        children: [
+          // TODO: vielleicht olls in oano ListView tian, dass man olles zusommen scrollen konn
+          Flexible(fit: FlexFit.loose, child: unread(context)),
+          Divider(
+            height: 30,
+            endIndent: 150,
+            indent: 150,
+            thickness: 2,
+            color: _themeChanger.getColor(),
+          ),
+          Flexible(
+              fit: FlexFit.loose,
+              child: FutureBuilder(
+                  future: update(),
+                  builder: (context, AsyncSnapshot<bool> snapshot) {
+                    print("neu");
+                    if (snapshot.data == true) {
+                      String data = Data.dashboard;
+                      items.clear();
+                      for (var i in jsonDecode(data)) {
+                        items.add(Dash.fromJson(i));
+                      }
+                      print(data);
+                      return ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: items.length,
+                        itemBuilder: (context, index1) {
+                          return Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: ListTile(
+                                title: Text(
+                                  items[index1].date.toString(),
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Column(
+                                  children: [
+                                    ListTile(
+                                      leading: Icon(Icons.add),
+                                      title: Text('Erinnerung hinzufügen'),
+                                      onTap: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              reminderController.clear();
+                                              return AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  10.0))),
+                                                  content: Container(
+                                                      height: 60,
+                                                      child: TextFormField(
+                                                        controller:
+                                                            reminderController,
+                                                        cursorColor:
+                                                            _themeChanger
+                                                                .getColor(),
+                                                        decoration:
+                                                            InputDecoration(
+                                                          labelText:
+                                                              'Erinnerung',
+                                                          hintText:
+                                                              'Erinnerung (z.B. Hausaufgabe)',
+                                                        ),
+                                                        textInputAction:
+                                                            TextInputAction
+                                                                .done,
+                                                        onFieldSubmitted:
+                                                            (_) async {
+                                                          DateTime date =
+                                                              new DateFormat(
+                                                                      'EEEE, d. MMM yyyy',
+                                                                      'de_DE')
+                                                                  .parse(items[
+                                                                          index1]
+                                                                      .date);
+                                                          await safeReminder(
+                                                                  DateFormat(
+                                                                          'yyyy-MM-d')
+                                                                      .format(
+                                                                          date)
+                                                                      .toString(),
+                                                                  reminderController
+                                                                      .text)
+                                                              .then(
+                                                                  (data) async {
+                                                            await refresh()
+                                                                .then((data) {
+                                                              setState(() {});
+                                                            });
+                                                          });
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                      )));
+                                            });
+                                      },
+                                    ),
+                                    Divider(
+                                      height: 20,
+                                      endIndent: 150,
+                                      indent: 150,
+                                      thickness: 2,
+                                      color: _themeChanger.getColor(),
+                                    ),
+                                    ListView.builder(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount: items[index1].items.length,
+                                      itemBuilder: (context, index2) {
+                                        return ListTile(
+                                          title: title(
+                                              context, items[index1], index2),
+                                          trailing: title2(
+                                              context,
+                                              items[index1],
+                                              index2,
+                                              _themeChanger),
+                                          subtitle: Text(items[index1]
+                                              .items[index2]
+                                              .subtitle
+                                              .toString()),
+                                        );
+                                      },
+                                    )
+                                  ],
+                                )),
+                          );
+                        },
+                      );
+                    } else if (snapshot.data == null) {
+                      return Loading();
+                    } else {
+                      return NoConnection();
+                    }
+                  }))
+        ],
+      ),
+    );
   }
 
   Widget title(BuildContext context, Dash item, int index2) {
@@ -227,13 +264,14 @@ class DrawDashboardState extends State<DrawDashboard> {
     } else {
       if (item.items[index2].deletable == true) {
         return GestureDetector(
-          onTap: () async{
+          onTap: () async {
             await Session().post(
-                Data.currentlink+'/v2/api/student/dashboard/delete_reminder',
+                Data.currentlink + '/v2/api/student/dashboard/delete_reminder',
                 {'id': item.items[index2].id});
             item.items.removeAt(index2);
-            // TODO: schaug do a mol drübo
-            await refresh().then((data){setState((){});});
+            await refresh().then((data) {
+              setState(() {});
+            });
           },
           child: Icon(Icons.delete),
         );
@@ -255,21 +293,21 @@ class DrawDashboardState extends State<DrawDashboard> {
               }
               get1 = false;
             }
-            return ListView.builder(
-                itemCount: list.length,
-                itemBuilder: (context, index2) {
-                  return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: ListTile(
-                          title: Text(list[index2].title),
-                          subtitle: Column(children: [
-                            Text(list[index2].subTitle),
-                            Text(list[index2].type),
-                            Text(list[index2].timeSent)
-                          ])));
-                });
+            if (list.isNotEmpty) {
+              return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: list.length,
+                  itemBuilder: (context, index2) {
+                    return Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ListTile(
+                            title: Text(list[index2].title),
+                            subtitle: Text(list[index2].timeSent)));
+                  });
+            } else
+              return Container();
           } else if (snapshot.data == null) {
             return Loading();
           } else {

@@ -35,11 +35,10 @@ class _LoginPageState extends State<LoginPage>
     super.dispose();
   }
 
-  Future<bool> loginExists(String username, String password,
-      String link) async {
+  Future<bool> loginExists(
+      String username, String password, String link) async {
     print(link);
-    String ret = await Session()
-        .login(link + '/v2/api/auth/login', {
+    String ret = await Session().login(link + '/v2/api/auth/login', {
       "username": username,
       "password": password,
     });
@@ -54,12 +53,12 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Future<void> login(BuildContext context) async {
-    String ret = await Session()
-        .login(Data.currentlink + '/v2/api/auth/login', {
+    String ret =
+        await Session().login(Data.currentlink + '/v2/api/auth/login', {
       "username": Data.currentuser,
       "password": Data.currentpassword,
     });
-    if(ret=='e'){
+    if (ret == 'e') {
       SizedBox.shrink();
     }
     if (jsonDecode(ret)['error'] == null) {
@@ -67,42 +66,105 @@ class _LoginPageState extends State<LoginPage>
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (BuildContext context) => HomePage()),
-              (route) => false);
+          (route) => false);
     } else {
-      scaffoldKey.currentState.showSnackBar(
-          SnackBar(behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-              ), content: Text(jsonDecode(ret)['message'])));
+      scaffoldKey.currentState.showSnackBar(SnackBar(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),
+          content: Text(jsonDecode(ret)['message'])));
     }
   }
-  static bool firstlogin=true;
-  load(_themeChanger,BuildContext context)async{
+
+  static bool firstlogin = true;
+  load(_themeChanger, BuildContext context) async {
     return this._memoizer.runOnce(() async {
       await Data().loadUser();
       await Data().LoadTheme(_themeChanger);
       await Data().GetAutoLogin();
-      if(firstlogin==true){
-        if(Data.autologin!='e'){
+      if (firstlogin == true) {
+        if (Data.autologin != -1) {
           await Data().SetUser(Data.autologin);
           await login(context);
         }
-        firstlogin=false;
-        }
+        firstlogin = false;
+      }
       return true;
     });
   }
 
+  Widget leftBackground() {
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20), color: Colors.green),
+      child: Align(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+              width: 20,
+            ),
+            Icon(
+              Icons.edit,
+              color: Colors.white,
+            ),
+            Text(
+              " Bearbeiten",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ],
+        ),
+        alignment: Alignment.centerLeft,
+      ),
+    );
+  }
+
+  Widget rightBackground() {
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20), color: Colors.red),
+      child: Align(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Text(
+              "Löschen ",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.right,
+            ),
+            Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+            SizedBox(
+              width: 20,
+            ),
+          ],
+        ),
+        alignment: Alignment.centerRight,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context, listen: false);
+    ThemeChanger _themeChanger =
+        Provider.of<ThemeChanger>(context, listen: false);
     return FutureBuilder(
-        future: load(_themeChanger,context) ,
+        future: load(_themeChanger, context),
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.data!=null) {
-            List<String> userkeys = Data.user.keys.toList();
+          if (snapshot.data != null) {
             SizeConfig().init(context);
             return Scaffold(
+              key: scaffoldKey,
               body: Container(
                 child: Column(
                   children: <Widget>[
@@ -146,98 +208,110 @@ class _LoginPageState extends State<LoginPage>
                       ),
                     ),
                     Container(
-                        padding: EdgeInsets.only(
-                            left: 40, right: 40, bottom: 25),
+                        padding:
+                            EdgeInsets.only(left: 40, right: 40, bottom: 25),
                         child: Column(children: <Widget>[
                           Text('Willkommen im digitalen Register',
-                              style: TextStyle(fontFamily: 'OpenSans',
+                              style: TextStyle(
+                                  fontFamily: 'OpenSans',
                                   fontSize: SizeConfig.safeBlockVertical * 4.5,
                                   fontWeight: FontWeight.bold)),
                           SizedBox(
                             height: 40,
                           ),
-                          Column(
-                              children: <Widget>[
-                                Data.user.isNotEmpty?
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: ListView.builder(
-                                    shrinkWrap: true,
-                                    scrollDirection: Axis.vertical,
-                                    itemCount: Data.user.length,
-                                    itemBuilder: (context, index) {
-                                      String userkey = userkeys[index];
-                                      return Dismissible(
-                                        confirmDismiss: ((DismissDirection direction){
-                                          return showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                            return AlertDialog(
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
-                                              title: const Text("Entfernen bestätigen"),
-                                              content: const Text("Sind Sie sicher, dass Sie diesen Benutzer Löschen möchten"),
-                                              actions: <Widget>[
-                                                FlatButton(
-                                                  onPressed: () => Navigator.of(context).pop(false),
-                                                  child: const Text("Abbrechen"),
-                                                ),
-                                                FlatButton(
-                                                    onPressed: () => Navigator.of(context).pop(true),
-                                                    child: const Text("Löschen")
-                                                ),
-                                              ],
-                                            );
-                                          });}),
-                                          key: UniqueKey(),
-                                        onDismissed: ((direction){
-                                            Data().RemoveUser(userkey);
-                                            setState((){});
-                                          }
-                                        ),
-                                      child: ListTile(
-                                          onLongPress: () {
-                                            EditUser(context, userkey).then((context){
-                                              setState((){});
-                                            });
-                                          },
-                                          onTap: () async {
-                                            Data().SetUser(userkey);
-                                            return login(context);
-                                          },
-                                          trailing: userkey==Data.autologin?Icon(LineAwesomeIcons.check):SizedBox.shrink(),
-                                          leading: Icon(
-                                            LineAwesomeIcons.user, size: 35,),
-                                          title: Text(Data.user[userkey].title),
-                                          subtitle: Text(
-                                              Data.user[userkey].username)));
-                                    },
-                                  ),
-                                ) : Container(),
-                                SizedBox(height: 30,),
-                                Container(
-                                  height: 40,
-                                  width: 80,
-                                  child: RaisedButton(
-                                    onPressed: () {
-                                      EditUser(context, 'new').then((context){
-                                      setState((){});
-                                    });
-                                    },
-                                    shape: new RoundedRectangleBorder(
-                                      borderRadius: new BorderRadius.circular(
-                                          30.0),
+                          Column(children: <Widget>[
+                            Data.user.isNotEmpty
+                                ? Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                    child: Icon(LineAwesomeIcons.plus_circle),
-                                    color: _themeChanger.getColor(),
-                                  ),
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.vertical,
+                                      itemCount: Data.user.length,
+                                      itemBuilder: (context, index) {
+                                        return Dismissible(
+                                            background: leftBackground(),
+                                            secondaryBackground:
+                                                rightBackground(),
+                                            confirmDismiss:
+                                                // ignore: missing_return
+                                                ((DismissDirection direction) {
+                                              if (direction ==
+                                                  DismissDirection.startToEnd) {
+                                                EditUser(context, index)
+                                                    .then((context) {
+                                                  setState(() {});
+                                                });
+                                              } else if (direction ==
+                                                  DismissDirection.endToStart) {
+                                                return showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return delete();
+                                                    });
+                                              }
+                                            }),
+                                            key: Key(
+                                                Data.user[index].toString()),
+                                            onDismissed: ((direction) {
+                                              Data().RemoveUser(index);
+                                            }),
+                                            child: ListTile(
+                                                // TODO: ListTile borderradius isch pan swipen olbm no kantig
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20)),
+                                                onLongPress: () {
+                                                  EditUser(context, index)
+                                                      .then((context) {
+                                                    setState(() {});
+                                                  });
+                                                },
+                                                onTap: () async {
+                                                  Data().SetUser(index);
+                                                  return login(context);
+                                                },
+                                                trailing: index ==
+                                                        Data.autologin
+                                                    ? Icon(
+                                                        LineAwesomeIcons.check)
+                                                    : SizedBox.shrink(),
+                                                leading: Icon(
+                                                  LineAwesomeIcons.user,
+                                                  size: 35,
+                                                ),
+                                                title: Text(
+                                                    Data.user[index].title),
+                                                subtitle: Text(Data
+                                                    .user[index].username)));
+                                      },
+                                    ),
+                                  )
+                                : Container(),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            Container(
+                              height: 40,
+                              width: 80,
+                              child: RaisedButton(
+                                onPressed: () {
+                                  EditUser(context, -1).then((context) {
+                                    setState(() {});
+                                  });
+                                },
+                                shape: new RoundedRectangleBorder(
+                                  borderRadius: new BorderRadius.circular(30.0),
                                 ),
-                              ]
-                          )
+                                child: Icon(LineAwesomeIcons.plus_circle),
+                                color: _themeChanger.getColor(),
+                              ),
+                            ),
+                          ])
                         ])),
-
                   ],
                 ),
               ),
@@ -246,7 +320,6 @@ class _LoginPageState extends State<LoginPage>
           return Login();
         });
   }
-
 
   void choiceAction(String choice) {
     if (choice == Constants.Setting) {
@@ -258,174 +331,192 @@ class _LoginPageState extends State<LoginPage>
       return;
     }
   }
+
+  Widget delete() {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0))),
+      title: const Text("Entfernen bestätigen"),
+      content: const Text(
+          "Sind Sie sicher, dass Sie diesen Benutzer Löschen möchten"),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text("Abbrechen"),
+        ),
+        FlatButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text("Löschen")),
+      ],
+    );
+  }
+
   bool autologin = true;
-  EditUser(context, String userkey) {
-    if (userkey =='new') {
+  EditUser(context, var index) {
+    if (index < 0) {
       titleController.clear();
       linkController.clear();
       passwordController.clear();
       usernameController.clear();
-      autologin=false;
-      }
-    else {
-      titleController..text = Data.user[userkey].title;
-      linkController..text = Data.user[userkey].link;
-      usernameController..text = Data.user[userkey].username;
-      passwordController..text = Data.user[userkey].password;
-      autologin = Data.autologin==userkey?true:false;
-      }
-    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(
-        context, listen: false);
+      autologin = false;
+    } else {
+      titleController..text = Data.user[index].title;
+      linkController..text = Data.user[index].link;
+      usernameController..text = Data.user[index].username;
+      passwordController..text = Data.user[index].password;
+      autologin = Data.autologin == index ? true : false;
+    }
+
+    ThemeChanger _themeChanger =
+        Provider.of<ThemeChanger>(context, listen: false);
     return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-
-          return StatefulBuilder(
-              builder: (context, setState) {
-                return AlertDialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0))),
-                    content:
-                    Container(
-                        height: 390,
-                        child: Column(children: <Widget>[
-                          TextFormField(
-                            controller: titleController,
-                            cursorColor: _themeChanger.getColor(),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              prefixIcon: Icon(LineAwesomeIcons.info_circle),
-                              labelText: 'Titel',
-                              hintText: 'Titel (Beliebig)',
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
+              content: Container(
+                  height: 390,
+                  child: Column(children: <Widget>[
+                    TextFormField(
+                      controller: titleController,
+                      cursorColor: _themeChanger.getColor(),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        prefixIcon: Icon(LineAwesomeIcons.info_circle),
+                        labelText: 'Titel',
+                        hintText: 'Titel (Beliebig)',
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                    Divider(
+                      height: 30,
+                      endIndent: 100,
+                      indent: 100,
+                      thickness: 2,
+                      color: _themeChanger.getColor(),
+                    ),
+                    TextField(
+                      controller: linkController,
+                      cursorColor: _themeChanger.getColor(),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        prefixIcon: Icon(LineAwesomeIcons.link),
+                        labelText: 'Link',
+                        hintText: 'Link für das Register',
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                    Divider(
+                      height: 30,
+                      endIndent: 100,
+                      indent: 100,
+                      thickness: 2,
+                      color: _themeChanger.getColor(),
+                    ),
+                    TextField(
+                      controller: usernameController,
+                      cursorColor: _themeChanger.getColor(),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        prefixIcon: Icon(LineAwesomeIcons.user),
+                        labelText: 'Benutzername',
+                        hintText: 'Benutzername zum Register',
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                    Divider(
+                      height: 30,
+                      endIndent: 100,
+                      indent: 100,
+                      thickness: 2,
+                      color: _themeChanger.getColor(),
+                    ),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: _passwordVisible,
+                      cursorColor: _themeChanger.getColor(),
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          prefixIcon: Icon(LineAwesomeIcons.lock),
+                          labelText: 'Passwort',
+                          hintText: 'Passwort eingeben',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _passwordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                             ),
-                            textInputAction: TextInputAction.next,
+                            onPressed: () {
+                              setState(() {
+                                _passwordVisible = !_passwordVisible;
+                              });
+                            },
+                          )),
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) {
+                        createUser(index);
+                      },
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(children: <Widget>[
+                      Switch(
+                          value: autologin,
+                          onChanged: (bool state) {
+                            setState(() {
+                              autologin = !autologin;
+                            });
+                          }),
+                      Spacer(),
+                      Container(
+                        height: 40,
+                        width: 80,
+                        child: RaisedButton(
+                          onPressed: () async {
+                            createUser(index);
+                          },
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0),
                           ),
-                          Divider(
-                            height: 30,
-                            endIndent: 100,
-                            indent: 100,
-                            thickness: 2,
-                            color: _themeChanger.getColor(),
-                          ),
-                          TextField(
-                            controller: linkController,
-                            cursorColor: _themeChanger.getColor(),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              prefixIcon: Icon(LineAwesomeIcons.link),
-                              labelText: 'Link',
-                              hintText: 'Link für das Register',
-                            ),
-                            textInputAction: TextInputAction.next,
-                          ),
-
-                          Divider(
-                            height: 30,
-                            endIndent: 100,
-                            indent: 100,
-                            thickness: 2,
-                            color: _themeChanger.getColor(),
-                          ),
-                          TextField(
-                            controller: usernameController,
-                            cursorColor: _themeChanger.getColor(),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              prefixIcon: Icon(LineAwesomeIcons.user),
-                              labelText: 'Benutzername',
-                              hintText: 'Benutzername zum Register',
-                            ),
-                            textInputAction: TextInputAction.next,
-                          ),
-
-                          Divider(
-                            height: 30,
-                            endIndent: 100,
-                            indent: 100,
-                            thickness: 2,
-                            color: _themeChanger.getColor(),
-                          ),
-                          TextField(
-                            controller: passwordController,
-                            obscureText: _passwordVisible,
-                            cursorColor: _themeChanger.getColor(),
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                prefixIcon: Icon(LineAwesomeIcons.lock),
-                                labelText: 'Passwort',
-                                hintText: 'Passwort eingeben',
-                                suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _passwordVisible
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
-                                    ), onPressed: () {
-                                  setState(() {
-                                    _passwordVisible = !_passwordVisible;
-                                  });
-                                },
-                                )),
-                            textInputAction: TextInputAction.done,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                              children: <Widget>[
-                                Switch(
-                                    value: autologin,
-                                    onChanged: (bool state) {
-                                      setState(() {
-                                        autologin = !autologin;
-                                      });
-                                    }
-                                ),
-                                Spacer(),
-                                Container(
-                                  height: 40,
-                                  width: 80,
-                                  child: RaisedButton(
-                                    onPressed: () async {
-                                      bool exists = await loginExists(
-                                          usernameController.text.trim(),
-                                          passwordController.text.trim(),
-                                          Data().getLink(linkController.text.trim()));
-                                      if (exists == true &&
-                                          titleController.text.trim() != null) {
-                                        await Data().SetCurrentUser(
-                                            usernameController.text.trim(),
-                                            passwordController.text.trim(),
-                                            titleController.text.trim(),
-                                            Data().getLink(linkController.text.trim()));
-                                        Data().SetAutoLogin(userkey!='new'?userkey:usernameController.text.trim(),autologin);
-                                        Navigator.pop(context, false);
-                                      } else {
-                                        print(
-                                            'Bitte überprüfen Sie Ihre Anmeldedaten');
-
-                                      }
-                                    },
-                                    shape: new RoundedRectangleBorder(
-                                      borderRadius: new BorderRadius.circular(
-                                          30.0),
-                                    ),
-                                    child: Icon(LineAwesomeIcons.check_circle),
-                                    color: _themeChanger.getColor(),
-                                  ),
-                                )
-                              ])
-                        ])
-                    ));
-              });
-        },
+                          child: Icon(LineAwesomeIcons.check_circle),
+                          color: _themeChanger.getColor(),
+                        ),
+                      )
+                    ])
+                  ])));
+        });
+      },
     );
+  }
+
+  void createUser(int index) async{
+    bool exists = await loginExists(
+        usernameController.text.trim(),
+        passwordController.text.trim(),
+        Data().getLink(linkController.text.trim()));
+    if (exists == true &&
+        titleController.text.trim() != null) {
+      await Data().SetCurrentUser(
+          usernameController.text.trim(),
+          passwordController.text.trim(),
+          titleController.text.trim(),
+          Data().getLink(linkController.text.trim()));
+      Data().SetAutoLogin(
+          index != -1 ? index : -1, autologin);
+      Navigator.pop(context, false);
+    } else {
+      print('Bitte überprüfen Sie Ihre Anmeldedaten');
+    }
   }
 }

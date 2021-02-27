@@ -102,7 +102,7 @@ class DrawAbsencesState extends State<DrawAbsences>{
                                       .toString() +
                                   '\nAbwesenheit: ' +
                                   jsonDecode(data)['statistics']
-                                  ['percentage'] +
+                                  ['percentage'].toString() +
                                   '%' +
                                   '\nNicht entschuldigt: ' +
                                   jsonDecode(data)['statistics']

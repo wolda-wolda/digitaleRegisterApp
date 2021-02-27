@@ -69,10 +69,15 @@ class DrawMessagesState extends State<DrawMessages> {
               return ListView.builder(
                 itemCount: items.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
+                  return Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius:
+                          BorderRadius.circular(
+                              5)),
+                      child: ListTile(
                       onTap: () => showMessage(context, items[index]),
                       title: Text(items[index].subject),
-                      subtitle: Text(items[index].date));
+                      subtitle: Text(items[index].date)));
                 },
               );
             } else if (snapshot.data == null) {

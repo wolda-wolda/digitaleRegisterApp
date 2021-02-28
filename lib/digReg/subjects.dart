@@ -45,7 +45,7 @@ class DrawSubjectsState extends State<DrawSubjects>{
     return;
   }
 
-  double total_average(List<Subject> data) {
+  double totalAverage(List<Subject> data) {
     double divident = 0;
     int divisor = 0;
     for (var i in data) {
@@ -104,7 +104,7 @@ class DrawSubjectsState extends State<DrawSubjects>{
                                 color: _themeChanger.getColor(),
                                 child: Align(
                                   alignment: Alignment.center,
-                                  child: Text(total_average(Data.subjectitems)
+                                  child: Text(totalAverage(Data.subjectitems)
                                       .toStringAsPrecision(3),style: TextStyle(fontSize: 15),),
                                 )
                             ),

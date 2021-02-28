@@ -48,7 +48,12 @@ class DrawDashboardState extends State<DrawDashboard> {
     }
     return true;
   }
-
+  Future<bool> load() async{
+    if(await update2() && await update()){
+      return true;
+    }
+    return false;
+  }
   Future<void> refresh() async {
     bool success = await Data().updateDashboard();
     Data.firstaccess["dashboard1"] =
@@ -56,11 +61,15 @@ class DrawDashboardState extends State<DrawDashboard> {
     success = await Data().updateUnread();
     Data.firstaccess["dashboard2"] =
         Data.firstaccess["dashboard2"] == true ? !success : false;
+    get1=true;
+    get2=true;
     return;
   }
 
   var items = List<Dash>();
-  bool get = true;
+  bool get1 = true;
+  bool get2 = true;
+  List<Unread> list = List<Unread>();
 
   var reminderController = new TextEditingController();
 
@@ -74,17 +83,35 @@ class DrawDashboardState extends State<DrawDashboard> {
 
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
+
     return RefreshIndicator(
         onRefresh: () async {
           await refresh();
           setState(() {});
           return Future.value(true);
         },
-        child: SingleChildScrollView(
+        child: FutureBuilder(
+            future: load(),
+            builder: (context, AsyncSnapshot<bool> snapshot) {
+              if (snapshot.data == true) {
+                if(get1==true){
+                  items.clear();
+                  for (var i in jsonDecode(Data.dashboard)) {
+                    items.add(Dash.fromJson(i));
+                  }
+                  get1=false;
+                }
+                if(get2==true){
+                  list.clear();
+                  for (var i in jsonDecode(Data.unread)) {
+                    list.add(Unread.fromJson(i));
+                  }
+                  get2=false;
+                }
+                return SingleChildScrollView(
           controller: _scrollController,
           child: Column(
             children: [
-              // TODO: vielleicht olls in oano ListView tian, dass man olles zusommen scrollen konn
               unread(context),
               Divider(
                 height: 30,
@@ -93,16 +120,8 @@ class DrawDashboardState extends State<DrawDashboard> {
                 thickness: 2,
                 color: _themeChanger.getColor(),
               ),
-              FutureBuilder(
-                  future: update(),
-                  builder: (context, AsyncSnapshot<bool> snapshot) {
-                    if (snapshot.data == true) {
-                      String data = Data.dashboard;
-                      items.clear();
-                      for (var i in jsonDecode(data)) {
-                        items.add(Dash.fromJson(i));
-                      }
-                      return ListView.builder(
+
+                    ListView.builder(
                         physics: ScrollPhysics(),
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
@@ -215,16 +234,15 @@ class DrawDashboardState extends State<DrawDashboard> {
                                 )),
                           );
                         },
-                      );
+                      )
+                    ]));
                     } else if (snapshot.data == null) {
-                      return Loading();
+                    return Loading();
                     } else {
-                      return NoConnection();
+                    return NoConnection();
                     }
-                  })
-            ],
-          ),
-        ));
+                  }),
+          );
   }
 
   Widget title(BuildContext context, Dash item, int index2) {
@@ -280,45 +298,31 @@ class DrawDashboardState extends State<DrawDashboard> {
     }
   }
 
-  bool get1 = true;
-  List<Unread> list = List<Unread>();
   Widget unread(BuildContext context) {
-    return FutureBuilder(
-        future: update2(),
-        builder: (context, AsyncSnapshot<bool> snapshot) {
-          list.clear();
-          if (snapshot.data == true) {
-            if (get1 == true) {
-              for (var i in jsonDecode(Data.unread)) {
-                list.add(Unread.fromJson(i));
-              }
-              get1 = false;
-            }
             if (list.isNotEmpty) {
-              _scrollController.jumpTo(list.length * 100.0);
-              return ListView.builder(
-                  physics: ScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: list.length,
-                  itemBuilder: (context, index2) {
-                    return Container(
-                        height: 100,
-                        child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: ListTile(
-                                title: Text(list[index2].title),
-                                subtitle: Text(list[index2].timeSent))));
-                  });
-            } else
-              return Container();
-          } else if (snapshot.data == null) {
-            return Container();
-          } else {
-            return NoConnection();
-          }
-        });
+              if(_scrollController.hasClients) {
+                // TODO Do Controller conn net hupfn werdn wenns no koan widget gib.
+                _scrollController.jumpTo(list.length * 100.0);
+              }
+                return ListView.builder(
+                    physics: ScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: list.length,
+                    itemBuilder: (context, index2) {
+                      return Container(
+                          height: 100,
+                          child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: ListTile(
+                                  title: Text(list[index2].title),
+                                  subtitle: Text(list[index2].timeSent))));
+                    });
+
+            }else{
+              return SizedBox.shrink();
+            }
   }
 }
 

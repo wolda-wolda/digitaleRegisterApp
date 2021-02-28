@@ -96,14 +96,12 @@ class DrawDashboardState extends State<DrawDashboard> {
               FutureBuilder(
                   future: update(),
                   builder: (context, AsyncSnapshot<bool> snapshot) {
-                    print("neu");
                     if (snapshot.data == true) {
                       String data = Data.dashboard;
                       items.clear();
                       for (var i in jsonDecode(data)) {
                         items.add(Dash.fromJson(i));
                       }
-                      print(data);
                       return ListView.builder(
                         physics: ScrollPhysics(),
                         scrollDirection: Axis.vertical,

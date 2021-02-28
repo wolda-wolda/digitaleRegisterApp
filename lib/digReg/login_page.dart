@@ -37,7 +37,6 @@ class _LoginPageState extends State<LoginPage>
 
   Future<bool> loginExists(
       String username, String password, String link) async {
-    print(link);
     String ret = await Session().login(link + '/v2/api/auth/login', {
       "username": username,
       "password": password,
@@ -514,6 +513,7 @@ class _LoginPageState extends State<LoginPage>
           userkey, autologin);
       Navigator.pop(context, false);
     } else {
+      // TODO Popup Bitte überprüfen Sie Ihre Anmeldedaten
       print('Bitte überprüfen Sie Ihre Anmeldedaten');
     }
   }

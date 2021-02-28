@@ -274,19 +274,15 @@ class Data {
     final preferences = await SharedPreferences.getInstance();
     if(preferences.getInt("Color")!=null){
       _themeChanger.setColor(Color(preferences.getInt('Color')));
-      print(Color(preferences.getInt('Color')));
-      print('loadcolor');
     }
     if(preferences.getBool('Theme')!=null){
       _themeChanger.setBool(preferences.getBool('Theme'));
-      print('loadTheme');
     }
     return true;
   }
   Future<bool> loadUser() async{
     final preferences = await SharedPreferences.getInstance();
     String jsonUser = preferences.getString("User");
-    print(jsonUser);
     if(jsonUser!=null) {
       Map<String,dynamic> usermap = jsonDecode(jsonUser);
       for (var i in usermap.keys.toList()) {

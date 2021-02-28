@@ -148,13 +148,14 @@ class DrawAbsencesState extends State<DrawAbsences> {
                       ))
                     ],
                   );
-                } else if (snapshot.data == null) {
-                  return Loading();
-                } else {
-                  return NoConnection();
                 }
+                return SizedBox.shrink();
               }
-              return Loading();
+              else if (snapshot.data == null) {
+                return Loading();
+              } else {
+                return NoConnection();
+              }
             }));
   }
 }

@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:digitales_register_app/theme/theme.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:digitales_register_app/API/API.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
 
 class Settings extends StatefulWidget {
@@ -45,7 +43,7 @@ class _SettingsState extends State<Settings> {
             ),
           );
         }).then((context) async{
-          await Data().StoreTheme(_themeChanger.getColor(),_themeChanger.getBool());
+          await Data().storeTheme(_themeChanger.getColor(),_themeChanger.getBool());
           return;
     });
   }
@@ -71,7 +69,7 @@ class _SettingsState extends State<Settings> {
                         title: 'Dark Mode',
                         onToggle: (value) async{
                           _themeChanger.setBool(value);
-                          await Data().StoreTheme(_themeChanger.getColor(),_themeChanger.getBool());
+                          await Data().storeTheme(_themeChanger.getColor(),_themeChanger.getBool());
                         },
                         switchValue: _themeChanger.getBool())
                   ],

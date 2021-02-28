@@ -26,6 +26,7 @@ class Session {
     return file;
   }
 
+  // ignore: missing_return
   Future<String> get(String url) async {
     try {
       http.Response response = await http
@@ -80,6 +81,7 @@ class Session {
     return response.body;
   }
 
+  // ignore: missing_return
   Future<String> post(String url, dynamic data) async {
     try {
       http.Response response = await http

@@ -10,7 +10,6 @@ import 'package:digitales_register_app/Data/Load&Store.dart';
 import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 class Dashboard {
-  @override
   Widget build(BuildContext context) {
     return DrawDashboard();
   }
@@ -22,6 +21,8 @@ class DrawDashboard extends StatefulWidget {
 }
 
 class DrawDashboardState extends State<DrawDashboard> {
+  ScrollController _scrollController = new ScrollController();
+
   Future<bool> update() async {
     if (Data.firstaccess["dashboard1"]) {
       if (await Data().updateDashboard() == false) {
@@ -74,25 +75,25 @@ class DrawDashboardState extends State<DrawDashboard> {
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
     return RefreshIndicator(
-      onRefresh: () async {
-        await refresh();
-        setState(() {});
-        return Future.value(true);
-      },
-      child: Column(
-        children: [
-          // TODO: vielleicht olls in oano ListView tian, dass man olles zusommen scrollen konn
-          Flexible(fit: FlexFit.loose, child: unread(context)),
-          Divider(
-            height: 30,
-            endIndent: 150,
-            indent: 150,
-            thickness: 2,
-            color: _themeChanger.getColor(),
-          ),
-          Flexible(
-              fit: FlexFit.loose,
-              child: FutureBuilder(
+        onRefresh: () async {
+          await refresh();
+          setState(() {});
+          return Future.value(true);
+        },
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            children: [
+              // TODO: vielleicht olls in oano ListView tian, dass man olles zusommen scrollen konn
+              unread(context),
+              Divider(
+                height: 30,
+                endIndent: 150,
+                indent: 150,
+                thickness: 2,
+                color: _themeChanger.getColor(),
+              ),
+              FutureBuilder(
                   future: update(),
                   builder: (context, AsyncSnapshot<bool> snapshot) {
                     print("neu");
@@ -104,6 +105,7 @@ class DrawDashboardState extends State<DrawDashboard> {
                       }
                       print(data);
                       return ListView.builder(
+                        physics: ScrollPhysics(),
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
                         itemCount: items.length,
@@ -221,10 +223,10 @@ class DrawDashboardState extends State<DrawDashboard> {
                     } else {
                       return NoConnection();
                     }
-                  }))
-        ],
-      ),
-    );
+                  })
+            ],
+          ),
+        ));
   }
 
   Widget title(BuildContext context, Dash item, int index2) {
@@ -239,6 +241,7 @@ class DrawDashboardState extends State<DrawDashboard> {
     );
   }
 
+  // ignore: missing_return
   Widget title2(
       BuildContext context, Dash item, int index2, ThemeChanger _themeChanger) {
     if (item.items[index2].label != null) {
@@ -294,22 +297,26 @@ class DrawDashboardState extends State<DrawDashboard> {
               get1 = false;
             }
             if (list.isNotEmpty) {
+              _scrollController.jumpTo(list.length * 100.0);
               return ListView.builder(
+                  physics: ScrollPhysics(),
                   shrinkWrap: true,
                   itemCount: list.length,
                   itemBuilder: (context, index2) {
-                    return Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: ListTile(
-                            title: Text(list[index2].title),
-                            subtitle: Text(list[index2].timeSent)));
+                    return Container(
+                        height: 100,
+                        child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: ListTile(
+                                title: Text(list[index2].title),
+                                subtitle: Text(list[index2].timeSent))));
                   });
             } else
               return Container();
           } else if (snapshot.data == null) {
-            return Loading();
+            return Container();
           } else {
             return NoConnection();
           }

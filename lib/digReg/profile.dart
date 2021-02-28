@@ -83,8 +83,8 @@ class DrawProfileState extends State<DrawProfile>{
       return Container();
     }
   }
-  @override
-  final snackbar =  GlobalKey<ScaffoldState>();
+
+  final snackBar =  GlobalKey<ScaffoldState>();
   Widget build(BuildContext context){
     return RefreshIndicator(
         onRefresh: () async {
@@ -111,7 +111,7 @@ class DrawProfileState extends State<DrawProfile>{
               cookie = Session().getCookie();
               headers = {'Cookie': cookie};
               return Scaffold(
-                  key: snackbar,
+                  key: snackBar,
                   body: ListView(
                     children: <Widget>[
                       profilePicture(pictureUrl,picture),
@@ -139,7 +139,7 @@ class DrawProfileState extends State<DrawProfile>{
                             notificationsEnabled = value;
                             if(await changeNotification()==false) {
                               notificationsEnabled = !value;
-                              snackbar.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
+                              snackBar.currentState.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                                   ),content: Text('Keine Netzwerkverbindung')));

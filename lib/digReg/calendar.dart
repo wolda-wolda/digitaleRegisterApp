@@ -37,7 +37,7 @@ class DrawCalendarState extends State<DrawCalendar>{
     }
     return;
   }
-  void refresh() async{
+  Future<void> refresh() async{
     loaded[currentindex]=  loaded[currentindex]==false?await Data().updateCalendar(currentindex,currentindex):true;
     return;
   }

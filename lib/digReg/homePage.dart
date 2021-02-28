@@ -29,7 +29,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   void initState() {
     setState(() {
       super.initState();
-      _tabController = TabController(length: options.length, vsync: this);
       initializeDateFormatting('de_DE');
     });
   }
@@ -60,8 +59,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       _selectedIndex = index;
     });
   }
-
-  TabController _tabController;
 
   @override
     Widget build(BuildContext context) {

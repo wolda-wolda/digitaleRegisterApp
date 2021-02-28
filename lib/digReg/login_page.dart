@@ -81,11 +81,11 @@ class _LoginPageState extends State<LoginPage>
   load(_themeChanger, BuildContext context) async {
     return this._memoizer.runOnce(() async {
       await Data().loadUser();
-      await Data().LoadTheme(_themeChanger);
-      await Data().GetAutoLogin();
+      await Data().loadTheme(_themeChanger);
+      await Data().getAutoLogin();
       if (firstlogin == true) {
         if (Data.autologin != 'e') {
-          await Data().SetUser(Data.autologin);
+          Data().setUser(Data.autologin);
           await login(context);
         }
         firstlogin = false;
@@ -241,7 +241,7 @@ class _LoginPageState extends State<LoginPage>
                                                 ((DismissDirection direction) {
                                               if (direction ==
                                                   DismissDirection.startToEnd) {
-                                                EditUser(context, userkey)
+                                                editUser(context, userkey)
                                                     .then((context) {
                                                   setState(() {});
                                                 });
@@ -257,7 +257,7 @@ class _LoginPageState extends State<LoginPage>
                                             }),
                                             key: UniqueKey(),
                                             onDismissed: ((direction) {
-                                              setState((){Data().RemoveUser(userkey);});
+                                              setState((){Data().removeUser(userkey);});
                                             }),
                                             child: ListTile(
                                                 // TODO: ListTile borderradius isch pan swipen olbm no kantig
@@ -266,13 +266,13 @@ class _LoginPageState extends State<LoginPage>
                                                         BorderRadius.circular(
                                                             20)),
                                                 onLongPress: () {
-                                                  EditUser(context, userkey)
+                                                  editUser(context, userkey)
                                                       .then((context) {
                                                     setState(() {});
                                                   });
                                                 },
                                                 onTap: () async {
-                                                  Data().SetUser(userkey);
+                                                  Data().setUser(userkey);
                                                   return login(context);
                                                 },
                                                 trailing: userkey==Data.autologin?Icon(LineAwesomeIcons.check):SizedBox.shrink(),
@@ -296,7 +296,7 @@ class _LoginPageState extends State<LoginPage>
                               width: 80,
                               child: RaisedButton(
                                 onPressed: () {
-                                  EditUser(context, 'e').then((context) {
+                                  editUser(context, 'e').then((context) {
                                     setState(() {});
                                   });
                                 },
@@ -349,7 +349,7 @@ class _LoginPageState extends State<LoginPage>
   }
 
   bool autologin = true;
-  EditUser(context, String userkey) {
+  editUser(context, String userkey) {
     if (userkey=='e') {
       titleController.clear();
       linkController.clear();
@@ -504,13 +504,13 @@ class _LoginPageState extends State<LoginPage>
         Data().getLink(linkController.text.trim()));
     if (exists == true &&
         titleController.text.trim() != null) {
-      await Data().SetCurrentUser(
+      await Data().setCurrentUser(
           userkey,
           usernameController.text.trim(),
           passwordController.text.trim(),
           titleController.text.trim(),
           Data().getLink(linkController.text.trim()));
-      await Data().SetAutoLogin(
+      await Data().setAutoLogin(
           userkey, autologin);
       Navigator.pop(context, false);
     } else {

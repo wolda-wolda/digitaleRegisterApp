@@ -17,7 +17,7 @@ class User{
         "title": title,
         "link": link,
       };
-  factory User.Decode(Map<String, dynamic> json){
+  factory User.decode(Map<String, dynamic> json){
     return User(
       json["username"],
       json["password"],
@@ -241,7 +241,7 @@ class Data {
     firstaccess["subjects"]=true;
     firstaccess["notifications"]=true;
   }
-  Future<String> GetAutoLogin()async{
+  Future<String> getAutoLogin()async{
     final preferences = await SharedPreferences.getInstance();
     if(preferences.getString("Autologin")==null){
       autologin ='e';
@@ -250,7 +250,7 @@ class Data {
     }
     return autologin;
   }
-  Future<bool> SetAutoLogin(String userkey,bool toggle)async{
+  Future<bool> setAutoLogin(String userkey,bool toggle)async{
     final preferences = await SharedPreferences.getInstance();
     if(toggle && userkey != autologin){
       autologin=userkey;
@@ -264,13 +264,13 @@ class Data {
     }
     return true;
   }
-  Future<bool> StoreTheme(Color color,bool theme) async{
+  Future<bool> storeTheme(Color color,bool theme) async{
     final preferences = await SharedPreferences.getInstance();
     preferences.setInt("Color", color.value);
     preferences.setBool("Theme",theme);
     return true;
   }
-  Future<bool> LoadTheme(_themeChanger) async{
+  Future<bool> loadTheme(_themeChanger) async{
     final preferences = await SharedPreferences.getInstance();
     if(preferences.getInt("Color")!=null){
       _themeChanger.setColor(Color(preferences.getInt('Color')));
@@ -290,17 +290,17 @@ class Data {
     if(jsonUser!=null) {
       Map<String,dynamic> usermap = jsonDecode(jsonUser);
       for (var i in usermap.keys.toList()) {
-        user[i]=(User.Decode(usermap[i]));
+        user[i]=(User.decode(usermap[i]));
       }
     }else{
       return false;
     }
     return true;
   }
-   Future<bool> RemoveUser(String userkey) async{
+   Future<bool> removeUser(String userkey) async{
     String username = user[userkey].username;
     final preferences = await SharedPreferences.getInstance();
-    await SetAutoLogin(userkey,false);
+    await setAutoLogin(userkey,false);
     List<String> userlist = user.keys.toList();
     user[userkey]= user[userlist[userlist.length-1]];
     user.remove(userlist[userlist.length-1]);
@@ -325,7 +325,7 @@ class Data {
 
    return true;
   }
-  bool SetUser(String userkey) {
+  void setUser(String userkey) {
     currentuser=user[userkey].username;
     currentpassword=user[userkey].password;
     currentlink=user[userkey].link;
@@ -341,7 +341,7 @@ class Data {
     }
     return link;
   }
-  Future<bool> SetCurrentUser(String userkey, String username, String password, String title, String link) async{
+  Future<bool> setCurrentUser(String userkey, String username, String password, String title, String link) async{
     currentuser=username;
     currentpassword=password;
     currenttitle= title;

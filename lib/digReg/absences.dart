@@ -154,7 +154,7 @@ class DrawAbsencesState extends State<DrawAbsences> {
                   return NoConnection();
                 }
               }
-              return Container();
+              return Loading();
             }));
   }
 }

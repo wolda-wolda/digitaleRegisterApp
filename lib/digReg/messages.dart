@@ -41,7 +41,7 @@ class DrawMessagesState extends State<DrawMessages> {
 
   List<Mess> items = List<Mess>();
   bool get = true;
-  void refresh() async {
+  Future<void> refresh() async {
     bool success = await Data().updateMessages();
     Data.firstaccess["messages"] = Data.firstaccess["messages"] == true ? !success : false;
     return;
@@ -73,7 +73,7 @@ class DrawMessagesState extends State<DrawMessages> {
                       shape: RoundedRectangleBorder(
                           borderRadius:
                           BorderRadius.circular(
-                              5)),
+                              10)),
                       child: ListTile(
                       onTap: () => showMessage(context, items[index]),
                       title: Text(items[index].subject),

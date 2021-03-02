@@ -6,12 +6,6 @@ import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
 import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
-class Absences {
-  Widget build(BuildContext context) {
-    return DrawAbsences();
-  }
-}
-
 class DrawAbsences extends StatefulWidget {
   @override
   DrawAbsencesState createState() => DrawAbsencesState();

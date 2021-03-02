@@ -7,11 +7,6 @@ import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 import 'package:digitales_register_app/theme/theme.dart';
 import 'package:provider/provider.dart';
 
-class Subjects {
-  Widget build(BuildContext context) {
-    return DrawSubjects();
-  }
-}
 class DrawSubjects extends StatefulWidget{
   @override
   DrawSubjectsState createState() => DrawSubjectsState();

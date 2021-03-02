@@ -7,12 +7,6 @@ import 'package:digitales_register_app/Data/Load&Store.dart';
 import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-class Messages {
-  Widget build(BuildContext context) {
-    return DrawMessages();
-  }
-}
-
 class DrawMessages extends StatefulWidget {
   @override
   DrawMessagesState createState() => DrawMessagesState();

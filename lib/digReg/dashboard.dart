@@ -21,7 +21,7 @@ class DrawDashboard extends StatefulWidget {
 }
 
 class DrawDashboardState extends State<DrawDashboard> {
-  ScrollController _scrollController = new ScrollController();
+  ScrollController _scrollController;
 
   Future<bool> update() async {
     if (Data.firstaccess["dashboard1"]) {
@@ -48,12 +48,14 @@ class DrawDashboardState extends State<DrawDashboard> {
     }
     return true;
   }
-  Future<bool> load() async{
-    if(await update2() && await update()){
+
+  Future<bool> load() async {
+    if (await update2() && await update()) {
       return true;
     }
     return false;
   }
+
   Future<void> refresh() async {
     bool success = await Data().updateDashboard();
     Data.firstaccess["dashboard1"] =
@@ -61,8 +63,8 @@ class DrawDashboardState extends State<DrawDashboard> {
     success = await Data().updateUnread();
     Data.firstaccess["dashboard2"] =
         Data.firstaccess["dashboard2"] == true ? !success : false;
-    get1=true;
-    get2=true;
+    get1 = true;
+    get2 = true;
     return;
   }
 
@@ -81,168 +83,165 @@ class DrawDashboardState extends State<DrawDashboard> {
     return;
   }
 
+  Widget divider(ThemeChanger _themeChanger) {
+    if (list.isEmpty) {
+      return Container();
+    }
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      Icon(Icons.arrow_circle_up, color: _themeChanger.getColor())
+    ]);
+  }
+
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
 
     return RefreshIndicator(
-        onRefresh: () async {
-          await refresh();
-          setState(() {});
-          return Future.value(true);
-        },
-        child: FutureBuilder(
-            future: load(),
-            builder: (context, AsyncSnapshot<bool> snapshot) {
-              if (snapshot.data == true) {
-                if(get1==true){
-                  items.clear();
-                  for (var i in jsonDecode(Data.dashboard)) {
-                    items.add(Dash.fromJson(i));
-                  }
-                  get1=false;
+      onRefresh: () async {
+        await refresh();
+        setState(() {
+          _scrollController.jumpTo(list.length * 100.0);
+        });
+        return Future.value(true);
+      },
+      child: FutureBuilder(
+          future: load(),
+          builder: (context, AsyncSnapshot<bool> snapshot) {
+            if (snapshot.data == true) {
+              if (get1 == true) {
+                items.clear();
+                for (var i in jsonDecode(Data.dashboard)) {
+                  items.add(Dash.fromJson(i));
                 }
-                if(get2==true){
-                  list.clear();
-                  for (var i in jsonDecode(Data.unread)) {
-                    list.add(Unread.fromJson(i));
-                  }
-                  get2=false;
+                get1 = false;
+              }
+              if (get2 == true) {
+                list.clear();
+                for (var i in jsonDecode(Data.unread)) {
+                  list.add(Unread.fromJson(i));
                 }
-                return SingleChildScrollView(
-          controller: _scrollController,
-          child: Column(
-            children: [
-              unread(context),
-              Divider(
-                height: 30,
-                endIndent: 150,
-                indent: 150,
-                thickness: 2,
-                color: _themeChanger.getColor(),
-              ),
-
+                get2 = false;
+              }
+              _scrollController = new ScrollController(
+                  initialScrollOffset: list.length * 100.0);
+              return SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(children: [
+                    unread(context),
+                    divider(_themeChanger),
                     ListView.builder(
-                        physics: ScrollPhysics(),
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemCount: items.length,
-                        itemBuilder: (context, index1) {
-                          return Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: ListTile(
-                                title: Text(
-                                  items[index1].date.toString(),
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Column(
-                                  children: [
-                                    ListTile(
-                                      leading: Icon(Icons.add),
-                                      title: Text('Erinnerung hinzufügen'),
-                                      onTap: () {
-                                        showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              reminderController.clear();
-                                              return AlertDialog(
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  10.0))),
-                                                  content: Container(
-                                                      height: 60,
-                                                      child: TextFormField(
-                                                        controller:
-                                                            reminderController,
-                                                        cursorColor:
-                                                            _themeChanger
-                                                                .getColor(),
-                                                        decoration:
-                                                            InputDecoration(
-                                                          labelText:
-                                                              'Erinnerung',
-                                                          hintText:
-                                                              'Erinnerung (z.B. Hausaufgabe)',
-                                                        ),
-                                                        textInputAction:
-                                                            TextInputAction
-                                                                .done,
-                                                        onFieldSubmitted:
-                                                            (_) async {
-                                                          DateTime date =
-                                                              new DateFormat(
-                                                                      'EEEE, d. MMM yyyy',
-                                                                      'de_DE')
-                                                                  .parse(items[
-                                                                          index1]
-                                                                      .date);
-                                                          await safeReminder(
-                                                                  DateFormat(
-                                                                          'yyyy-MM-d')
-                                                                      .format(
-                                                                          date)
-                                                                      .toString(),
-                                                                  reminderController
-                                                                      .text)
-                                                              .then(
-                                                                  (data) async {
-                                                            await refresh()
-                                                                .then((data) {
-                                                              setState(() {});
-                                                            });
+                      physics: ScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: items.length,
+                      itemBuilder: (context, index1) {
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ListTile(
+                              title: Text(
+                                items[index1].date.toString(),
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Column(
+                                children: [
+                                  ListTile(
+                                    leading: Icon(Icons.add),
+                                    title: Text('Erinnerung hinzufügen'),
+                                    onTap: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            reminderController.clear();
+                                            return AlertDialog(
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10.0))),
+                                                content: Container(
+                                                    height: 60,
+                                                    child: TextFormField(
+                                                      controller:
+                                                          reminderController,
+                                                      cursorColor: _themeChanger
+                                                          .getColor(),
+                                                      decoration:
+                                                          InputDecoration(
+                                                        labelText: 'Erinnerung',
+                                                        hintText:
+                                                            'Erinnerung (z.B. Hausaufgabe)',
+                                                      ),
+                                                      textInputAction:
+                                                          TextInputAction.done,
+                                                      onFieldSubmitted:
+                                                          (_) async {
+                                                        DateTime date =
+                                                            new DateFormat(
+                                                                    'EEEE, d. MMM yyyy',
+                                                                    'de_DE')
+                                                                .parse(items[
+                                                                        index1]
+                                                                    .date);
+                                                        await safeReminder(
+                                                                DateFormat(
+                                                                        'yyyy-MM-d')
+                                                                    .format(
+                                                                        date)
+                                                                    .toString(),
+                                                                reminderController
+                                                                    .text)
+                                                            .then((data) async {
+                                                          await refresh()
+                                                              .then((data) {
+                                                            setState(() {});
                                                           });
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                      )));
-                                            });
-                                      },
-                                    ),
-                                    Divider(
-                                      height: 20,
-                                      endIndent: 150,
-                                      indent: 150,
-                                      thickness: 2,
-                                      color: _themeChanger.getColor(),
-                                    ),
-                                    ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount: items[index1].items.length,
-                                      itemBuilder: (context, index2) {
-                                        return ListTile(
-                                          title: title(
-                                              context, items[index1], index2),
-                                          trailing: title2(
-                                              context,
-                                              items[index1],
-                                              index2,
-                                              _themeChanger),
-                                          subtitle: Text(items[index1]
-                                              .items[index2]
-                                              .subtitle
-                                              .toString()),
-                                        );
-                                      },
-                                    )
-                                  ],
-                                )),
-                          );
-                        },
-                      )
-                    ]));
-                    } else if (snapshot.data == null) {
-                    return Loading();
-                    } else {
-                    return NoConnection();
-                    }
-                  }),
-          );
+                                                        });
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                    )));
+                                          });
+                                    },
+                                  ),
+                                  Divider(
+                                    height: 20,
+                                    endIndent: 150,
+                                    indent: 150,
+                                    thickness: 2,
+                                    color: _themeChanger.getColor(),
+                                  ),
+                                  ListView.builder(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: items[index1].items.length,
+                                    itemBuilder: (context, index2) {
+                                      return ListTile(
+                                        title: title(
+                                            context, items[index1], index2),
+                                        trailing: title2(context, items[index1],
+                                            index2, _themeChanger),
+                                        subtitle: Text(items[index1]
+                                            .items[index2]
+                                            .subtitle
+                                            .toString()),
+                                      );
+                                    },
+                                  )
+                                ],
+                              )),
+                        );
+                      },
+                    )
+                  ]));
+            } else if (snapshot.data == null) {
+              return Loading();
+            } else {
+              return NoConnection();
+            }
+          }),
+    );
   }
 
   Widget title(BuildContext context, Dash item, int index2) {
@@ -299,30 +298,25 @@ class DrawDashboardState extends State<DrawDashboard> {
   }
 
   Widget unread(BuildContext context) {
-            if (list.isNotEmpty) {
-              if(_scrollController.hasClients) {
-                // TODO Do Controller conn net hupfn werdn wenns no koan widget gib.
-                _scrollController.jumpTo(list.length * 100.0);
-              }
-                return ListView.builder(
-                    physics: ScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: list.length,
-                    itemBuilder: (context, index2) {
-                      return Container(
-                          height: 100,
-                          child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: ListTile(
-                                  title: Text(list[index2].title),
-                                  subtitle: Text(list[index2].timeSent))));
-                    });
-
-            }else{
-              return SizedBox.shrink();
-            }
+    if (list.isNotEmpty) {
+      return ListView.builder(
+          physics: ScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: list.length,
+          itemBuilder: (context, index2) {
+            return Container(
+                height: 100,
+                child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ListTile(
+                        title: Text(list[index2].title),
+                        subtitle: Text(list[index2].timeSent))));
+          });
+    } else {
+      return SizedBox.shrink();
+    }
   }
 }
 

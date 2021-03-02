@@ -35,19 +35,19 @@ class _LoginPageState extends State<LoginPage>
     super.dispose();
   }
 
-  Future<bool> loginExists(
+  Future<String> loginExists(
       String username, String password, String link) async {
     String ret = await Session().login(link + '/v2/api/auth/login', {
       "username": username,
       "password": password,
     });
     if (ret == 'e') {
-      return false;
+      return 'e';
     }
     if (jsonDecode(ret)['error'] == null) {
-      return true;
+      return 'true';
     } else {
-      return false;
+      return jsonDecode(ret)['message'];
     }
   }
 
@@ -460,7 +460,7 @@ class _LoginPageState extends State<LoginPage>
                           )),
                       textInputAction: TextInputAction.done,
                       onSubmitted: (_) {
-                        createUser(userkey);
+                        createUser(userkey, _themeChanger);
                       },
                     ),
                     SizedBox(
@@ -480,7 +480,7 @@ class _LoginPageState extends State<LoginPage>
                         width: 80,
                         child: RaisedButton(
                           onPressed: () async {
-                            createUser(userkey);
+                            createUser(userkey, _themeChanger);
                           },
                           shape: new RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(30.0),
@@ -496,12 +496,12 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  void createUser(String userkey) async{
-    bool exists = await loginExists(
+  void createUser(String userkey, ThemeChanger _themeChanger) async{
+    String exists = await loginExists(
         usernameController.text.trim(),
         passwordController.text.trim(),
         Data().getLink(linkController.text.trim()));
-    if (exists == true &&
+    if (exists == 'true' &&
         titleController.text.trim() != null) {
       await Data().setCurrentUser(
           userkey,
@@ -513,8 +513,29 @@ class _LoginPageState extends State<LoginPage>
           userkey, autologin);
       Navigator.pop(context, false);
     } else {
-      // TODO Popup Bitte überprüfen Sie Ihre Anmeldedaten
-      print('Bitte überprüfen Sie Ihre Anmeldedaten');
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Anmeldedaten sind nicht korrekt'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(exists),
+                  RaisedButton(
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                    shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0),
+                    ),
+                    child: Icon(LineAwesomeIcons.check_circle),
+                    color: _themeChanger.getColor(),
+                  ),
+                ],
+              ),
+            );
+          });
     }
   }
 }

@@ -178,15 +178,17 @@ class Lesson {
 }
 
 class Unread {
+  final int id;
   final String title;
   final String subTitle;
   final String timeSent;
   final String type;
 
-  Unread({this.title, this.subTitle, this.timeSent, this.type});
+  Unread({this.id, this.title, this.subTitle, this.timeSent, this.type});
 
   factory Unread.fromJson(Map<String, dynamic> json) {
     return Unread(
+        id: json['id'],
         title: json['title'],
         subTitle: json['subTitle'],
         timeSent: Date.format(json['timeSent']).date,

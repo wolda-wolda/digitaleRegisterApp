@@ -10,12 +10,20 @@ import 'package:digitales_register_app/Data/Load&Store.dart';
 import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 
 class Dashboard {
+  final ValueChanged update;
+
+  Dashboard({this.update});
+
   Widget build(BuildContext context) {
     return DrawDashboard();
   }
 }
 
 class DrawDashboard extends StatefulWidget {
+  final ValueChanged<int> update;
+
+  DrawDashboard({this.update});
+
   @override
   DrawDashboardState createState() => DrawDashboardState();
 }
@@ -56,6 +64,11 @@ class DrawDashboardState extends State<DrawDashboard> {
     return false;
   }
 
+  var items = List<Dash>();
+  bool get1 = true;
+  bool get2 = true;
+  List<Unread> list = List<Unread>();
+
   Future<void> refresh() async {
     bool success = await Data().updateDashboard();
     Data.firstaccess["dashboard1"] =
@@ -65,13 +78,11 @@ class DrawDashboardState extends State<DrawDashboard> {
         Data.firstaccess["dashboard2"] == true ? !success : false;
     get1 = true;
     get2 = true;
+    setState(() {
+      _scrollController.jumpTo(list.length * 100.0);
+    });
     return;
   }
-
-  var items = List<Dash>();
-  bool get1 = true;
-  bool get2 = true;
-  List<Unread> list = List<Unread>();
 
   var reminderController = new TextEditingController();
 
@@ -98,9 +109,6 @@ class DrawDashboardState extends State<DrawDashboard> {
     return RefreshIndicator(
       onRefresh: () async {
         await refresh();
-        setState(() {
-          _scrollController.jumpTo(list.length * 100.0);
-        });
         return Future.value(true);
       },
       child: FutureBuilder(
@@ -297,22 +305,56 @@ class DrawDashboardState extends State<DrawDashboard> {
     }
   }
 
+  void unreadOption(int index) {
+    Unread data = list[index];
+    print(data.type);
+    if (data.type == 'message') {
+      markAsRead(index);
+      widget.update(4);
+    } else if (data.type == 'grade') {
+      markAsRead(index);
+      widget.update(3);
+    }
+  }
+
+  Future<void> markAsRead(int index) {
+    Session().post(
+        'https://fallmerayer.digitalesregister.it/v2/api/notification/markAsRead',
+        {'id': list[index].id});
+    list.removeAt(index);
+    // TODO: DATA removeUnread
+  }
+
   Widget unread(BuildContext context) {
     if (list.isNotEmpty) {
+      if(_scrollController.hasClients) {
+        setState(() {
+          _scrollController.jumpTo(list.length * 100.0);
+        });
+      }
       return ListView.builder(
           physics: ScrollPhysics(),
           shrinkWrap: true,
           itemCount: list.length,
           itemBuilder: (context, index2) {
-            return Container(
-                height: 100,
-                child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ListTile(
-                        title: Text(list[index2].title),
-                        subtitle: Text(list[index2].timeSent))));
+            return Dismissible(
+                onDismissed: (direction) {
+                  markAsRead(index2);
+                },
+                key: Key(list[index2].id.toString()),
+                child: Container(
+                  height: 100,
+                  child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListTile(
+                          onTap: () {
+                            unreadOption(index2);
+                          },
+                          title: Text(list[index2].title),
+                          subtitle: Text(list[index2].timeSent))),
+                ));
           });
     } else {
       return SizedBox.shrink();

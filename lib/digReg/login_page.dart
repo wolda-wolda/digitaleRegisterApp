@@ -256,7 +256,11 @@ class _LoginPageState extends State<LoginPage>
                                             }),
                                             key: UniqueKey(),
                                             onDismissed: ((direction) {
-                                              setState((){Data().removeUser(userkey);});
+                                              if (direction == DismissDirection.endToStart) {
+                                                setState(() {
+                                                  Data().removeUser(userkey);
+                                                });
+                                              }
                                             }),
                                             child: ListTile(
                                                 // TODO: ListTile borderradius isch pan swipen olbm no kantig

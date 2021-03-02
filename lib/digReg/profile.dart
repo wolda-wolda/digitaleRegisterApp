@@ -7,12 +7,6 @@ import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:settings_ui/settings_ui.dart';
 
-class Profile {
-
-  Widget build(BuildContext context) {
-    return DrawProfile();
-  }
-}
 class DrawProfile extends StatefulWidget{
   @override
   DrawProfileState createState() => DrawProfileState();

@@ -221,11 +221,8 @@ class _LoginPageState extends State<LoginPage>
                           ),
                           Column(children: <Widget>[
                             Data.user.isNotEmpty
-                                ? Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: ListView.builder(
+                                ?
+                            ListView.builder(
                                       shrinkWrap: true,
                                       scrollDirection: Axis.vertical,
                                       itemCount: Data.user.length,
@@ -265,9 +262,7 @@ class _LoginPageState extends State<LoginPage>
                                             child: ListTile(
                                                 // TODO: ListTile borderradius isch pan swipen olbm no kantig
                                                 shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20)),
+                                                ),
                                                 onLongPress: () {
                                                   editUser(context, userkey)
                                                       .then((context) {
@@ -288,9 +283,7 @@ class _LoginPageState extends State<LoginPage>
                                                 subtitle: Text(Data
                                                     .user[userkey].username)));
                                       },
-                                    ),
-                                  )
-                                : SizedBox.shrink(),
+                                    ):SizedBox.shrink(),
                             SizedBox(
                               height: 30,
                             ),

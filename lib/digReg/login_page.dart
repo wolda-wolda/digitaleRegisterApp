@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:digitales_register_app/digReg/settings.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'SizeConfig.dart';
@@ -28,6 +29,7 @@ class _LoginPageState extends State<LoginPage>
   final titleController = TextEditingController();
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final AsyncMemoizer _memoizer = AsyncMemoizer();
+
   @override
   void dispose() {
     usernameController.dispose();
@@ -77,6 +79,7 @@ class _LoginPageState extends State<LoginPage>
   }
 
   static bool firstlogin = true;
+
   load(_themeChanger, BuildContext context) async {
     return this._memoizer.runOnce(() async {
       await Data().loadUser();
@@ -219,71 +222,78 @@ class _LoginPageState extends State<LoginPage>
                           SizedBox(
                             height: 40,
                           ),
+                          Align(
+                              alignment: Alignment.centerRight,
+                              child: Text('Autologin')),
                           Column(children: <Widget>[
                             Data.user.isNotEmpty
-                                ?
-                            ListView.builder(
-                                      shrinkWrap: true,
-                                      scrollDirection: Axis.vertical,
-                                      itemCount: Data.user.length,
-                                      itemBuilder: (context, index) {
-                                        String userkey=userlist[index];
-                                        return Dismissible(
-                                            background: leftBackground(),
-                                            secondaryBackground:
-                                                rightBackground(),
-                                            confirmDismiss:
-                                                // ignore: missing_return
-                                                ((DismissDirection direction) {
-                                              if (direction ==
-                                                  DismissDirection.startToEnd) {
+                                ? ListView.builder(
+                                    padding: EdgeInsets.all(0.0),
+                                    shrinkWrap: true,
+                                    scrollDirection: Axis.vertical,
+                                    itemCount: Data.user.length,
+                                    itemBuilder: (context, index) {
+                                      String userkey = userlist[index];
+                                      return Dismissible(
+                                          background: leftBackground(),
+                                          secondaryBackground:
+                                              rightBackground(),
+                                          confirmDismiss:
+                                              // ignore: missing_return
+                                              ((DismissDirection direction) {
+                                            if (direction ==
+                                                DismissDirection.startToEnd) {
+                                              editUser(context, userkey)
+                                                  .then((context) {
+                                                setState(() {});
+                                              });
+                                            } else if (direction ==
+                                                DismissDirection.endToStart) {
+                                              return showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return delete();
+                                                  });
+                                            }
+                                          }),
+                                          key: UniqueKey(),
+                                          onDismissed: ((direction) {
+                                            if (direction ==
+                                                DismissDirection.endToStart) {
+                                              setState(() {
+                                                Data().removeUser(userkey);
+                                              });
+                                            }
+                                          }),
+                                          child: ListTile(
+                                              // TODO: ListTile borderradius isch pan swipen olbm no kantig
+                                              shape: RoundedRectangleBorder(),
+                                              onLongPress: () {
                                                 editUser(context, userkey)
                                                     .then((context) {
                                                   setState(() {});
                                                 });
-                                              } else if (direction ==
-                                                  DismissDirection.endToStart) {
-                                                return showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return delete();
-                                                    });
-                                              }
-                                            }),
-                                            key: UniqueKey(),
-                                            onDismissed: ((direction) {
-                                              if (direction == DismissDirection.endToStart) {
-                                                setState(() {
-                                                  Data().removeUser(userkey);
-                                                });
-                                              }
-                                            }),
-                                            child: ListTile(
-                                                // TODO: ListTile borderradius isch pan swipen olbm no kantig
-                                                shape: RoundedRectangleBorder(
-                                                ),
-                                                onLongPress: () {
-                                                  editUser(context, userkey)
-                                                      .then((context) {
-                                                    setState(() {});
-                                                  });
-                                                },
-                                                onTap: () async {
-                                                  Data().setUser(userkey);
-                                                  return login(context);
-                                                },
-                                                trailing: userkey==Data.autologin?Icon(LineAwesomeIcons.check):SizedBox.shrink(),
-                                                leading: Icon(
-                                                  LineAwesomeIcons.user,
-                                                  size: 35,
-                                                ),
-                                                title: Text(
-                                                    Data.user[userkey].title),
-                                                subtitle: Text(Data
-                                                    .user[userkey].username)));
-                                      },
-                                    ):SizedBox.shrink(),
+                                              },
+                                              onTap: () async {
+                                                Data().setUser(userkey);
+                                                return login(context);
+                                              },
+                                              trailing: userkey ==
+                                                      Data.autologin
+                                                  ? Icon(LineAwesomeIcons.check)
+                                                  : SizedBox.shrink(),
+                                              leading: Icon(
+                                                LineAwesomeIcons.user,
+                                                size: 35,
+                                              ),
+                                              title: Text(
+                                                  Data.user[userkey].title),
+                                              subtitle: Text(Data
+                                                  .user[userkey].username)));
+                                    },
+                                  )
+                                : SizedBox.shrink(),
                             SizedBox(
                               height: 30,
                             ),
@@ -345,8 +355,9 @@ class _LoginPageState extends State<LoginPage>
   }
 
   bool autologin = true;
+
   editUser(context, String userkey) {
-    if (userkey=='e') {
+    if (userkey == 'e') {
       titleController.clear();
       linkController.clear();
       passwordController.clear();
@@ -370,7 +381,7 @@ class _LoginPageState extends State<LoginPage>
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0))),
               content: Container(
-                  height: 390,
+                  height: 428,
                   child: Column(children: <Widget>[
                     TextFormField(
                       controller: titleController,
@@ -461,8 +472,11 @@ class _LoginPageState extends State<LoginPage>
                       },
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 35,
                     ),
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Autologin')),
                     Row(children: <Widget>[
                       Switch(
                           value: autologin,
@@ -493,21 +507,19 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  void createUser(String userkey, ThemeChanger _themeChanger) async{
+  void createUser(String userkey, ThemeChanger _themeChanger) async {
     String exists = await loginExists(
         usernameController.text.trim(),
         passwordController.text.trim(),
         Data().getLink(linkController.text.trim()));
-    if (exists == 'true' &&
-        titleController.text.trim() != null) {
+    if (exists == 'true' && titleController.text.trim() != null) {
       await Data().setCurrentUser(
           userkey,
           usernameController.text.trim(),
           passwordController.text.trim(),
           titleController.text.trim(),
           Data().getLink(linkController.text.trim()));
-      await Data().setAutoLogin(
-          userkey, autologin);
+      await Data().setAutoLogin(userkey, autologin);
       Navigator.pop(context, false);
     } else {
       return showDialog(

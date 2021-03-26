@@ -1,10 +1,12 @@
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:digitales_register_app/Data/Load&Store.dart';
 import 'package:digitales_register_app/digReg/usefulWidgets.dart';
 import 'package:digitales_register_app/theme/theme.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class DrawSubjects extends StatefulWidget{
@@ -29,8 +31,8 @@ class DrawSubjectsState extends State<DrawSubjects>{
 
 
   Text average(double ave) {
-    if (ave.isNaN) return Text('Durchschnitt: /');
-    return Text('Durchschnitt: ' + ave.toString());
+    if (ave.isNaN) return Text('/');
+    return Text(ave.toString());
   }
 
   Future<void> refresh() async{
@@ -128,15 +130,31 @@ class DrawSubjectsState extends State<DrawSubjects>{
                                   Data.subjectitems[index1].name.toString(),
                                   style:
                                   TextStyle(fontWeight: FontWeight.bold)),
-                              subtitle:
-                              average(Data.subjectitems[index1].average),
+                              subtitle: Text('Durchschnitt:'),
                               children: <Widget>[
                                 Divider(
                                   thickness: 1.0,
                                   height: 1.0,
                                 ),
                                 Detail(index1,Data.subjectitems),
-                              ]);
+                              ],
+                              trailing:
+                                  Container(
+                                      height: 30,
+                                      width: 70,
+                                  child: Column(
+                                  children: [
+                                  Transform(
+                                    transform: Matrix4.translationValues(0, 15, 0),
+                                  child:Card(
+                                    color: _themeChanger.getColor(),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                              child: Align(
+                                alignment: Alignment.center,
+                              child: average(Data.subjectitems[index1].average),))
+                          )])));
                         }))
               ],
             );
